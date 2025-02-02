@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MyShows from "./MyShows";
 import MySongs from "./MySongs";
 import MyVenues from "./MyVenues";
+import utf8 from 'utf8';
 
 export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
