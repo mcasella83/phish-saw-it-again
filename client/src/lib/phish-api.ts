@@ -11,9 +11,12 @@ export async function getPhishShows(username: string) {
   }
   const data = await response.json();
   console.log("API response data:", data);
+  console.log("data.error", data.error);
+  console.log("data.error_message", data.error_message);
 
   if (data.error && data.error_message) {
-    throw new Error("Error getting shows: ", data.error_message);
+    console.log("throwing error");
+    throw new Error(`Error getting shows: ${data.error_message}`);
   }
 
   return data;
