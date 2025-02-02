@@ -13,6 +13,19 @@ export default function HomePage() {
   const [loadingMaxShowCount, setLoadingMaxShowCount] = useState(0);
   const { toast } = useToast();
 
+  useEffect(() => {
+    let interval: NodeJS.Timer;
+    if (loading) {
+      interval = setInterval(() => {
+        setLoadingShowCount(count => count + 1);
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+      setLoadingShowCount(0);
+    };
+  }, [loading]);
+
   const handleSubmit = async (data: User) => {
     try {
       setLoading(true);
@@ -63,7 +76,7 @@ export default function HomePage() {
       <div className="flex flex-col items-center justify-center min-h-[80vh] gap-4">
         <Loader2 className="h-8 w-8 animate-spin" />
         <p className="text-muted-foreground">
-          Loading shows... ({loadingShowCount} out of {loadingMaxShowCount}))
+          Loading shows... ({loadingShowCount} out of {loadingMaxShowCount})
         </p>
       </div>
     );
@@ -75,27 +88,51 @@ export default function HomePage() {
         <h1 className="text-2xl font-bold mb-4">Welcome, {user.username}!</h1>
         <div className="space-y-4">
           <h2 className="text-xl font-semibold">Your Phish Shows</h2>
-          {showsWithSetLists.map((show) => (
-            <div key={show.data[0].showid} className="p-4 border rounded-lg">
-              <h3 className="font-medium">{show.data[0].venue}</h3>
-              <p className="text-sm text-muted-foreground">{show.data[0].location}</p>
-              <p className="text-sm">
-                {new Date(show.data[0].showdate).toLocaleDateString()}
-              </p>
-              <div className="mt-2">
-                <h4 className="font-medium text-sm mb-1">Setlist:</h4>
-                <ul className="list-disc list-inside text-sm">
-                  {show.data.map((song: any) => (
-                    <li key={song.uniqueid}>
-                      {song.song}
-                      {song.transition === 2 && " >"}
-                      {song.transition === 3 && " ->"}
-                    </li>
+          {showsWithSetLists.map((show) => {
+            // Group songs by set
+            const songsBySet = show.data.reduce((acc: Record<string, any[]>, song: any) => {
+              const setKey = song.set;
+              if (!acc[setKey]) {
+                acc[setKey] = [];
+              }
+              acc[setKey].push(song);
+              return acc;
+            }, {});
+
+            return (
+              <div key={show.data[0].showid} className="p-4 border rounded-lg">
+                <h3 className="font-medium">{show.data[0].venue}</h3>
+                <p className="text-sm text-muted-foreground">{show.data[0].location}</p>
+                <p className="text-sm">
+                  {new Date(show.data[0].showdate).toLocaleDateString()}
+                </p>
+                <div className="mt-2 space-y-4">
+                  {Object.entries(songsBySet).map(([setName, songs]) => (
+                    <div key={setName}>
+                      <h4 className="font-medium text-sm mb-1">
+                        {setName === "E" ? "Encore" : `Set ${setName}`}
+                      </h4>
+                      <ul className="list-disc list-inside text-sm">
+                        {songs.map((song: any) => (
+                          <li key={song.uniqueid}>
+                            {song.song}
+                            {song.transition === 2 && " >"}
+                            {song.transition === 3 && " ->"}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   ))}
-                </ul>
+                </div>
+                {show.data[0].setlistnotes && (
+                  <div className="mt-4 text-sm text-muted-foreground">
+                    <h4 className="font-medium">Notes:</h4>
+                    <div dangerouslySetInnerHTML={{ __html: show.data[0].setlistnotes }} />
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
     );
