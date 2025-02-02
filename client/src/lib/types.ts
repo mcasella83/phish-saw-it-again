@@ -25,3 +25,9 @@ export interface PhishSetlistResponse {
   error_message?: string;
   data: PhishSetlist[];
 }
+
+export interface Song{
+  name: string;
+  showDate: Date;
+}
+

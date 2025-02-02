@@ -1,8 +1,3 @@
-interface Song{
-  string: name,
-  date: showdate
-}
-
 
 export function getUniqueSongsFromSetlists(setlists: any) {
   let allMySongs = new Map()
