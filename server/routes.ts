@@ -33,7 +33,12 @@ export function registerRoutes(app: Express) {
 
       const apiUrl = `https://api.phish.net/v5/attendance/username/${username}.json?apikey=${apiKey}&order_by=showdate`;
       console.log("Fetching shows from Phish.net API:", apiUrl);
-      const response = await fetch(apiUrl);
+      const response = await fetch(apiUrl, {
+        headers: {
+          'Accept': 'application/json; charset=utf-8',
+          'Content-Type': 'application/json; charset=utf-8'
+        }
+      });
 
       if (!response.ok) {
         console.error(
@@ -52,6 +57,8 @@ export function registerRoutes(app: Express) {
         data.data?.length,
       );
       console.log("API Response:", JSON.stringify(data).slice(0, 200));
+
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
       res.json(data);
     } catch (error) {
       console.error("Phish.net API error:", error);
@@ -79,7 +86,12 @@ export function registerRoutes(app: Express) {
         `setlists/setlistid/${showId}.json` +
         `?apikey=${apiKey}&order_by=showdate`;
       console.log("Fetching shows from Phish.net API:", apiUrl);
-      const response = await fetch(apiUrl);
+      const response = await fetch(apiUrl, {
+        headers: {
+          'Accept': 'application/json; charset=utf-8',
+          'Content-Type': 'application/json; charset=utf-8'
+        }
+      });
 
       if (!response.ok) {
         console.error(
@@ -98,6 +110,8 @@ export function registerRoutes(app: Express) {
         data.data?.length,
       );
       console.log("API Response:", JSON.stringify(data).slice(0, 200));
+
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
       res.json(data);
     } catch (error) {
       console.error("Phish.net API error:", error);

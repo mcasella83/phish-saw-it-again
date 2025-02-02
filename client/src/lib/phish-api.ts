@@ -1,6 +1,11 @@
 export async function getShowsByUsername(username: string) {
   console.log("Making API request for username:", username);
-  const response = await fetch(`/api/phish/shows?username=${username}`);
+  const response = await fetch(`/api/phish/shows?username=${username}`, {
+    headers: {
+      'Accept': 'application/json; charset=utf-8',
+      'Content-Type': 'application/json; charset=utf-8'
+    }
+  });
 
   console.log("response=", response);
   if (!response.ok) {
@@ -19,7 +24,12 @@ export async function getShowsByUsername(username: string) {
 
 export async function getShowSetList(id: string){
   console.log("Making API request for id:", id);
-  const response = await fetch(`/api/phish/showsetlist/${id}`);
+  const response = await fetch(`/api/phish/showsetlist/${id}`, {
+    headers: {
+      'Accept': 'application/json; charset=utf-8',
+      'Content-Type': 'application/json; charset=utf-8'
+    }
+  });
 
   console.log("response=", response);
   if (!response.ok) {
