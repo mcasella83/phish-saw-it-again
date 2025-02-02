@@ -27,7 +27,8 @@ export function registerRoutes(app: Express) {
       }
 
       console.log('Fetching shows from Phish.net API...');
-      const response = await fetch('https://api.phish.net/v5/shows/recent?apikey=' + apiKey);
+      // Update API endpoint to include more parameters
+      const response = await fetch(`https://api.phish.net/v5/shows/recent?apikey=${apiKey}&limit=10&order=DESC`);
 
       if (!response.ok) {
         console.error('Phish.net API error:', response.status, response.statusText);
@@ -36,6 +37,7 @@ export function registerRoutes(app: Express) {
 
       const data = await response.json();
       console.log('Successfully fetched shows:', data.error === false, 'Show count:', data.data?.length);
+      console.log('API Response:', JSON.stringify(data).slice(0, 200));
       res.json(data);
     } catch (error) {
       console.error('Phish.net API error:', error);
