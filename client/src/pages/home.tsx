@@ -1,7 +1,7 @@
 import UserForm from "@/components/UserForm";
 import type { User } from "@shared/schema";
-import { useState } from "react";
-import { getPhishShows } from "@/lib/phish-api";
+import { useState, useEffect } from "react";
+import { getShowsByUsername } from "@/lib/phish-api";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 
@@ -9,13 +9,27 @@ export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
   const [shows, setShows] = useState<any[] | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingCount, setLoadingCount] = useState(0);
   const { toast } = useToast();
+
+  useEffect(() => {
+    let interval: NodeJS.Timer;
+    if (loading) {
+      interval = setInterval(() => {
+        setLoadingCount(count => count + 1);
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+      setLoadingCount(0);
+    };
+  }, [loading]);
 
   const handleSubmit = async (data: User) => {
     try {
       setLoading(true);
       setUser(data);
-      const showsData = await getPhishShows(data.username);
+      const showsData = await getShowsByUsername(data.username);
       console.log("Shows data received:", showsData);
 
       if (!showsData.error && showsData.data) {
@@ -31,7 +45,10 @@ export default function HomePage() {
       // Ensure we're showing the toast with the correct error message
       toast({
         title: "Failed to fetch shows",
-        description: error instanceof Error ? error.message : 'An unexpected error occurred',
+        description:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
         variant: "destructive",
       });
     } finally {
@@ -41,8 +58,11 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[80vh]">
+      <div className="flex flex-col items-center justify-center min-h-[80vh] gap-4">
         <Loader2 className="h-8 w-8 animate-spin" />
+        <p className="text-muted-foreground">
+          Loading shows... ({loadingCount}s)
+        </p>
       </div>
     );
   }
@@ -57,7 +77,9 @@ export default function HomePage() {
             <div key={show.showid} className="p-4 border rounded-lg">
               <h3 className="font-medium">{show.venue}</h3>
               <p className="text-sm text-muted-foreground">{show.location}</p>
-              <p className="text-sm">{new Date(show.showdate).toLocaleDateString()}</p>
+              <p className="text-sm">
+                {new Date(show.showdate).toLocaleDateString()}
+              </p>
             </div>
           ))}
         </div>
@@ -68,7 +90,9 @@ export default function HomePage() {
   return (
     <div className="min-h-[80vh] flex items-center justify-center">
       <div className="w-full max-w-md p-6 bg-card rounded-lg shadow-sm">
-        <h1 className="text-2xl font-bold text-center mb-6">Welcome to Phish.net Explorer</h1>
+        <h1 className="text-2xl font-bold text-center mb-6">
+          Welcome to Phish.net Explorer
+        </h1>
         <UserForm onSubmit={handleSubmit} />
       </div>
     </div>
