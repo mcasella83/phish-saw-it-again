@@ -13,9 +13,9 @@ import { cn } from "@/lib/utils";
 
 // Helper function to decode HTML entities and ensure UTF-8
 function decodeHtmlEntities(text: string): string {
-  const textarea = document.createElement('textarea');
-  textarea.innerHTML = text;
-  return textarea.value;
+  if (!text) return '';
+  const doc = new DOMParser().parseFromString(text, 'text/html');
+  return doc.body.textContent || '';
 }
 
 export default function HomePage() {
@@ -189,8 +189,9 @@ export default function HomePage() {
                       <div className="mt-4 text-sm text-muted-foreground">
                         <h4 className="font-medium">Notes:</h4>
                         <div 
+                          className="whitespace-pre-wrap"
                           dangerouslySetInnerHTML={{ 
-                            __html: decodeHtmlEntities(show.data[0].setlistnotes)
+                            __html: show.data[0].setlistnotes
                           }} 
                         />
                       </div>
