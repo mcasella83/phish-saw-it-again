@@ -18,10 +18,11 @@ export default function HomePage() {
   const [loadingShowCount, setLoadingShowCount] = useState(0);
   const [loadingMaxShowCount, setLoadingMaxShowCount] = useState(0);
   const [expandedShows, setExpandedShows] = useState<Record<string, boolean>>({});
+  const [expandedSets, setExpandedSets] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
 
   useEffect(() => {
-    let interval: NodeJS.Timer;
+    let interval: NodeJS.Timeout;
     if (loading) {
       interval = setInterval(() => {
         setLoadingShowCount(count => count + 1);
@@ -64,7 +65,6 @@ export default function HomePage() {
       setUser(null);
       setShowsWithSetlists(null);
 
-      // Ensure we're showing the toast with the correct error message
       toast({
         title: "Failed to fetch shows",
         description:
@@ -96,7 +96,6 @@ export default function HomePage() {
         <div className="space-y-4">
           <h2 className="text-xl font-semibold">Your Phish Shows</h2>
           {showsWithSetLists.map((show) => {
-            // Group songs by set
             const songsBySet = show.data.reduce((acc: Record<string, any[]>, song: any) => {
               const setKey = song.set;
               if (!acc[setKey]) {
@@ -137,22 +136,48 @@ export default function HomePage() {
                 </div>
                 <CollapsibleContent>
                   <div className="px-4 pb-4 space-y-4">
-                    {Object.entries(songsBySet).map(([setName, songs]) => (
-                      <div key={setName}>
-                        <h4 className="font-medium text-sm mb-1">
-                          {setName === "E" ? "Encore" : `Set ${setName}`}
-                        </h4>
-                        <ul className="list-disc list-inside text-sm">
-                          {songs.map((song: any) => (
-                            <li key={song.uniqueid}>
-                              {song.song}
-                              {song.transition === 2 && " >"}
-                              {song.transition === 3 && " ->"}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
+                    {Object.entries(songsBySet).map(([setName, songs]) => {
+                      const setKey = `${showId}-${setName}`;
+                      const isSetExpanded = expandedSets[setKey] || false;
+
+                      return (
+                        <Collapsible
+                          key={setKey}
+                          open={isSetExpanded}
+                          onOpenChange={(open) =>
+                            setExpandedSets(prev => ({ ...prev, [setKey]: open }))
+                          }
+                          className="border rounded-lg"
+                        >
+                          <div className="p-2 flex items-center justify-between bg-muted/50">
+                            <h4 className="font-medium text-sm">
+                              {setName === "E" ? "Encore" : `Set ${setName}`}
+                            </h4>
+                            <CollapsibleTrigger className="p-1">
+                              <ChevronDown 
+                                className={cn(
+                                  "h-3 w-3 transition-transform duration-200",
+                                  isSetExpanded && "transform rotate-180"
+                                )}
+                              />
+                            </CollapsibleTrigger>
+                          </div>
+                          <CollapsibleContent>
+                            <div className="p-2">
+                              <ul className="list-disc list-inside text-sm space-y-1">
+                                {songs.map((song: any) => (
+                                  <li key={song.uniqueid} className="text-sm">
+                                    {song.song}
+                                    {song.transition === 2 && " >"}
+                                    {song.transition === 3 && " ->"}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </CollapsibleContent>
+                        </Collapsible>
+                      );
+                    })}
                     {show.data[0].setlistnotes && (
                       <div className="mt-4 text-sm text-muted-foreground">
                         <h4 className="font-medium">Notes:</h4>
