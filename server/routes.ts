@@ -31,8 +31,9 @@ export function registerRoutes(app: Express) {
         throw new Error('Username is required');
       }
 
-      console.log('Fetching shows from Phish.net API...');
-      const response = await fetch(`https://api.phish.net/v5/attendance/user/get?apikey=${apiKey}&username=${username}&orderby=showdate`);
+      const apiUrl = `https://api.phish.net/v5/attendance/user/get?apikey=${apiKey}&username=${username}&orderby=showdate`;
+      console.log('Fetching shows from Phish.net API:', apiUrl);
+      const response = await fetch(apiUrl);
 
       if (!response.ok) {
         console.error('Phish.net API error:', response.status, response.statusText);
