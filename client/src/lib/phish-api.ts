@@ -1,5 +1,14 @@
+import { useApiCounter } from './api-context';
+
+let incrementApiCallCount: (() => void) | null = null;
+
+export function setApiCallCounter(increment: () => void) {
+  incrementApiCallCount = increment;
+}
+
 export async function getShowsByUsername(username: string) {
   console.log("Making API request for username:", username);
+  incrementApiCallCount?.();
   const response = await fetch(`/api/phish/shows?username=${username}`);
 
   console.log("response=", response);
@@ -19,6 +28,7 @@ export async function getShowsByUsername(username: string) {
 
 export async function getShowSetList(id: string){
   console.log("Making API request for id:", id);
+  incrementApiCallCount?.();
   const response = await fetch(`/api/phish/showsetlist/${id}`);
 
   console.log("response=", response);
