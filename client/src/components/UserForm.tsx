@@ -34,8 +34,8 @@ export default function UserForm({ onSubmit }: UserFormProps) {
             <FormItem>
               <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input 
-                  {...field} 
+                <Input
+                  {...field}
                   placeholder="Enter your username"
                   autoComplete="off"
                 />
@@ -45,7 +45,7 @@ export default function UserForm({ onSubmit }: UserFormProps) {
           )}
         />
         <Button type="submit" className="w-full">
-          Continue
+          Step into the freezer...
         </Button>
       </form>
     </Form>

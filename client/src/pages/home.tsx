@@ -36,19 +36,6 @@ export default function HomePage() {
   const [expandedSets, setExpandedSets] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (loading) {
-      interval = setInterval(() => {
-        setLoadingShowCount((count) => count + 1);
-      }, 1000);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-      setLoadingShowCount(0);
-    };
-  }, [loading]);
-
   const handleSubmit = async (data: User) => {
     try {
       setLoading(true);
