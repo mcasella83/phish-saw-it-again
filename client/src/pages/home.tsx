@@ -23,7 +23,7 @@ export default function HomePage() {
       });
 
       setUser(data);
-      const showsData = await getPhishShows();
+      const showsData = await getPhishShows(data.username);
       if (!showsData.error && showsData.data) {
         setShows(showsData.data);
       } else {

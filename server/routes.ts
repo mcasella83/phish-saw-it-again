@@ -26,9 +26,13 @@ export function registerRoutes(app: Express) {
         throw new Error('API key not configured');
       }
 
+      const username = req.query.username;
+      if (!username) {
+        throw new Error('Username is required');
+      }
+
       console.log('Fetching shows from Phish.net API...');
-      // Update API endpoint to include more parameters
-      const response = await fetch(`https://api.phish.net/v5/shows/recent?apikey=${apiKey}&limit=10&order=DESC`);
+      const response = await fetch(`https://api.phish.net/v5/attendance/user/${username}.json?apikey=${apiKey}`);
 
       if (!response.ok) {
         console.error('Phish.net API error:', response.status, response.statusText);
