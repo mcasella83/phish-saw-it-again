@@ -35,15 +35,19 @@ export default function MyShows({
     );
   }
 
-  if (!showsWithSetLists) {
+  if (!showsWithSetLists || showsWithSetLists.length === 0) {
     return null;
   }
 
   return (
     <div className="space-y-4">
-      {showsWithSetLists.map((show) => {
-        const songsBySet = show.data.setlist.reduce(
-          (acc: Record<string, typeof show.data.setlist>, song) => {
+      {showsWithSetLists.map((showData) => {
+        if (!showData.data || !showData.data.setlist) {
+          return null;
+        }
+
+        const songsBySet = showData.data.setlist.reduce(
+          (acc: Record<string, typeof showData.data.setlist>, song) => {
             const setKey = song.set;
             if (!acc[setKey]) {
               acc[setKey] = [];
@@ -51,10 +55,10 @@ export default function MyShows({
             acc[setKey].push(song);
             return acc;
           },
-          {},
+          {}
         );
 
-        const showId = show.data.showid;
+        const showId = showData.data.showid;
         const isExpanded = expandedShows[showId] || false;
 
         return (
@@ -69,19 +73,19 @@ export default function MyShows({
             <CollapsibleTrigger className="w-full">
               <div className="p-4 flex items-start justify-between cursor-pointer">
                 <div>
-                  <h3 className="font-medium">{show.data.venue}</h3>
+                  <h3 className="font-medium">{showData.data.venue}</h3>
                   <p className="text-sm text-muted-foreground">
-                    {show.data.location}
+                    {showData.data.location}
                   </p>
                   <p className="text-sm">
-                    {new Date(show.data.showdate).toLocaleDateString()}
+                    {new Date(showData.data.showdate).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="p-2">
                   <ChevronDown
                     className={cn(
                       "h-4 w-4 transition-transform duration-200",
-                      isExpanded && "transform rotate-180",
+                      isExpanded && "transform rotate-180"
                     )}
                   />
                 </div>
@@ -114,7 +118,7 @@ export default function MyShows({
                             <ChevronDown
                               className={cn(
                                 "h-3 w-3 transition-transform duration-200",
-                                isSetExpanded && "transform rotate-180",
+                                isSetExpanded && "transform rotate-180"
                               )}
                             />
                           </div>
@@ -136,13 +140,13 @@ export default function MyShows({
                     </Collapsible>
                   );
                 })}
-                {show.data.setlistnotes && (
+                {showData.data.setlistnotes && (
                   <div className="mt-4 text-sm text-muted-foreground">
                     <h4 className="font-medium">Notes:</h4>
                     <div
                       className="whitespace-pre-wrap"
                       dangerouslySetInnerHTML={{
-                        __html: decodeHtmlEntities(show.data.setlistnotes),
+                        __html: decodeHtmlEntities(showData.data.setlistnotes),
                       }}
                     />
                   </div>
