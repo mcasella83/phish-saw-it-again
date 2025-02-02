@@ -143,27 +143,29 @@ export default function HomePage() {
                 onOpenChange={(open) =>
                   setExpandedShows((prev) => ({ ...prev, [showId]: open }))
                 }
-                className="border rounded-lg"
+                className="border rounded-lg hover:bg-accent/50 transition-colors"
               >
-                <div className="p-4 flex items-start justify-between">
-                  <div>
-                    <h3 className="font-medium">{show.data[0].venue}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {show.data[0].location}
-                    </p>
-                    <p className="text-sm">
-                      {new Date(show.data[0].showdate).toLocaleDateString()}
-                    </p>
+                <CollapsibleTrigger className="w-full">
+                  <div className="p-4 flex items-start justify-between cursor-pointer">
+                    <div>
+                      <h3 className="font-medium">{show.data[0].venue}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {show.data[0].location}
+                      </p>
+                      <p className="text-sm">
+                        {new Date(show.data[0].showdate).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="p-2">
+                      <ChevronDown
+                        className={cn(
+                          "h-4 w-4 transition-transform duration-200",
+                          isExpanded && "transform rotate-180",
+                        )}
+                      />
+                    </div>
                   </div>
-                  <CollapsibleTrigger className="p-2">
-                    <ChevronDown
-                      className={cn(
-                        "h-4 w-4 transition-transform duration-200",
-                        isExpanded && "transform rotate-180",
-                      )}
-                    />
-                  </CollapsibleTrigger>
-                </div>
+                </CollapsibleTrigger>
                 <CollapsibleContent>
                   <div className="px-4 pb-4 space-y-4">
                     {Object.entries(songsBySet).map(([setName, songs]) => {
@@ -180,21 +182,23 @@ export default function HomePage() {
                               [setKey]: open,
                             }))
                           }
-                          className="border rounded-lg"
+                          className="border rounded-lg hover:bg-accent/50 transition-colors"
                         >
-                          <div className="p-2 flex items-center justify-between bg-muted/50">
-                            <h4 className="font-medium text-sm">
-                              {setName === "e" ? "Encore" : `Set ${setName}`}
-                            </h4>
-                            <CollapsibleTrigger className="p-1">
-                              <ChevronDown
-                                className={cn(
-                                  "h-3 w-3 transition-transform duration-200",
-                                  isSetExpanded && "transform rotate-180",
-                                )}
-                              />
-                            </CollapsibleTrigger>
-                          </div>
+                          <CollapsibleTrigger className="w-full">
+                            <div className="p-2 flex items-center justify-between bg-muted/50 cursor-pointer">
+                              <h4 className="font-medium text-sm">
+                                {setName === "e" ? "Encore" : `Set ${setName}`}
+                              </h4>
+                              <div className="p-1">
+                                <ChevronDown
+                                  className={cn(
+                                    "h-3 w-3 transition-transform duration-200",
+                                    isSetExpanded && "transform rotate-180",
+                                  )}
+                                />
+                              </div>
+                            </div>
+                          </CollapsibleTrigger>
                           <CollapsibleContent>
                             <div className="p-2">
                               <ol className="list-decimal list-inside text-sm space-y-1">
