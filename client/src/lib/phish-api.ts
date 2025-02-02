@@ -6,5 +6,7 @@ export async function getPhishShows(username: string) {
   if (!response.ok) {
     throw new Error("Failed to fetch shows");
   }
-  return response.json();
+  const data = await response.json();
+  console.log("API response data:", data);
+  return data;
 }
