@@ -3,7 +3,13 @@ import type { User } from "@shared/schema";
 import { useState, useEffect } from "react";
 import { getShowsByUsername, getShowSetList } from "@/lib/phish-api";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronDown } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { cn } from "@/lib/utils";
 
 export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
@@ -11,6 +17,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [loadingShowCount, setLoadingShowCount] = useState(0);
   const [loadingMaxShowCount, setLoadingMaxShowCount] = useState(0);
+  const [expandedShows, setExpandedShows] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
 
   useEffect(() => {
@@ -99,39 +106,63 @@ export default function HomePage() {
               return acc;
             }, {});
 
+            const showId = show.data[0].showid;
+            const isExpanded = expandedShows[showId] || false;
+
             return (
-              <div key={show.data[0].showid} className="p-4 border rounded-lg">
-                <h3 className="font-medium">{show.data[0].venue}</h3>
-                <p className="text-sm text-muted-foreground">{show.data[0].location}</p>
-                <p className="text-sm">
-                  {new Date(show.data[0].showdate).toLocaleDateString()}
-                </p>
-                <div className="mt-2 space-y-4">
-                  {Object.entries(songsBySet).map(([setName, songs]) => (
-                    <div key={setName}>
-                      <h4 className="font-medium text-sm mb-1">
-                        {setName === "E" ? "Encore" : `Set ${setName}`}
-                      </h4>
-                      <ul className="list-disc list-inside text-sm">
-                        {songs.map((song: any) => (
-                          <li key={song.uniqueid}>
-                            {song.song}
-                            {song.transition === 2 && " >"}
-                            {song.transition === 3 && " ->"}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-                {show.data[0].setlistnotes && (
-                  <div className="mt-4 text-sm text-muted-foreground">
-                    <h4 className="font-medium">Notes:</h4>
-                    <div dangerouslySetInnerHTML={{ __html: show.data[0].setlistnotes }} />
+              <Collapsible
+                key={showId}
+                open={isExpanded}
+                onOpenChange={(open) => 
+                  setExpandedShows(prev => ({ ...prev, [showId]: open }))
+                }
+                className="border rounded-lg"
+              >
+                <div className="p-4 flex items-start justify-between">
+                  <div>
+                    <h3 className="font-medium">{show.data[0].venue}</h3>
+                    <p className="text-sm text-muted-foreground">{show.data[0].location}</p>
+                    <p className="text-sm">
+                      {new Date(show.data[0].showdate).toLocaleDateString()}
+                    </p>
                   </div>
-                )}
-              </div>
-            )
+                  <CollapsibleTrigger className="p-2">
+                    <ChevronDown 
+                      className={cn(
+                        "h-4 w-4 transition-transform duration-200",
+                        isExpanded && "transform rotate-180"
+                      )}
+                    />
+                  </CollapsibleTrigger>
+                </div>
+                <CollapsibleContent>
+                  <div className="px-4 pb-4 space-y-4">
+                    {Object.entries(songsBySet).map(([setName, songs]) => (
+                      <div key={setName}>
+                        <h4 className="font-medium text-sm mb-1">
+                          {setName === "E" ? "Encore" : `Set ${setName}`}
+                        </h4>
+                        <ul className="list-disc list-inside text-sm">
+                          {songs.map((song: any) => (
+                            <li key={song.uniqueid}>
+                              {song.song}
+                              {song.transition === 2 && " >"}
+                              {song.transition === 3 && " ->"}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                    {show.data[0].setlistnotes && (
+                      <div className="mt-4 text-sm text-muted-foreground">
+                        <h4 className="font-medium">Notes:</h4>
+                        <div dangerouslySetInnerHTML={{ __html: show.data[0].setlistnotes }} />
+                      </div>
+                    )}
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            );
           })}
         </div>
       </div>
