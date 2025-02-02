@@ -19,5 +19,25 @@ export function registerRoutes(app: Express) {
     res.status(201).json(result.data);
   });
 
+  app.get("/api/phish/shows", async (req, res) => {
+    try {
+      const apiKey = process.env.PHISH_NET_API_KEY;
+      if (!apiKey) {
+        throw new Error('API key not configured');
+      }
+
+      const response = await fetch('https://api.phish.net/v5/shows/recent?apikey=' + apiKey);
+      if (!response.ok) {
+        throw new Error('Failed to fetch from Phish.net API');
+      }
+
+      const data = await response.json();
+      res.json(data);
+    } catch (error) {
+      console.error('Phish.net API error:', error);
+      res.status(500).json({ message: 'Failed to fetch shows from Phish.net' });
+    }
+  });
+
   return createServer(app);
 }
