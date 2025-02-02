@@ -197,15 +197,15 @@ export default function HomePage() {
                           </div>
                           <CollapsibleContent>
                             <div className="p-2">
-                              <ul className="list-disc list-inside text-sm space-y-1">
-                                {songs.map((song: any) => (
+                              <ol className="list-decimal list-inside text-sm space-y-1">
+                                {songs.map((song: any, index: number) => (
                                   <li key={song.uniqueid} className="text-sm">
                                     {song.song}
                                     {song.transition === 2 && " >"}
                                     {song.transition === 3 && " ->"}
                                   </li>
                                 ))}
-                              </ul>
+                              </ol>
                             </div>
                           </CollapsibleContent>
                         </Collapsible>
