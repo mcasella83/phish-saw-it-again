@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MyShows from "./MyShows";
 import MySongs from "./MySongs";
 import MyVenues from "./MyVenues";
-import utf8 from 'utf8';
+import { decodeHtmlEntities } from "@/lib/utils";
 
 export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
@@ -108,12 +108,4 @@ export default function HomePage() {
       </div>
     </div>
   );
-}
-
-// Helper function to decode HTML entities and ensure UTF-8
-function decodeHtmlEntities(text: string): string {
-  if (!text) return "";
-  const decodedText = utf8.decode(text);
-  const doc = new DOMParser().parseFromString(decodedText, "text/html");
-  return doc.body.textContent || "";
 }

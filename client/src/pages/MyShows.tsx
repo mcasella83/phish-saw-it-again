@@ -5,16 +5,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { cn } from "@/lib/utils";
-import utf8 from "utf8";
-
-// Helper function to decode HTML entities and ensure UTF-8
-function decodeHtmlEntities(text: string): string {
-  if (!text) return "";
-  const decodedText = utf8.decode(text);
-  const doc = new DOMParser().parseFromString(decodedText, "text/html");
-  return doc.body.textContent || "";
-}
+import { cn, decodeHtmlEntities } from "@/lib/utils";
 
 interface MyShowsProps {
   showsWithSetLists: any[] | null;
