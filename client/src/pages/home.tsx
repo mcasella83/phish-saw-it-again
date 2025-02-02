@@ -32,9 +32,11 @@ export default function HomePage() {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to fetch Phish.net data",
+        description: error instanceof Error ? error.message : 'Failed to fetch Phish.net data',
         variant: "destructive",
       });
+      setUser(null);
+      setShows(null);
     } finally {
       setLoading(false);
     }
