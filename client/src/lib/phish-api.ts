@@ -16,7 +16,7 @@ export async function getPhishShows(username: string) {
 
   if (data.error && data.error_message) {
     console.log("throwing error");
-    throw new Error(`Error getting shows: ${data.error_message}`);
+    throw new Error(data.error_message);
   }
 
   return data;

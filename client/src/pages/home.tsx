@@ -14,22 +14,17 @@ export default function HomePage() {
   const handleSubmit = async (data: User) => {
     try {
       setLoading(true);
-      // await fetch('/api/users', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(data)
-      // });
-
       setUser(data);
       const showsData = await getPhishShows(data.username);
+      console.log("Shows data received:", showsData);
+
       if (!showsData.error && showsData.data) {
         setShows(showsData.data);
       } else {
         throw new Error(showsData.error_message || 'Failed to fetch shows');
       }
     } catch (error) {
+      console.error("Error in handleSubmit:", error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : 'Failed to fetch Phish.net data',
