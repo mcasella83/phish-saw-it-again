@@ -24,7 +24,11 @@ export default function HomePage() {
 
       setUser(data);
       const showsData = await getPhishShows();
-      setShows(showsData.data);
+      if (!showsData.error && showsData.data) {
+        setShows(showsData.data);
+      } else {
+        throw new Error(showsData.error_message || 'Failed to fetch shows');
+      }
     } catch (error) {
       toast({
         title: "Error",
@@ -50,7 +54,7 @@ export default function HomePage() {
         <h1 className="text-2xl font-bold mb-4">Welcome, {user.username}!</h1>
         <div className="space-y-4">
           <h2 className="text-xl font-semibold">Recent Phish Shows</h2>
-          {shows.map((show: any) => (
+          {shows.map((show) => (
             <div key={show.showid} className="p-4 border rounded-lg">
               <h3 className="font-medium">{show.venue}</h3>
               <p className="text-sm text-muted-foreground">{show.location}</p>
