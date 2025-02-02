@@ -14,13 +14,13 @@ export default function HomePage() {
   const handleSubmit = async (data: User) => {
     try {
       setLoading(true);
-      await fetch('/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
-      });
+      // await fetch('/api/users', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify(data)
+      // });
 
       setUser(data);
       const showsData = await getPhishShows(data.username);
