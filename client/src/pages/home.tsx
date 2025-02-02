@@ -25,13 +25,15 @@ export default function HomePage() {
       }
     } catch (error) {
       console.error("Error in handleSubmit:", error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : 'Failed to fetch Phish.net data',
-        variant: "destructive",
-      });
       setUser(null);
       setShows(null);
+
+      // Ensure we're showing the toast with the correct error message
+      toast({
+        title: "Failed to fetch shows",
+        description: error instanceof Error ? error.message : 'An unexpected error occurred',
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }

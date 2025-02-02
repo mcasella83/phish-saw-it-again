@@ -8,7 +8,7 @@ import HomePage from "@/pages/home";
 function Router() {
   return (
     <div className="min-h-screen bg-background">
-      <main className="container mx-auto px-4">
+      <main className="container mx-auto px-4 py-8">
         <Switch>
           <Route path="/" component={HomePage} />
           <Route component={NotFound} />
