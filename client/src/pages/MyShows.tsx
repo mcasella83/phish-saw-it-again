@@ -6,9 +6,10 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { cn, decodeHtmlEntities } from "@/lib/utils";
+import { PhishSetlistResponse } from "@/lib/types";
 
 interface MyShowsProps {
-  showsWithSetLists: any[] | null;
+  showsWithSetLists: PhishSetlistResponse[];
   loading: boolean;
   loadingShowCount: number;
   loadingMaxShowCount: number;
@@ -41,8 +42,8 @@ export default function MyShows({
   return (
     <div className="space-y-4">
       {showsWithSetLists.map((show) => {
-        const songsBySet = show.data.reduce(
-          (acc: Record<string, any[]>, song: any) => {
+        const songsBySet = show.data.setlist.reduce(
+          (acc: Record<string, typeof show.data.setlist>, song) => {
             const setKey = song.set;
             if (!acc[setKey]) {
               acc[setKey] = [];
@@ -53,7 +54,7 @@ export default function MyShows({
           {},
         );
 
-        const showId = show.data[0].showid;
+        const showId = show.data.showid;
         const isExpanded = expandedShows[showId] || false;
 
         return (
@@ -68,12 +69,12 @@ export default function MyShows({
             <CollapsibleTrigger className="w-full">
               <div className="p-4 flex items-start justify-between cursor-pointer">
                 <div>
-                  <h3 className="font-medium">{show.data[0].venue}</h3>
+                  <h3 className="font-medium">{show.data.venue}</h3>
                   <p className="text-sm text-muted-foreground">
-                    {show.data[0].location}
+                    {show.data.location}
                   </p>
                   <p className="text-sm">
-                    {new Date(show.data[0].showdate).toLocaleDateString()}
+                    {new Date(show.data.showdate).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="p-2">
@@ -122,7 +123,7 @@ export default function MyShows({
                       <CollapsibleContent>
                         <div className="p-2">
                           <ol className="list-decimal list-inside text-sm space-y-1">
-                            {songs.map((song: any, index: number) => (
+                            {songs.map((song) => (
                               <li key={song.uniqueid} className="text-sm">
                                 {song.song}
                                 {song.transition === 2 && " >"}
@@ -135,13 +136,13 @@ export default function MyShows({
                     </Collapsible>
                   );
                 })}
-                {show.data[0].setlistnotes && (
+                {show.data.setlistnotes && (
                   <div className="mt-4 text-sm text-muted-foreground">
                     <h4 className="font-medium">Notes:</h4>
                     <div
                       className="whitespace-pre-wrap"
                       dangerouslySetInnerHTML={{
-                        __html: show.data[0].setlistnotes,
+                        __html: decodeHtmlEntities(show.data.setlistnotes),
                       }}
                     />
                   </div>

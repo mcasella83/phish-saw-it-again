@@ -1,4 +1,3 @@
-
 export interface PhishShow {
   showid: string;
   showdate: string;
@@ -13,21 +12,34 @@ export interface PhishApiResponse {
   data: PhishShow[];
 }
 
-export interface PhishSetlist {
+export interface SetlistSong {
+  uniqueid: string;
   showid: string;
+  showdate: string;
   set: string;
-  song: string;
   position: number;
+  song: string;
+  transition?: number;
+  isjam?: boolean;
+  notes?: string;
+}
+
+export interface SetlistData {
+  showid: string;
+  showdate: string;
+  venue: string;
+  location: string;
+  setlistnotes?: string;
 }
 
 export interface PhishSetlistResponse {
   error: boolean;
   error_message?: string;
-  data: PhishSetlist[];
+  data: SetlistData & { setlist: SetlistSong[] };
 }
 
-export interface Song{
+export interface Song {
   name: string;
+  displayDate: string;
   showDate: Date;
 }
-
