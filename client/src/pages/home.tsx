@@ -10,21 +10,29 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
+import utf8 from "utf8";
 
 // Helper function to decode HTML entities and ensure UTF-8
 function decodeHtmlEntities(text: string): string {
-  if (!text) return '';
-  const doc = new DOMParser().parseFromString(text, 'text/html');
-  return doc.body.textContent || '';
+  if (!text) return "";
+  // First decode UTF-8
+  const decodedText = utf8.decode(text);
+  // Then parse HTML entities
+  const doc = new DOMParser().parseFromString(decodedText, "text/html");
+  return doc.body.textContent || "";
 }
 
 export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
-  const [showsWithSetLists, setShowsWithSetlists] = useState<any[] | null>(null);
+  const [showsWithSetLists, setShowsWithSetlists] = useState<any[] | null>(
+    null,
+  );
   const [loading, setLoading] = useState(false);
   const [loadingShowCount, setLoadingShowCount] = useState(0);
   const [loadingMaxShowCount, setLoadingMaxShowCount] = useState(0);
-  const [expandedShows, setExpandedShows] = useState<Record<string, boolean>>({});
+  const [expandedShows, setExpandedShows] = useState<Record<string, boolean>>(
+    {},
+  );
   const [expandedSets, setExpandedSets] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
 
@@ -32,7 +40,7 @@ export default function HomePage() {
     let interval: NodeJS.Timeout;
     if (loading) {
       interval = setInterval(() => {
-        setLoadingShowCount(count => count + 1);
+        setLoadingShowCount((count) => count + 1);
       }, 1000);
     }
     return () => {
@@ -48,18 +56,28 @@ export default function HomePage() {
       const showsData = await getShowsByUsername(data.username);
       console.log("Shows data received:", showsData);
 
+      const LIMIT = 1;
+
       let showSetLists = [];
 
       if (!showsData.error && showsData.data) {
         setLoadingMaxShowCount(showsData.data.length);
 
         for (let i = 0; i < showsData.data.length; i++) {
+          if (i >= LIMIT) break;
+
           let show = showsData.data[i];
           setLoadingShowCount(i + 1);
           console.log(`processing show #${i}, id=${show.showid}`);
 
           const showSetList = await getShowSetList(show.showid);
           console.log("Show set list received:", JSON.stringify(showSetList));
+
+          // Decode setlist notes before storing
+          if (showSetList.data?.[0]?.setlistnotes) {
+            showSetList.data[0].setlistnotes = decodeHtmlEntities(showSetList.data[0].setlistnotes);
+          }
+
           showSetLists.push(showSetList);
         }
 
@@ -103,14 +121,17 @@ export default function HomePage() {
         <div className="space-y-4">
           <h2 className="text-xl font-semibold">Your Phish Shows</h2>
           {showsWithSetLists.map((show) => {
-            const songsBySet = show.data.reduce((acc: Record<string, any[]>, song: any) => {
-              const setKey = song.set;
-              if (!acc[setKey]) {
-                acc[setKey] = [];
-              }
-              acc[setKey].push(song);
-              return acc;
-            }, {});
+            const songsBySet = show.data.reduce(
+              (acc: Record<string, any[]>, song: any) => {
+                const setKey = song.set;
+                if (!acc[setKey]) {
+                  acc[setKey] = [];
+                }
+                acc[setKey].push(song);
+                return acc;
+              },
+              {},
+            );
 
             const showId = show.data[0].showid;
             const isExpanded = expandedShows[showId] || false;
@@ -119,24 +140,26 @@ export default function HomePage() {
               <Collapsible
                 key={showId}
                 open={isExpanded}
-                onOpenChange={(open) => 
-                  setExpandedShows(prev => ({ ...prev, [showId]: open }))
+                onOpenChange={(open) =>
+                  setExpandedShows((prev) => ({ ...prev, [showId]: open }))
                 }
                 className="border rounded-lg"
               >
                 <div className="p-4 flex items-start justify-between">
                   <div>
                     <h3 className="font-medium">{show.data[0].venue}</h3>
-                    <p className="text-sm text-muted-foreground">{show.data[0].location}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {show.data[0].location}
+                    </p>
                     <p className="text-sm">
                       {new Date(show.data[0].showdate).toLocaleDateString()}
                     </p>
                   </div>
                   <CollapsibleTrigger className="p-2">
-                    <ChevronDown 
+                    <ChevronDown
                       className={cn(
                         "h-4 w-4 transition-transform duration-200",
-                        isExpanded && "transform rotate-180"
+                        isExpanded && "transform rotate-180",
                       )}
                     />
                   </CollapsibleTrigger>
@@ -152,19 +175,22 @@ export default function HomePage() {
                           key={setKey}
                           open={isSetExpanded}
                           onOpenChange={(open) =>
-                            setExpandedSets(prev => ({ ...prev, [setKey]: open }))
+                            setExpandedSets((prev) => ({
+                              ...prev,
+                              [setKey]: open,
+                            }))
                           }
                           className="border rounded-lg"
                         >
                           <div className="p-2 flex items-center justify-between bg-muted/50">
                             <h4 className="font-medium text-sm">
-                              {setName === "E" ? "Encore" : `Set ${setName}`}
+                              {setName === "e" ? "Encore" : `Set ${setName}`}
                             </h4>
                             <CollapsibleTrigger className="p-1">
-                              <ChevronDown 
+                              <ChevronDown
                                 className={cn(
                                   "h-3 w-3 transition-transform duration-200",
-                                  isSetExpanded && "transform rotate-180"
+                                  isSetExpanded && "transform rotate-180",
                                 )}
                               />
                             </CollapsibleTrigger>
@@ -188,11 +214,11 @@ export default function HomePage() {
                     {show.data[0].setlistnotes && (
                       <div className="mt-4 text-sm text-muted-foreground">
                         <h4 className="font-medium">Notes:</h4>
-                        <div 
+                        <div
                           className="whitespace-pre-wrap"
-                          dangerouslySetInnerHTML={{ 
-                            __html: show.data[0].setlistnotes
-                          }} 
+                          dangerouslySetInnerHTML={{
+                            __html: show.data[0].setlistnotes,
+                          }}
                         />
                       </div>
                     )}
