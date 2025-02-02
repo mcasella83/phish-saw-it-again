@@ -11,6 +11,13 @@ import {
 } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 
+// Helper function to decode HTML entities and ensure UTF-8
+function decodeHtmlEntities(text: string): string {
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = text;
+  return textarea.value;
+}
+
 export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
   const [showsWithSetLists, setShowsWithSetlists] = useState<any[] | null>(null);
@@ -181,7 +188,11 @@ export default function HomePage() {
                     {show.data[0].setlistnotes && (
                       <div className="mt-4 text-sm text-muted-foreground">
                         <h4 className="font-medium">Notes:</h4>
-                        <div dangerouslySetInnerHTML={{ __html: show.data[0].setlistnotes }} />
+                        <div 
+                          dangerouslySetInnerHTML={{ 
+                            __html: decodeHtmlEntities(show.data[0].setlistnotes)
+                          }} 
+                        />
                       </div>
                     )}
                   </div>
