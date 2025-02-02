@@ -1,4 +1,6 @@
-export async function getShowsByUsername(username: string) {
+import { PhishApiResponse, PhishSetlistResponse } from './types';
+
+export async function getShowsByUsername(username: string): Promise<PhishApiResponse> {
   console.log("Making API request for username:", username);
   const response = await fetch(`/api/phish/shows?username=${username}`, {
     headers: {
@@ -11,7 +13,7 @@ export async function getShowsByUsername(username: string) {
   if (!response.ok) {
     throw new Error("Failed to fetch shows");
   }
-  const data = await response.json();
+  const data: PhishApiResponse = await response.json();
   console.log("API response data:", data);
 
   if (data.error && data.error_message) {
