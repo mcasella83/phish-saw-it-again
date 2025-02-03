@@ -51,7 +51,7 @@ export async function getShowSetList(id: string) {
     throw new Error(data.error_message);
   }
 
-  const setlist: PhishShowSetlist = data.data;
+  const setlist: PhishShowSetlist = { }
 
   return setlist;
 }
