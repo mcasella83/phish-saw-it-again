@@ -6,10 +6,10 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { cn, decodeHtmlEntities } from "@/lib/utils";
-import { PhishSetlistResponse } from "@/lib/types";
+import { PhishSetlistApiResponse } from "@/lib/types";
 
 interface MyShowsProps {
-  showsWithSetLists: PhishSetlistResponse[];
+  showsWithSetLists: PhishSetlistApiResponse[];
   loading: boolean;
   loadingShowCount: number;
   loadingMaxShowCount: number;

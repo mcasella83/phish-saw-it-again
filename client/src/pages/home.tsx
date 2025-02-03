@@ -7,11 +7,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MyShows from "./MyShows";
 import MySongs from "./MySongs";
 import MyVenues from "./MyVenues";
-import { decodeHtmlEntities } from "@/lib/utils";
+import utf8 from "utf8";
+import { PhishShowSetlist } from "@/lib/types";
 
 export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
-  const [showsWithSetLists, setShowsWithSetlists] = useState<any[] | null>(null);
+  const [showsWithSetLists, setShowsWithSetlists] = useState<any[] | null>(
+    null,
+  );
   const [loading, setLoading] = useState(false);
   const [loadingShowCount, setLoadingShowCount] = useState(0);
   const [loadingMaxShowCount, setLoadingMaxShowCount] = useState(0);
@@ -37,10 +40,10 @@ export default function HomePage() {
           setLoadingShowCount(i + 1);
           console.log(`processing show #${i}, id=${show.showid}`);
 
-          const showSetList = await getShowSetList(show.showid);
+          const showSetList: PhishShowSetlist = await getShowSetList(show.showid);
           console.log("Show set list received:", JSON.stringify(showSetList));
 
-          if (showSetList.data?.[0]?.setlistnotes) {
+          if (showSetList.[0]?.setlistnotes) {
             showSetList.data[0].setlistnotes = decodeHtmlEntities(
               showSetList.data[0].setlistnotes,
             );
@@ -61,7 +64,9 @@ export default function HomePage() {
       toast({
         title: "Failed to fetch shows",
         description:
-          error instanceof Error ? error.message : "An unexpected error occurred",
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
         variant: "destructive",
       });
     } finally {
@@ -80,7 +85,7 @@ export default function HomePage() {
             <TabsTrigger value="venues">My Venues</TabsTrigger>
           </TabsList>
           <TabsContent value="shows">
-            <MyShows 
+            <MyShows
               showsWithSetLists={showsWithSetLists}
               loading={loading}
               loadingShowCount={loadingShowCount}
@@ -108,4 +113,12 @@ export default function HomePage() {
       </div>
     </div>
   );
+}
+
+// Helper function to decode HTML entities and ensure UTF-8
+function decodeHtmlEntities(text: string): string {
+  if (!text) return "";
+  const decodedText = utf8.decode(text);
+  const doc = new DOMParser().parseFromString(decodedText, "text/html");
+  return doc.body.textContent || "";
 }

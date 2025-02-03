@@ -1,6 +1,6 @@
-import { PhishSetlist, Song } from "./types";
+import { PhishShowSetlist, Song } from "./types";
 
-export function getUniqueSongsFromSetlists(setlists: PhishSetlist[]) {
+export function getUniqueSongsFromSetlists(setlists: PhishShowSetlist[]) {
   let allMySongs = new Map();
 
   setlists.forEach((setlist) => {

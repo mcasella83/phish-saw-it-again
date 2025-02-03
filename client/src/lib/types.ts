@@ -6,40 +6,32 @@ export interface PhishShow {
   rating: number;
 }
 
-export interface PhishApiResponse {
+export interface PhishShowApiResponse {
   error: boolean;
   error_message?: string;
   data: PhishShow[];
 }
 
-export interface SetlistSong {
-  uniqueid: string;
-  showid: string;
-  showdate: string;
-  set: string;
-  position: number;
-  song: string;
-  transition?: number;
-  isjam?: boolean;
-  notes?: string;
-}
-
-export interface SetlistData {
-  showid: string;
-  showdate: string;
-  venue: string;
-  location: string;
-  setlistnotes?: string;
-}
-
-export interface PhishSetlistResponse {
+export interface PhishSetlistApiResponse {
   error: boolean;
   error_message?: string;
-  data: SetlistData & { setlist: SetlistSong[] };
+  data: PhishShowSetlist;
 }
 
-export interface Song {
+export interface PhishShowSetlist {
+  id: string;
+  date: string;
+  song: PhishSong[];
+  setListNotes: string;
+  venue: string;
+  city: string;
+  state: string;
+  country: string;
+}
+
+export interface PhishSong {
   name: string;
-  displayDate: string;
-  showDate: Date;
+  date: string;
+  position: number;
+  set: string;
 }
