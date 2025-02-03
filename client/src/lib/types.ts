@@ -19,8 +19,43 @@ export interface PhishSetlistApiResponse {
 }
 
 export interface ApiSong {
+  showid: number;
   showdate: string;
-  
+  permalink: string;
+  showyear: string;
+  uniqueid: number;
+  meta: string;
+  reviews: number;
+  exclude: number;
+  setlistnotes: string;
+  soundcheck: string;
+  songid: number;
+  position: number;
+  transition: number;
+  footnote: string;
+  set: string;
+  isjam: number;
+  isreprise: number;
+  isjamchart: number;
+  jamchart_description: string;
+  tracktime: string;
+  gap: number;
+  tourid: number;
+  tourname: string;
+  tourwhen: string;
+  song: string;
+  nickname: string;
+  slug: string;
+  is_original: number;
+  venueid: number;
+  venue: string;
+  city: string;
+  state: string;
+  country: string;
+  trans_mark: string;
+  artistid: number;
+  artist_slug: string;
+  artist_name: string;
 }
 
 export interface PhishShowSetlist {
