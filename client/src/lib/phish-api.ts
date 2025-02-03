@@ -43,15 +43,15 @@ export async function getShowSetList(id: string) {
   if (!response.ok) {
     throw new Error("Failed to fetch show setlists");
   }
-  const data: PhishSetlistApiResponse = await response.json();
-  console.log("API response data:", data);
+  const apiResponse: PhishSetlistApiResponse = await response.json();
+  console.log("API response data:", apiResponse);
 
-  if (data.error && data.error_message) {
+  if (apiResponse.error && apiResponse.error_message) {
     console.log("throwing error");
-    throw new Error(data.error_message);
+    throw new Error(apiResponse.error_message);
   }
 
-  const setlist: PhishShowSetlist = { }
+  const setlist: PhishShowSetlist = { date: apiResponse.data.showdate }
 
   return setlist;
 }

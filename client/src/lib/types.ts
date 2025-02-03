@@ -18,6 +18,11 @@ export interface PhishSetlistApiResponse {
   data: PhishShowSetlist;
 }
 
+export interface ApiSong {
+  showdate: string;
+  
+}
+
 export interface PhishShowSetlist {
   id: string;
   date: string;
