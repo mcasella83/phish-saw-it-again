@@ -4,6 +4,7 @@ import {
   PhishSetlistApiResponse,
   PhishSong,
 } from "./types";
+import { encodeUTF8 } from "./utils";
 
 export async function getShowsByUsername(
   username: string,
@@ -78,7 +79,7 @@ export async function getShowSetList(id: string): Promise<PhishShowSetlist> {
     id: firstSong.showid,
     date: firstSong.showdate,
     songs: songs,
-    setListNotes: firstSong.setlistnotes,
+    setListNotes: encodeUTF8(firstSong.setlistnotes),
     venue: firstSong.venue,
     city: firstSong.city,
     state: firstSong.state,
