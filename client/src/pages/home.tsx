@@ -1,18 +1,18 @@
 import UserForm from "@/components/UserForm";
 import type { User } from "@shared/schema";
 import { useState } from "react";
-import { getShowsByUsername, getShowSetList } from "@/lib/phish-api";
+import { getShowsByUsername } from "@/lib/phish-api";
+import { processShowsData } from "@/lib/phish-processing";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MyShows from "./MyShows";
 import MySongs from "./MySongs";
 import MyVenues from "./MyVenues";
-import utf8 from "utf8";
 import { PhishShowSetlist } from "@/lib/types";
 
 export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
-  const [showsWithSetLists, setShowsWithSetlists] = useState<any[] | null>(
+  const [showsWithSetLists, setShowsWithSetlists] = useState<PhishShowSetlist[] | null>(
     null,
   );
   const [loading, setLoading] = useState(false);
@@ -27,34 +27,16 @@ export default function HomePage() {
       const showsData = await getShowsByUsername(data.username);
       console.log("Shows data received:", showsData);
 
-      const LIMIT = 10;
-      let showSetLists = [];
-
       if (!showsData.error && showsData.data) {
-        setLoadingMaxShowCount(showsData.data.length);
+        setLoadingMaxShowCount(Math.min(showsData.data.length, 10));
 
-        for (let i = 0; i < showsData.data.length; i++) {
-          if (i >= LIMIT) break;
+        const processedShows = await processShowsData(
+          showsData,
+          10,
+          (current, total) => setLoadingShowCount(current)
+        );
 
-          let show = showsData.data[i];
-          setLoadingShowCount(i + 1);
-          console.log(`processing show #${i}, id=${show.showid}`);
-
-          const showSetList: PhishShowSetlist = await getShowSetList(
-            show.showid,
-          );
-          console.log("Show set list received:", JSON.stringify(showSetList));
-
-          if (showSetList?.setListNotes) {
-            showSetList.setListNotes = decodeHtmlEntities(
-              showSetList.setListNotes,
-            );
-          }
-
-          showSetLists.push(showSetList);
-        }
-
-        setShowsWithSetlists(showSetLists);
+        setShowsWithSetlists(processedShows);
       } else {
         throw new Error(showsData.error_message || "Failed to fetch shows");
       }
@@ -115,12 +97,4 @@ export default function HomePage() {
       </div>
     </div>
   );
-}
-
-// Helper function to decode HTML entities and ensure UTF-8
-function decodeHtmlEntities(text: string): string {
-  if (!text) return "";
-  const decodedText = utf8.decode(text);
-  const doc = new DOMParser().parseFromString(decodedText, "text/html");
-  return doc.body.textContent || "";
 }

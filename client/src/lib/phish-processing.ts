@@ -1,34 +1,52 @@
-import { PhishShowSetlist, Song } from "./types";
+import { PhishShowApiResponse, PhishShowSetlist } from "./types";
+import { getShowSetList } from "./phish-api";
 
 export function getUniqueSongsFromSetlists(setlists: PhishShowSetlist[]) {
-  let allMySongs = new Map();
+  const allMySongs = new Map<string, Array<{name: string, date: string}>>();
 
   setlists.forEach((setlist) => {
-    let songsFromShow = new Map();
+    const songsFromShow = new Map<string, Array<{name: string, date: string}>>();
 
-    setlist.forEach((song) => {
-      //console.log('processing %s', name)
+    setlist.songs.forEach((song) => {
+      const name = song.name;
+      const songEntry = { name: song.name, date: song.date };
 
-      let name = song.song;
-      let songEntry = { name: song.song, date: song.showdate };
-
-      //first time
-      if (allMySongs.has(name) === false) {
+      if (!allMySongs.has(name)) {
         allMySongs.set(name, [songEntry]);
         songsFromShow.set(name, [songEntry]);
       } else {
-        let songEntries = allMySongs.get(name);
-
-        //TODO: handle multiple songs at same show
-        if (songsFromShow.has(name)) {
+        const songEntries = allMySongs.get(name);
+        if (songEntries && !songsFromShow.has(name)) {
+          songEntries.push(songEntry);
+        } else {
           console.log("repeat song %s on %s", songEntry.name, songEntry.date);
         }
-
-        songEntries.push([songEntry]);
       }
     });
   });
-  allMySongs = new Map([...allMySongs.entries()].sort());
 
-  return allMySongs;
+  return new Map([...allMySongs.entries()].sort());
+}
+
+export async function processShowsData(
+  showsData: PhishShowApiResponse,
+  limit = 10,
+  onProgress?: (current: number, total: number) => void,
+): Promise<PhishShowSetlist[]> {
+  if (!showsData.data) {
+    throw new Error("No show data available");
+  }
+
+  const showSetLists: PhishShowSetlist[] = [];
+  const totalShows = Math.min(showsData.data.length, limit);
+
+  for (let i = 0; i < totalShows; i++) {
+    const show = showsData.data[i];
+    onProgress?.(i + 1, totalShows);
+
+    const showSetList = await getShowSetList(show.showid);
+    showSetLists.push(showSetList);
+  }
+
+  return showSetLists;
 }
