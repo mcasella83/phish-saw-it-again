@@ -1,7 +1,7 @@
 import UserForm from "@/components/UserForm";
 import type { User } from "@shared/schema";
 import { useState } from "react";
-import { getShowsByUsername } from "@/lib/phish-api";
+import { getShowsByUsername, getShowSetList } from "@/lib/phish-api";
 import { processShowsData } from "@/lib/phish-processing";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -28,14 +28,20 @@ export default function HomePage() {
       console.log("Shows data received:", showsData);
 
       if (!showsData.error && showsData.data) {
-        setLoadingMaxShowCount(Math.min(showsData.data.length, 10));
+        const FETCH_LIMIT = 10;
+        setLoadingMaxShowCount(Math.min(showsData.data.length, FETCH_LIMIT));
 
-        const processedShows = await processShowsData(
-          showsData,
-          10,
-          (current, total) => setLoadingShowCount(current)
-        );
+        // Fetch all show setlists
+        const fetchedSetLists: PhishShowSetlist[] = [];
+        for (let i = 0; i < Math.min(showsData.data.length, FETCH_LIMIT); i++) {
+          const show = showsData.data[i];
+          setLoadingShowCount(i + 1);
+          const setList = await getShowSetList(show.showid);
+          fetchedSetLists.push(setList);
+        }
 
+        // Process the fetched data
+        const processedShows = processShowsData(fetchedSetLists, FETCH_LIMIT);
         setShowsWithSetlists(processedShows);
       } else {
         throw new Error(showsData.error_message || "Failed to fetch shows");
