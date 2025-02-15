@@ -95,19 +95,28 @@ export async function processShowsData(
     throw new Error("No show data available");
   }
 
-  const showSetLists: PhishShowSetlist[] = [];
-
-  if (LIMIT_SHOWS && LIMIT_SHOWS >= 0 && LIMIT_SHOWS <= showsData.data.length) {
-    showsData.data = showsData.data.slice(0, LIMIT_SHOWS);
+  let shows = showsData.data;
+  if (LIMIT_SHOWS && LIMIT_SHOWS >= 0 && LIMIT_SHOWS <= shows.length) {
+    shows = shows.slice(0, LIMIT_SHOWS);
   }
 
-  for (let i = 0; i < showsData.data.length; i++) {
-    const show = showsData.data[i];
-    onProgress?.(i + 1, showsData.data.length, show);
+  const totalShows = shows.length;
+  let completedShows = 0;
 
-    const showSetList = await getShowSetList(show.showid);
-    showSetLists.push(showSetList);
-  }
+  const showPromises = shows.map(async (show) => {
+    try {
+      const setlist = await getShowSetList(show.showid);
+      completedShows++;
+      onProgress?.(completedShows, totalShows, show);
+      return setlist;
+    } catch (error) {
+      console.error(`Failed to fetch setlist for show ${show.showid}:`, error);
+      completedShows++;
+      onProgress?.(completedShows, totalShows, show);
+      return null;
+    }
+  });
 
-  return showSetLists;
+  const results = await Promise.all(showPromises);
+  return results.filter((setlist): setlist is PhishShowSetlist => setlist !== null);
 }
