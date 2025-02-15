@@ -1,7 +1,7 @@
 import { PhishShowApiResponse, PhishShowSetlist } from "./types";
 import { getShowSetList } from "./phish-api";
 
-const LIMIT_SHOWS = -1;
+const LIMIT_SHOWS = 2;
 
 export interface SongStats {
   name: string;
@@ -52,7 +52,13 @@ export function getVenueStatsFromSetlists(
 ): VenueStats[] {
   const venueMap = new Map<
     string,
-    { city: string; state: string; country: string; count: number; dates: Set<string> }
+    {
+      city: string;
+      state: string;
+      country: string;
+      count: number;
+      dates: Set<string>;
+    }
   >();
 
   setlists.forEach((setlist) => {
@@ -74,7 +80,7 @@ export function getVenueStatsFromSetlists(
 
   return Array.from(venueMap.entries())
     .map(([venueKey, stats]) => {
-      const [name] = venueKey.split('-');
+      const [name] = venueKey.split("-");
       return {
         name,
         city: stats.city,
@@ -118,5 +124,7 @@ export async function processShowsData(
   });
 
   const results = await Promise.all(showPromises);
-  return results.filter((setlist): setlist is PhishShowSetlist => setlist !== null);
+  return results.filter(
+    (setlist): setlist is PhishShowSetlist => setlist !== null,
+  );
 }

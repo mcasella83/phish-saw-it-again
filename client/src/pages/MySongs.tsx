@@ -1,4 +1,11 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { SongStats } from "@/lib/phish-processing";
 
 interface MySongsProps {
@@ -19,7 +26,9 @@ export default function MySongs({ songs }: MySongsProps) {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">My Songs ({songs.length} unique songs)</h2>
+      <h2 className="text-xl font-semibold">
+        My Songs ({songs.length} unique songs)
+      </h2>
       <div className="border rounded-lg">
         <Table>
           <TableHeader>
@@ -39,7 +48,9 @@ export default function MySongs({ songs }: MySongsProps) {
                   {new Date(song.dates[0]).toLocaleDateString()}
                 </TableCell>
                 <TableCell>
-                  {new Date(song.dates[song.dates.length - 1]).toLocaleDateString()}
+                  {new Date(
+                    song.dates[song.dates.length - 1],
+                  ).toLocaleDateString()}
                 </TableCell>
               </TableRow>
             ))}
