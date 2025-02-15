@@ -10,11 +10,12 @@ export function cn(...inputs: ClassValue[]) {
 export function decodeHtmlEntities(text: string): string {
   if (!text) return "";
   try {
-    const doc = new DOMParser().parseFromString(
-      text.replace(/[\u00A0-\u9999<>&]/g, (i) => `&#${i.charCodeAt(0)};`),
-      "text/html"
-    );
-    return doc.body.textContent || "";
+    const textArea = document.createElement('textarea');
+    textArea.innerHTML = text
+      .replace(/Â/g, '') // Remove invisible characters
+      .replace(/&nbsp;/g, ' ') // Replace &nbsp; with space
+      .replace(/[\u00A0-\u9999<>&]/g, (i) => `&#${i.charCodeAt(0)};`);
+    return textArea.value;
   } catch (error) {
     console.error("Error decoding HTML entities:", error);
     return text;
