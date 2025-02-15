@@ -12,9 +12,9 @@ import { PhishShowSetlist } from "@/lib/types";
 
 export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
-  const [showsWithSetLists, setShowsWithSetlists] = useState<PhishShowSetlist[] | null>(
-    null,
-  );
+  const [showsWithSetLists, setShowsWithSetlists] = useState<
+    PhishShowSetlist[] | null
+  >(null);
   const [loading, setLoading] = useState(false);
   const [loadingShowCount, setLoadingShowCount] = useState(0);
   const [loadingMaxShowCount, setLoadingMaxShowCount] = useState(0);
@@ -32,8 +32,7 @@ export default function HomePage() {
 
         const processedShows = await processShowsData(
           showsData,
-          10,
-          (current, total) => setLoadingShowCount(current)
+          (current, total) => setLoadingShowCount(current),
         );
 
         setShowsWithSetlists(processedShows);

@@ -1,11 +1,16 @@
 import { PhishShowApiResponse, PhishShowSetlist } from "./types";
 import { getShowSetList } from "./phish-api";
 
+const LIMIT_SHOWS = 10;
+
 export function getUniqueSongsFromSetlists(setlists: PhishShowSetlist[]) {
-  const allMySongs = new Map<string, Array<{name: string, date: string}>>();
+  const allMySongs = new Map<string, Array<{ name: string; date: string }>>();
 
   setlists.forEach((setlist) => {
-    const songsFromShow = new Map<string, Array<{name: string, date: string}>>();
+    const songsFromShow = new Map<
+      string,
+      Array<{ name: string; date: string }>
+    >();
 
     setlist.songs.forEach((song) => {
       const name = song.name;
@@ -30,7 +35,6 @@ export function getUniqueSongsFromSetlists(setlists: PhishShowSetlist[]) {
 
 export async function processShowsData(
   showsData: PhishShowApiResponse,
-  limit = 10,
   onProgress?: (current: number, total: number) => void,
 ): Promise<PhishShowSetlist[]> {
   if (!showsData.data) {
@@ -38,7 +42,12 @@ export async function processShowsData(
   }
 
   const showSetLists: PhishShowSetlist[] = [];
-  const totalShows = Math.min(showsData.data.length, limit);
+
+  //optional limit for the number of shows for debugging
+  const totalShows =
+    LIMIT_SHOWS && LIMIT_SHOWS >= 0
+      ? Math.min(showsData.data.length, LIMIT_SHOWS)
+      : showsData.data.length;
 
   for (let i = 0; i < totalShows; i++) {
     const show = showsData.data[i];
