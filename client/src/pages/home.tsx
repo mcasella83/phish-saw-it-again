@@ -27,7 +27,7 @@ export default function HomePage() {
       const showsData = await getShowsByUsername(data.username);
       console.log("Shows data received:", showsData);
 
-      const LIMIT = 1;
+      const LIMIT = 10;
       let showSetLists = [];
 
       if (!showsData.error && showsData.data) {
@@ -40,12 +40,14 @@ export default function HomePage() {
           setLoadingShowCount(i + 1);
           console.log(`processing show #${i}, id=${show.showid}`);
 
-          const showSetList: PhishShowSetlist = await getShowSetList(show.showid);
+          const showSetList: PhishShowSetlist = await getShowSetList(
+            show.showid,
+          );
           console.log("Show set list received:", JSON.stringify(showSetList));
 
-          if (showSetList.[0]?.setlistnotes) {
-            showSetList.data[0].setlistnotes = decodeHtmlEntities(
-              showSetList.data[0].setlistnotes,
+          if (showSetList?.setListNotes) {
+            showSetList.setListNotes = decodeHtmlEntities(
+              showSetList.setListNotes,
             );
           }
 

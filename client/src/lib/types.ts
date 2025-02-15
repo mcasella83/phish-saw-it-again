@@ -15,7 +15,7 @@ export interface PhishShowApiResponse {
 export interface PhishSetlistApiResponse {
   error: boolean;
   error_message?: string;
-  data: PhishShowSetlist;
+  data: ApiSong[];
 }
 
 export interface ApiSong {
@@ -59,9 +59,9 @@ export interface ApiSong {
 }
 
 export interface PhishShowSetlist {
-  id: string;
+  id: number;
   date: string;
-  song: PhishSong[];
+  songs: PhishSong[];
   setListNotes: string;
   venue: string;
   city: string;
@@ -74,4 +74,9 @@ export interface PhishSong {
   date: string;
   position: number;
   set: string;
+  transition?: number;
+  isjam?: boolean;
+  gap?: number;
+  nickname?: string;
+  uniqueid: number;
 }

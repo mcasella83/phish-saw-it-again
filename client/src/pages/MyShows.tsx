@@ -6,10 +6,10 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { cn, decodeHtmlEntities } from "@/lib/utils";
-import { PhishSetlistApiResponse } from "@/lib/types";
+import { PhishShowSetlist, PhishSong } from "@/lib/types";
 
 interface MyShowsProps {
-  showsWithSetLists: PhishSetlistApiResponse[];
+  showsWithSetLists: PhishShowSetlist[];
   loading: boolean;
   loadingShowCount: number;
   loadingMaxShowCount: number;
@@ -41,13 +41,9 @@ export default function MyShows({
 
   return (
     <div className="space-y-4">
-      {showsWithSetLists.map((showData) => {
-        if (!showData.data || !showData.data.setlist) {
-          return null;
-        }
-
-        const songsBySet = showData.data.setlist.reduce(
-          (acc: Record<string, typeof showData.data.setlist>, song) => {
+      {showsWithSetLists.map((show) => {
+        const songsBySet = show.songs.reduce(
+          (acc: Record<string, PhishSong[]>, song) => {
             const setKey = song.set;
             if (!acc[setKey]) {
               acc[setKey] = [];
@@ -58,7 +54,7 @@ export default function MyShows({
           {}
         );
 
-        const showId = showData.data.showid;
+        const showId = show.id.toString();
         const isExpanded = expandedShows[showId] || false;
 
         return (
@@ -73,12 +69,12 @@ export default function MyShows({
             <CollapsibleTrigger className="w-full">
               <div className="p-4 flex items-start justify-between cursor-pointer">
                 <div>
-                  <h3 className="font-medium">{showData.data.venue}</h3>
+                  <h3 className="font-medium">{show.venue}</h3>
                   <p className="text-sm text-muted-foreground">
-                    {showData.data.location}
+                    {show.city}, {show.state}, {show.country}
                   </p>
                   <p className="text-sm">
-                    {new Date(showData.data.showdate).toLocaleDateString()}
+                    {new Date(show.date).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="p-2">
@@ -129,9 +125,10 @@ export default function MyShows({
                           <ol className="list-decimal list-inside text-sm space-y-1">
                             {songs.map((song) => (
                               <li key={song.uniqueid} className="text-sm">
-                                {song.song}
+                                {song.name}
                                 {song.transition === 2 && " >"}
                                 {song.transition === 3 && " ->"}
+                                {song.isjam && " [jam]"}
                               </li>
                             ))}
                           </ol>
@@ -140,13 +137,13 @@ export default function MyShows({
                     </Collapsible>
                   );
                 })}
-                {showData.data.setlistnotes && (
+                {show.setListNotes && (
                   <div className="mt-4 text-sm text-muted-foreground">
                     <h4 className="font-medium">Notes:</h4>
                     <div
                       className="whitespace-pre-wrap"
                       dangerouslySetInnerHTML={{
-                        __html: decodeHtmlEntities(showData.data.setlistnotes),
+                        __html: decodeHtmlEntities(show.setListNotes),
                       }}
                     />
                   </div>
