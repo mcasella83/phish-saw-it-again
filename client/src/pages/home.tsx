@@ -5,7 +5,9 @@ import { getShowsByUsername } from "@/lib/phish-api";
 import {
   processShowsData,
   getUniqueSongsFromSetlists,
+  getVenueStatsFromSetlists,
   type SongStats,
+  type VenueStats,
 } from "@/lib/phish-processing";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,6 +23,7 @@ export default function HomePage() {
     PhishShowSetlist[] | null
   >(null);
   const [songStats, setSongStats] = useState<SongStats[] | null>(null);
+  const [venueStats, setVenueStats] = useState<VenueStats[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingShowCount, setLoadingShowCount] = useState(0);
   const [loadingMaxShowCount, setLoadingMaxShowCount] = useState(0);
@@ -52,9 +55,11 @@ export default function HomePage() {
         );
 
         setShowsWithSetlists(processedShows);
-        // Process songs after shows are loaded
+        // Process songs and venues after shows are loaded
         const processedSongs = getUniqueSongsFromSetlists(processedShows);
+        const processedVenues = getVenueStatsFromSetlists(processedShows);
         setSongStats(processedSongs);
+        setVenueStats(processedVenues);
       } else {
         throw new Error(showsData.error_message || "Failed to fetch shows");
       }
@@ -63,6 +68,7 @@ export default function HomePage() {
       setUser(null);
       setShowsWithSetlists(null);
       setSongStats(null);
+      setVenueStats(null);
 
       toast({
         title: "Failed to fetch shows",
@@ -103,7 +109,7 @@ export default function HomePage() {
             <MySongs songs={songStats} />
           </TabsContent>
           <TabsContent value="venues">
-            <MyVenues />
+            <MyVenues venues={venueStats} />
           </TabsContent>
         </Tabs>
       </div>
