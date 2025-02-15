@@ -9,6 +9,7 @@ import MyShows from "./MyShows";
 import MySongs from "./MySongs";
 import MyVenues from "./MyVenues";
 import { PhishShowSetlist } from "@/lib/types";
+import { LoadingModal } from "@/components/ui/LoadingModal";
 
 export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
@@ -59,6 +60,8 @@ export default function HomePage() {
       });
     } finally {
       setLoading(false);
+      setLoadingShowCount(0);
+      setLoadingMaxShowCount(0);
     }
   };
 
@@ -92,13 +95,20 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center">
-      <div className="w-full max-w-md p-6 bg-card rounded-lg shadow-sm">
-        <h1 className="text-2xl font-bold text-center mb-6">
-          Welcome to Phish.net Explorer
-        </h1>
-        <UserForm onSubmit={handleSubmit} />
+    <>
+      <LoadingModal 
+        isOpen={loading}
+        current={loadingShowCount}
+        total={loadingMaxShowCount}
+      />
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="w-full max-w-md p-6 bg-card rounded-lg shadow-sm">
+          <h1 className="text-2xl font-bold text-center mb-6">
+            Welcome to Phish.net Explorer
+          </h1>
+          <UserForm onSubmit={handleSubmit} />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
