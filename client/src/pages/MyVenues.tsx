@@ -50,7 +50,7 @@ export default function MyVenues({ venues }: MyVenuesProps) {
               return (
                 <>
                   <TableRow
-                    key={venueKey}
+                    key={`row-${venueKey}`}
                     className="cursor-pointer hover:bg-muted/50"
                     onClick={() =>
                       setExpandedVenues((prev) => ({
@@ -74,7 +74,7 @@ export default function MyVenues({ venues }: MyVenuesProps) {
                     </TableCell>
                   </TableRow>
                   {isExpanded && (
-                    <TableRow className="bg-muted/50">
+                    <TableRow key={`expanded-${venueKey}`} className="bg-muted/50">
                       <TableCell colSpan={4} className="p-4">
                         <h4 className="text-sm font-medium mb-2">Show Dates:</h4>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
