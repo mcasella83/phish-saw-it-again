@@ -1,7 +1,7 @@
 import { PhishShowApiResponse, PhishShowSetlist } from "./types";
 import { getShowSetList } from "./phish-api";
 
-const LIMIT_SHOWS = 10;
+const LIMIT_SHOWS = -1;
 
 export interface SongStats {
   name: string;
@@ -9,7 +9,9 @@ export interface SongStats {
   dates: string[];
 }
 
-export function getUniqueSongsFromSetlists(setlists: PhishShowSetlist[]): SongStats[] {
+export function getUniqueSongsFromSetlists(
+  setlists: PhishShowSetlist[],
+): SongStats[] {
   const songMap = new Map<string, { count: number; dates: Set<string> }>();
 
   setlists.forEach((setlist) => {
@@ -21,7 +23,7 @@ export function getUniqueSongsFromSetlists(setlists: PhishShowSetlist[]): SongSt
       } else {
         songMap.set(song.name, {
           count: 1,
-          dates: new Set([song.date])
+          dates: new Set([song.date]),
         });
       }
     });
@@ -32,7 +34,7 @@ export function getUniqueSongsFromSetlists(setlists: PhishShowSetlist[]): SongSt
     .map(([name, stats]) => ({
       name,
       playCount: stats.count,
-      dates: Array.from(stats.dates).sort((a, b) => a.localeCompare(b))
+      dates: Array.from(stats.dates).sort((a, b) => a.localeCompare(b)),
     }))
     .sort((a, b) => b.playCount - a.playCount);
 }
@@ -47,14 +49,18 @@ export async function processShowsData(
 
   const showSetLists: PhishShowSetlist[] = [];
 
-  const totalShows =
-    LIMIT_SHOWS && LIMIT_SHOWS >= 0
-      ? Math.min(showsData.data.length, LIMIT_SHOWS)
-      : showsData.data.length;
+  // const totalShows =
+  //   LIMIT_SHOWS && LIMIT_SHOWS >= 0
+  //     ? Math.min(showsData.data.length, LIMIT_SHOWS)
+  //     : showsData.data.length;
 
-  for (let i = 0; i < totalShows; i++) {
+  if (LIMIT_SHOWS && LIMIT_SHOWS >= 0 && LIMIT_SHOWS <= showsData.data.length) {
+    showsData.data = showsData.data.slice(0, LIMIT_SHOWS);
+  }
+
+  for (let i = 0; i < showsData.data.length; i++) {
     const show = showsData.data[i];
-    onProgress?.(i + 1, totalShows, show);
+    onProgress?.(i + 1, showsData.data.length, show);
 
     const showSetList = await getShowSetList(show.showid);
     showSetLists.push(showSetList);

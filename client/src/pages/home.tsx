@@ -2,7 +2,11 @@ import UserForm from "@/components/UserForm";
 import type { User } from "@shared/schema";
 import { useState } from "react";
 import { getShowsByUsername } from "@/lib/phish-api";
-import { processShowsData, getUniqueSongsFromSetlists, type SongStats } from "@/lib/phish-processing";
+import {
+  processShowsData,
+  getUniqueSongsFromSetlists,
+  type SongStats,
+} from "@/lib/phish-processing";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MyShows from "./MyShows";
@@ -32,7 +36,9 @@ export default function HomePage() {
       console.log("Shows data received:", showsData);
 
       if (!showsData.error && showsData.data) {
-        setLoadingMaxShowCount(Math.min(showsData.data.length, 10));
+        setLoadingMaxShowCount(
+          Math.min(showsData.data.length, showsData.data.length),
+        );
 
         const processedShows = await processShowsData(
           showsData,
@@ -106,7 +112,7 @@ export default function HomePage() {
 
   return (
     <>
-      <LoadingModal 
+      <LoadingModal
         isOpen={loading}
         current={loadingShowCount}
         total={loadingMaxShowCount}
