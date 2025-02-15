@@ -39,7 +39,7 @@ export function getUniqueSongsFromSetlists(setlists: PhishShowSetlist[]): SongSt
 
 export async function processShowsData(
   showsData: PhishShowApiResponse,
-  onProgress?: (current: number, total: number) => void,
+  onProgress?: (current: number, total: number, show?: any) => void,
 ): Promise<PhishShowSetlist[]> {
   if (!showsData.data) {
     throw new Error("No show data available");
@@ -54,7 +54,7 @@ export async function processShowsData(
 
   for (let i = 0; i < totalShows; i++) {
     const show = showsData.data[i];
-    onProgress?.(i + 1, totalShows);
+    onProgress?.(i + 1, totalShows, show);
 
     const showSetList = await getShowSetList(show.showid);
     showSetLists.push(showSetList);

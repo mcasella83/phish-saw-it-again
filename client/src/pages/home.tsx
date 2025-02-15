@@ -20,6 +20,8 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [loadingShowCount, setLoadingShowCount] = useState(0);
   const [loadingMaxShowCount, setLoadingMaxShowCount] = useState(0);
+  const [currentShowDate, setCurrentShowDate] = useState<string>("");
+  const [currentShowVenue, setCurrentShowVenue] = useState<string>("");
   const { toast } = useToast();
 
   const handleSubmit = async (data: User) => {
@@ -34,7 +36,13 @@ export default function HomePage() {
 
         const processedShows = await processShowsData(
           showsData,
-          (current, total) => setLoadingShowCount(current),
+          (current, total, show) => {
+            setLoadingShowCount(current);
+            if (show) {
+              setCurrentShowDate(show.showdate);
+              setCurrentShowVenue(show.venue);
+            }
+          },
         );
 
         setShowsWithSetlists(processedShows);
@@ -62,6 +70,8 @@ export default function HomePage() {
       setLoading(false);
       setLoadingShowCount(0);
       setLoadingMaxShowCount(0);
+      setCurrentShowDate("");
+      setCurrentShowVenue("");
     }
   };
 
@@ -100,6 +110,8 @@ export default function HomePage() {
         isOpen={loading}
         current={loadingShowCount}
         total={loadingMaxShowCount}
+        currentShowDate={currentShowDate}
+        currentShowVenue={currentShowVenue}
       />
       <div className="min-h-[80vh] flex items-center justify-center">
         <div className="w-full max-w-md p-6 bg-card rounded-lg shadow-sm">
