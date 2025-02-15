@@ -20,3 +20,11 @@ export function decodeHtmlEntities(text: string): string {
     return text;
   }
 }
+
+// Helper function to encode text as UTF-8
+export function encodeUTF8(text: string): string {
+  return encodeURIComponent(text).replace(/%([0-9A-F]{2})/g,
+    function (match, p1) {
+      return String.fromCharCode(parseInt(p1, 16));
+    });
+}
