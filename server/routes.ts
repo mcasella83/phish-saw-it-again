@@ -103,6 +103,17 @@ export function registerRoutes(app: Express) {
       }
 
       const data = await response.json();
+      
+      // Decode special characters in setlist notes
+      if (data.data) {
+        data.data = data.data.map((item: any) => ({
+          ...item,
+          setlistnotes: item.setlistnotes 
+            ? decodeURIComponent(escape(item.setlistnotes))
+            : item.setlistnotes
+        }));
+      }
+      
       console.log(
         "Successfully fetched setlists:",
         data.error === false,
