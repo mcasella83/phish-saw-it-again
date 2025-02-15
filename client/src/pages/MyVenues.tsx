@@ -48,7 +48,7 @@ export default function MyVenues({ venues }: MyVenuesProps) {
               const isExpanded = expandedVenues[venueKey] || false;
 
               return (
-                <>
+                <React.Fragment key={venueKey}>
                   <TableRow
                     key={`row-${venueKey}`}
                     className="cursor-pointer hover:bg-muted/50"
@@ -87,7 +87,7 @@ export default function MyVenues({ venues }: MyVenuesProps) {
                       </TableCell>
                     </TableRow>
                   )}
-                </>
+                </React.Fragment>
               );
             })}
           </TableBody>
