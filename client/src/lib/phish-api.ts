@@ -4,7 +4,7 @@ import {
   PhishSetlistApiResponse,
   PhishSong,
 } from "./types";
-import { encodeUTF8 } from "./utils";
+import { decodeHtmlEntities, encodeUTF8 } from "./utils";
 
 export async function getShowsByUsername(
   username: string,
@@ -54,7 +54,7 @@ export async function getShowSetList(id: string): Promise<PhishShowSetlist> {
   }
 
   // Map the API response to our PhishShowSetlist type
-  const songs: PhishSong[] = apiResponse.data.map(song => ({
+  const songs: PhishSong[] = apiResponse.data.map((song) => ({
     name: song.song,
     date: song.showdate,
     position: song.position,
@@ -63,7 +63,7 @@ export async function getShowSetList(id: string): Promise<PhishShowSetlist> {
     isjam: song.isjam === 1,
     gap: song.gap,
     nickname: song.nickname,
-    uniqueid: song.uniqueid
+    uniqueid: song.uniqueid,
   }));
 
   // Sort songs by set and position
@@ -79,7 +79,7 @@ export async function getShowSetList(id: string): Promise<PhishShowSetlist> {
     id: firstSong.showid,
     date: firstSong.showdate,
     songs: songs,
-    setListNotes: encodeUTF8(firstSong.setlistnotes),
+    setListNotes: decodeHtmlEntities(firstSong.setlistnotes),
     venue: firstSong.venue,
     city: firstSong.city,
     state: firstSong.state,
