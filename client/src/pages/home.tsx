@@ -2,24 +2,20 @@ import UserForm from "@/components/UserForm";
 import type { User } from "@shared/schema";
 import { useState } from "react";
 import { getShowsByUsername } from "@/lib/phish-api";
-import { processShowsData } from "@/lib/phish-processing";
+import { processShowsData, getUniqueSongsFromSetlists, type SongStats } from "@/lib/phish-processing";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MyShows from "./MyShows";
 import MySongs from "./MySongs";
 import MyVenues from "./MyVenues";
-import { PhishShowSetlist, PhishSong } from "@/lib/types";
+import { PhishShowSetlist } from "@/lib/types";
 
 export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
   const [showsWithSetLists, setShowsWithSetlists] = useState<
     PhishShowSetlist[] | null
   >(null);
-
-  const [songsStats, setSongsStats] = useState<
-    PhishSong[] | null
-  >(null);
-
+  const [songStats, setSongStats] = useState<SongStats[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingShowCount, setLoadingShowCount] = useState(0);
   const [loadingMaxShowCount, setLoadingMaxShowCount] = useState(0);
@@ -41,10 +37,9 @@ export default function HomePage() {
         );
 
         setShowsWithSetlists(processedShows);
-
-        const song
-
-        
+        // Process songs after shows are loaded
+        const processedSongs = getUniqueSongsFromSetlists(processedShows);
+        setSongStats(processedSongs);
       } else {
         throw new Error(showsData.error_message || "Failed to fetch shows");
       }
@@ -52,6 +47,7 @@ export default function HomePage() {
       console.error("Error in handleSubmit:", error);
       setUser(null);
       setShowsWithSetlists(null);
+      setSongStats(null);
 
       toast({
         title: "Failed to fetch shows",
@@ -85,7 +81,7 @@ export default function HomePage() {
             />
           </TabsContent>
           <TabsContent value="songs">
-            <MySongs />
+            <MySongs songs={songStats} />
           </TabsContent>
           <TabsContent value="venues">
             <MyVenues />

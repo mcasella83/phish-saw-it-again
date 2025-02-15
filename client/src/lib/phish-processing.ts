@@ -1,36 +1,40 @@
 import { PhishShowApiResponse, PhishShowSetlist } from "./types";
 import { getShowSetList } from "./phish-api";
 
-const LIMIT_SHOWS = -1;
+const LIMIT_SHOWS = 10;
 
-export function getUniqueSongsFromSetlists(setlists: PhishShowSetlist[]) {
-  const allMySongs = new Map<string, Array<{ name: string; date: string }>>();
+export interface SongStats {
+  name: string;
+  playCount: number;
+  dates: string[];
+}
+
+export function getUniqueSongsFromSetlists(setlists: PhishShowSetlist[]): SongStats[] {
+  const songMap = new Map<string, { count: number; dates: Set<string> }>();
 
   setlists.forEach((setlist) => {
-    const songsFromShow = new Map<
-      string,
-      Array<{ name: string; date: string }>
-    >();
-
     setlist.songs.forEach((song) => {
-      const name = song.name;
-      const songEntry = { name: song.name, date: song.date };
-
-      if (!allMySongs.has(name)) {
-        allMySongs.set(name, [songEntry]);
-        songsFromShow.set(name, [songEntry]);
+      const existingEntry = songMap.get(song.name);
+      if (existingEntry) {
+        existingEntry.count++;
+        existingEntry.dates.add(song.date);
       } else {
-        const songEntries = allMySongs.get(name);
-        if (songEntries && !songsFromShow.has(name)) {
-          songEntries.push(songEntry);
-        } else {
-          console.log("repeat song %s on %s", songEntry.name, songEntry.date);
-        }
+        songMap.set(song.name, {
+          count: 1,
+          dates: new Set([song.date])
+        });
       }
     });
   });
 
-  return new Map([...allMySongs.entries()].sort());
+  // Convert map to array and sort by play count (descending)
+  return Array.from(songMap.entries())
+    .map(([name, stats]) => ({
+      name,
+      playCount: stats.count,
+      dates: Array.from(stats.dates).sort((a, b) => a.localeCompare(b))
+    }))
+    .sort((a, b) => b.playCount - a.playCount);
 }
 
 export async function processShowsData(
@@ -43,13 +47,10 @@ export async function processShowsData(
 
   const showSetLists: PhishShowSetlist[] = [];
 
-  //optional limit for the number of shows for debugging
   const totalShows =
     LIMIT_SHOWS && LIMIT_SHOWS >= 0
       ? Math.min(showsData.data.length, LIMIT_SHOWS)
       : showsData.data.length;
-
-  console.log("processing %d shows", totalShows);
 
   for (let i = 0; i < totalShows; i++) {
     const show = showsData.data[i];
