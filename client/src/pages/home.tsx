@@ -181,7 +181,7 @@ export default function HomePage({
         handleSignOut={handleSignOut}
       />
       {user && showsWithSetLists ? (
-        <div className="w-full px-8 py-8 mt-16">
+        <div className="w-full px-8 pb-8">
           <div className="space-y-4">{getContent()}</div>
         </div>
       ) : (
