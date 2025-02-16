@@ -1,7 +1,7 @@
 import { PhishShowApiResponse, PhishShowSetlist } from "./types";
 import { getShowSetList } from "./phish-api";
 
-const LIMIT_SHOWS = 2;
+const LIMIT_SHOWS = -1; //2;
 
 export interface SongStats {
   name: string;
