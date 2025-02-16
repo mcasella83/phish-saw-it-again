@@ -10,12 +10,13 @@ import {
   type VenueStats,
 } from "@/lib/phish-processing";
 import { useToast } from "@/hooks/use-toast";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TabsContent } from "@/components/ui/tabs";
 import MyShows from "./MyShows";
 import MySongs from "./MySongs";
 import MyVenues from "./MyVenues";
 import { PhishShowSetlist } from "@/lib/types";
 import { LoadingModal } from "@/components/ui/LoadingModal";
+import Header from "@/components/layout/Header";
 
 export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
@@ -55,7 +56,6 @@ export default function HomePage() {
         );
 
         setShowsWithSetlists(processedShows);
-        // Process songs and venues after shows are loaded
         const processedSongs = getUniqueSongsFromSetlists(processedShows);
         const processedVenues = getVenueStatsFromSetlists(processedShows);
         setSongStats(processedSongs);
@@ -89,17 +89,10 @@ export default function HomePage() {
 
   if (user && showsWithSetLists) {
     return (
-      <div className="w-full px-8 py-8">
-        <div className="max-w-4xl mx-auto mb-6">
-          <h1 className="text-2xl font-bold">Welcome, {user.username}!</h1>
-        </div>
-        <Tabs defaultValue="shows" className="space-y-4">
-          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-3">
-            <TabsTrigger value="shows">My Shows</TabsTrigger>
-            <TabsTrigger value="songs">My Songs</TabsTrigger>
-            <TabsTrigger value="venues">My Venues</TabsTrigger>
-          </TabsList>
-          <TabsContent value="shows">
+      <div className="min-h-screen flex flex-col">
+        <Header username={user.username} />
+        <div className="flex-1 container mx-auto px-4 py-8">
+          <TabsContent value="shows" className="mt-0">
             <MyShows
               showsWithSetLists={showsWithSetLists}
               loading={loading}
@@ -113,7 +106,7 @@ export default function HomePage() {
           <TabsContent value="venues">
             <MyVenues venues={venueStats} />
           </TabsContent>
-        </Tabs>
+        </div>
       </div>
     );
   }
@@ -127,12 +120,15 @@ export default function HomePage() {
         currentShowDate={currentShowDate}
         currentShowVenue={currentShowVenue}
       />
-      <div className="min-h-[80vh] flex items-center justify-center">
-        <div className="w-full max-w-md p-6 bg-card rounded-lg shadow-sm">
-          <h1 className="text-2xl font-bold text-center mb-6">
-            Welcome to Phish.net Explorer
-          </h1>
-          <UserForm onSubmit={handleSubmit} />
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-1 flex items-center justify-center px-4">
+          <div className="w-full max-w-md p-6 bg-card rounded-lg shadow-sm">
+            <h1 className="text-2xl font-bold text-center mb-6">
+              Welcome to Phish.net Explorer
+            </h1>
+            <UserForm onSubmit={handleSubmit} />
+          </div>
         </div>
       </div>
     </>
