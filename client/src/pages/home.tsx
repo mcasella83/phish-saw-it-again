@@ -16,10 +16,10 @@ import MySongs from "./MySongs";
 import MyVenues from "./MyVenues";
 import { PhishShowSetlist } from "@/lib/types";
 import { LoadingModal } from "@/components/ui/LoadingModal";
-import { 
-  clearShowsCache, 
-  loadShowsFromCache, 
-  saveShowsToCache 
+import {
+  clearShowsCache,
+  loadShowsFromCache,
+  saveShowsToCache
 } from "@/lib/storage-utils";
 
 const STORAGE_KEY = "phish-explorer-username";
@@ -159,7 +159,7 @@ export default function HomePage() {
             <TabsTrigger value="songs">My Songs</TabsTrigger>
             <TabsTrigger value="venues">My Venues</TabsTrigger>
           </TabsList>
-          <TabsContent value="shows">
+          <TabsContent value="shows" className="space-y-4">
             <MyShows
               showsWithSetLists={showsWithSetLists}
               loading={loading}
@@ -167,10 +167,10 @@ export default function HomePage() {
               loadingMaxShowCount={loadingMaxShowCount}
             />
           </TabsContent>
-          <TabsContent value="songs">
+          <TabsContent value="songs" className="space-y-4">
             <MySongs songs={songStats} />
           </TabsContent>
-          <TabsContent value="venues">
+          <TabsContent value="venues" className="space-y-4">
             <MyVenues venues={venueStats} />
           </TabsContent>
         </Tabs>
