@@ -10,7 +10,7 @@ import {
   type VenueStats,
 } from "@/lib/phish-processing";
 import { useToast } from "@/hooks/use-toast";
-import { TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import MyShows from "./MyShows";
 import MySongs from "./MySongs";
 import MyVenues from "./MyVenues";
@@ -92,20 +92,22 @@ export default function HomePage() {
       <div className="min-h-screen flex flex-col">
         <Header username={user.username} />
         <div className="flex-1 container mx-auto px-4 py-8">
-          <TabsContent value="shows" className="mt-0">
-            <MyShows
-              showsWithSetLists={showsWithSetLists}
-              loading={loading}
-              loadingShowCount={loadingShowCount}
-              loadingMaxShowCount={loadingMaxShowCount}
-            />
-          </TabsContent>
-          <TabsContent value="songs">
-            <MySongs songs={songStats} />
-          </TabsContent>
-          <TabsContent value="venues">
-            <MyVenues venues={venueStats} />
-          </TabsContent>
+          <Tabs defaultValue="shows"> {/* Added defaultValue prop */}
+            <TabsContent value="shows" className="mt-0">
+              <MyShows
+                showsWithSetLists={showsWithSetLists}
+                loading={loading}
+                loadingShowCount={loadingShowCount}
+                loadingMaxShowCount={loadingMaxShowCount}
+              />
+            </TabsContent>
+            <TabsContent value="songs">
+              <MySongs songs={songStats} />
+            </TabsContent>
+            <TabsContent value="venues">
+              <MyVenues venues={venueStats} />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     );
