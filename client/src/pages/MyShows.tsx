@@ -26,6 +26,7 @@ export default function MyShows({
   loadingMaxShowCount 
 }: MyShowsProps) {
   const [expandedShows, setExpandedShows] = useState<Record<string, boolean>>({});
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const tableRef = useRef<HTMLDivElement>(null);
 
   // Calculate show counts per year and assign random colors
@@ -102,7 +103,9 @@ export default function MyShows({
               margin={{ top: 20, right: 0, left: -20, bottom: 5 }}
               onClick={(data) => {
                 if (data && data.activePayload && data.activePayload[0]) {
-                  scrollToYear(data.activePayload[0].payload.year);
+                  const year = data.activePayload[0].payload.year;
+                  setSelectedYear(year);
+                  scrollToYear(year);
                 }
               }}
             >
@@ -118,12 +121,19 @@ export default function MyShows({
               <Tooltip 
                 formatter={(value, name) => [value, 'Shows']}
                 labelFormatter={(label) => `Year: ${label}`}
-                cursor={{ fill: 'var(--muted)' }}
+                cursor={{ 
+                  fill: 'transparent',
+                  stroke: 'var(--foreground)',
+                  strokeWidth: 1
+                }}
               />
               <Bar 
                 dataKey="count" 
                 name="Shows"
-                onClick={(data) => scrollToYear(data.year)}
+                onClick={(data) => {
+                  setSelectedYear(data.year);
+                  scrollToYear(data.year);
+                }}
                 cursor="pointer"
               >
                 {showsByYear.map((entry, index) => (
@@ -166,7 +176,10 @@ export default function MyShows({
                 <React.Fragment key={showId}>
                   <TableRow
                     data-year={showYear}
-                    className="cursor-pointer hover:bg-muted/50"
+                    className={cn(
+                      "cursor-pointer hover:bg-muted/50",
+                      selectedYear === showYear && "bg-muted"
+                    )}
                     onClick={() =>
                       setExpandedShows((prev) => ({
                         ...prev,
