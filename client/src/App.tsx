@@ -9,7 +9,8 @@ import { useState } from "react";
 
 function Router() {
   const [activeTab, setActiveTab] = useState("shows");
-  const isLoggedIn = localStorage.getItem("phish-explorer-username") !== null;
+  const username = localStorage.getItem("phish-explorer-username");
+  const isLoggedIn = username !== null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -17,6 +18,8 @@ function Router() {
         showNavigation={isLoggedIn} 
         activeTab={activeTab} 
         onTabChange={setActiveTab}
+        isLoggedIn={isLoggedIn}
+        username={username || ""}
       />
       <main className="container mx-auto px-4 py-8 mt-16">
         <Switch>
