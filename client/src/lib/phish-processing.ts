@@ -42,7 +42,7 @@ export function getUniqueSongsFromSetlists(
     .map(([name, stats]) => ({
       name,
       playCount: stats.count,
-      dates: Array.from(stats.dates).sort((a, b) => a.localeCompare(b)),
+      dates: Array.from(stats.dates).sort((a, b) => b.localeCompare(a)),
     }))
     .sort((a, b) => b.playCount - a.playCount);
 }
@@ -87,7 +87,7 @@ export function getVenueStatsFromSetlists(
         state: stats.state,
         country: stats.country,
         showCount: stats.count,
-        dates: Array.from(stats.dates).sort((a, b) => a.localeCompare(b)),
+        dates: Array.from(stats.dates).sort((a, b) => b.localeCompare(a)),
       };
     })
     .sort((a, b) => b.showCount - a.showCount);
