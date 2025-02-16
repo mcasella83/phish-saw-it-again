@@ -44,6 +44,8 @@ export default function HomePage({
   const [loadingMaxShowCount, setLoadingMaxShowCount] = useState(0);
   const [currentShowDate, setCurrentShowDate] = useState<string>("");
   const [currentShowVenue, setCurrentShowVenue] = useState<string>("");
+  const [selectedYear, setSelectedYear] = useState<number | null>(null); // Added state variable
+  const [expandedShows, setExpandedShows] = useState<{ [key: string]: boolean }>({}); // Added state variable
   const { toast } = useToast();
 
   const loadUserData = async (username: string) => {
@@ -142,12 +144,15 @@ export default function HomePage({
     // Clear all cached data first
     clearShowsCache();
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.clear(); // Clear all items in localStorage to ensure complete cleanup
 
     // Reset all state
     setUser(null);
     setShowsWithSetlists(null);
     setSongStats(null);
     setVenueStats(null);
+    setSelectedYear(null);
+    setExpandedShows({});
   };
 
   const getContent = () => {
@@ -159,6 +164,9 @@ export default function HomePage({
             loading={loading}
             loadingShowCount={loadingShowCount}
             loadingMaxShowCount={loadingMaxShowCount}
+            selectedYear={selectedYear} // Added prop
+            setExpandedShows={setExpandedShows} // Added prop
+            expandedShows={expandedShows} // Added prop
           />
         );
       case "songs":
