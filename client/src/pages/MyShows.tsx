@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LabelList } from "recharts";
 
 interface MyShowsProps {
   showsWithSetLists: PhishShowSetlist[];
@@ -25,6 +25,33 @@ interface YearData {
   color: string;
 }
 
+const getLuminance = (color: string): number => {
+  const hsl = color.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+  if (!hsl) return 0.5;
+
+  const h = parseInt(hsl[1]) / 360;
+  const s = parseInt(hsl[2]) / 100;
+  const l = parseInt(hsl[3]) / 100;
+
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  const p = 2 * l - q;
+
+  const rgb = [
+    h + 1/3,
+    h,
+    h - 1/3
+  ].map(t => {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1/6) return p + (q - p) * 6 * t;
+    if (t < 1/2) return q;
+    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+    return p;
+  });
+
+  return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+};
+
 export default function MyShows({
   showsWithSetLists,
   loading,
@@ -35,7 +62,6 @@ export default function MyShows({
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const tableRef = useRef<HTMLDivElement>(null);
 
-  // Calculate show counts per year and assign random colors
   const showsByYear = useMemo(() => {
     if (!showsWithSetLists?.length) return [];
 
@@ -49,7 +75,6 @@ export default function MyShows({
       .map(([year, count]) => ({
         year: parseInt(year),
         count,
-        // Generate a random but visually pleasing color using HSL
         color: `hsl(${Math.random() * 360}, 70%, 50%)`
       }))
       .sort((a, b) => a.year - b.year);
@@ -58,14 +83,12 @@ export default function MyShows({
   const scrollToYear = (year: number) => {
     if (!tableRef.current) return;
 
-    // Find the first show of the selected year
     const yearRow = tableRef.current.querySelector(
       `[data-year="${year}"]`
     );
 
     if (yearRow) {
-      // Calculate offset for the sticky histogram (height + padding)
-      const histogramOffset = 400; // 300px height + 100px for padding and margins
+      const histogramOffset = 400; 
       const elementPosition = yearRow.getBoundingClientRect().top + window.pageYOffset;
       const offsetPosition = elementPosition - histogramOffset;
 
@@ -101,7 +124,6 @@ export default function MyShows({
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">My Shows ({showsWithSetLists.length})</h2>
-      {/* Chart section - sticky at the top */}
       <div className="sticky top-4 z-10 bg-background rounded-md border p-4 mb-4 shadow-sm">
         <h3 className="text-lg font-medium mb-4">Shows by Year</h3>
         <div className="h-[300px]">
@@ -155,12 +177,33 @@ export default function MyShows({
                     }}
                   />
                 ))}
+                <LabelList
+                  dataKey="count"
+                  position="center"
+                  content={({ x, y, width, height, value, index }) => {
+                    const entry = showsByYear[index];
+                    const luminance = getLuminance(entry.color);
+                    const textColor = luminance > 0.5 ? '#000000' : '#FFFFFF';
+
+                    return (
+                      <text
+                        x={(x || 0) + (width || 0) / 2}
+                        y={(y || 0) + (height || 0) / 2}
+                        fill={textColor}
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                        className="font-bold text-sm"
+                      >
+                        {value}
+                      </text>
+                    );
+                  }}
+                />
               </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
-      {/* Shows table */}
       <div className="rounded-md border" ref={tableRef}>
         <Table>
           <TableHeader>
@@ -225,7 +268,6 @@ export default function MyShows({
                     <TableRow className="bg-muted/50">
                       <TableCell colSpan={4} className="p-4">
                         <div className="space-y-4">
-                          {/* Sets */}
                           {Object.entries(songsBySet).map(([setName, songs]) => (
                             <div key={`${showId}-${setName}`} className="space-y-2">
                               <h4 className="font-medium text-sm">
@@ -243,7 +285,6 @@ export default function MyShows({
                               </ol>
                             </div>
                           ))}
-                          {/* Notes */}
                           {show.setListNotes && (
                             <div className="mt-4">
                               <h4 className="font-medium text-sm">Notes:</h4>
