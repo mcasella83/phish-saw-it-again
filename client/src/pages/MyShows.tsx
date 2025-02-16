@@ -22,6 +22,7 @@ interface MyShowsProps {
 interface YearData {
   year: number;
   count: number;
+  percentage: number;
   color: string;
 }
 
@@ -71,10 +72,13 @@ export default function MyShows({
       counts[year] = (counts[year] || 0) + 1;
     });
 
+    const totalShows = showsWithSetLists.length;
+
     return Object.entries(counts)
       .map(([year, count]) => ({
         year: parseInt(year),
         count,
+        percentage: (count / totalShows) * 100,
         color: `hsl(${Math.random() * 360}, 70%, 50%)`
       }))
       .sort((a, b) => a.year - b.year);
@@ -186,16 +190,28 @@ export default function MyShows({
                     const textColor = luminance > 0.5 ? '#000000' : '#FFFFFF';
 
                     return (
-                      <text
-                        x={(x || 0) + (width || 0) / 2}
-                        y={(y || 0) + (height || 0) / 2}
-                        fill={textColor}
-                        textAnchor="middle"
-                        dominantBaseline="central"
-                        className="font-bold text-sm"
-                      >
-                        {value}
-                      </text>
+                      <g>
+                        <text
+                          x={(x || 0) + (width || 0) / 2}
+                          y={(y || 0) + (height || 0) / 2 - 8}
+                          fill={textColor}
+                          textAnchor="middle"
+                          dominantBaseline="central"
+                          className="font-bold text-sm"
+                        >
+                          {value}
+                        </text>
+                        <text
+                          x={(x || 0) + (width || 0) / 2}
+                          y={(y || 0) + (height || 0) / 2 + 8}
+                          fill={textColor}
+                          textAnchor="middle"
+                          dominantBaseline="central"
+                          className="text-xs"
+                        >
+                          {entry.percentage.toFixed(1)}%
+                        </text>
+                      </g>
                     );
                   }}
                 />
