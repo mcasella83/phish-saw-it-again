@@ -12,12 +12,17 @@ interface HeaderProps {
   showNavigation?: boolean;
   activeTab?: string;
   onTabChange?: (value: string) => void;
+  isLoggedIn?: boolean;
+  username?: string;
 }
 
-export default function Header({ showNavigation = false, activeTab = "shows", onTabChange }: HeaderProps) {
-  // For demo purposes, assuming we have a logged-in user
-  const username = "DemoUser"; // This should be replaced with actual user data
-
+export default function Header({ 
+  showNavigation = false, 
+  activeTab = "shows", 
+  onTabChange,
+  isLoggedIn = false,
+  username = "" 
+}: HeaderProps) {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b bg-gradient-to-r from-primary/5 to-primary/10 backdrop-blur-sm">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -30,9 +35,11 @@ export default function Header({ showNavigation = false, activeTab = "shows", on
                   I Saw It Again
                 </span>
               </div>
-              <span className="text-sm text-muted-foreground mt-1">
-                {username}
-              </span>
+              {isLoggedIn && username && (
+                <span className="text-sm text-muted-foreground mt-1">
+                  {username}
+                </span>
+              )}
             </a>
           </Link>
         </div>
