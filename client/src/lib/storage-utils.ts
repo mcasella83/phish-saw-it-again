@@ -9,8 +9,8 @@ const CACHE_KEYS = {
   CACHE_TIMESTAMP: "phish-explorer-cache-timestamp",
 } as const;
 
-// Cache will expire after 24 hours
-const CACHE_EXPIRATION_MS = 24 * 60 * 60 * 1000;
+// Cache will expire after 90 days
+const CACHE_EXPIRATION_MS = 90 * 24 * 60 * 60 * 1000;
 
 interface CacheData {
   shows: PhishShowSetlist[] | null;
@@ -21,10 +21,10 @@ interface CacheData {
 function isCacheValid(): boolean {
   const timestamp = localStorage.getItem(CACHE_KEYS.CACHE_TIMESTAMP);
   if (!timestamp) return false;
-  
+
   const cacheTime = parseInt(timestamp, 10);
   const now = Date.now();
-  
+
   return now - cacheTime < CACHE_EXPIRATION_MS;
 }
 
@@ -57,7 +57,9 @@ export function loadShowsFromCache(): CacheData | null {
   try {
     const shows = JSON.parse(localStorage.getItem(CACHE_KEYS.SHOWS) || "null");
     const songs = JSON.parse(localStorage.getItem(CACHE_KEYS.SONGS) || "null");
-    const venues = JSON.parse(localStorage.getItem(CACHE_KEYS.VENUES) || "null");
+    const venues = JSON.parse(
+      localStorage.getItem(CACHE_KEYS.VENUES) || "null",
+    );
 
     if (!shows || !songs || !venues) {
       return null;
