@@ -127,222 +127,226 @@ export default function MyShows({
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">My Shows ({showsWithSetLists.length})</h2>
-      <div className="sticky top-4 z-10 bg-background rounded-md border p-4 shadow-sm w-full">
-        <h3 className="text-lg font-medium mb-4">Shows by Year</h3>
-        <div className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={showsByYear}
-              margin={{ top: 20, right: 20, left: -20, bottom: 5 }}
-              onMouseMove={(state) => {
-                if (state && state.activePayload && state.activePayload[0]) {
-                  const year = (state.activePayload[0].payload as YearData).year;
-                  setSelectedYear(year);
-                }
-              }}
-              onMouseLeave={() => {
-                setSelectedYear(null);
-              }}
-            >
-              <XAxis
-                dataKey="year"
-                tickFormatter={(value) => value.toString()}
-                fontSize={12}
-              />
-              <YAxis
-                allowDecimals={false}
-                fontSize={12}
-              />
-              <Tooltip
-                formatter={(value, name) => [value, 'Shows']}
-                labelFormatter={(label) => `Year: ${label}`}
-                cursor={false}
-              />
-              <Bar
-                dataKey="count"
-                name="Shows"
-                onClick={(data) => {
-                  const yearData = data as unknown as YearData;
-                  setSelectedYear(yearData.year);
-                  scrollToYear(yearData.year);
+      <div className="fixed top-16 left-0 right-0 z-50 bg-background px-8">
+        <h2 className="text-xl font-semibold mb-4">My Shows ({showsWithSetLists.length})</h2>
+        <div className="rounded-md border p-4 shadow-sm w-full">
+          <h3 className="text-lg font-medium mb-4">Shows by Year</h3>
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={showsByYear}
+                margin={{ top: 20, right: 20, left: -20, bottom: 5 }}
+                onMouseMove={(state) => {
+                  if (state && state.activePayload && state.activePayload[0]) {
+                    const year = (state.activePayload[0].payload as YearData).year;
+                    setSelectedYear(year);
+                  }
                 }}
-                cursor="pointer"
+                onMouseLeave={() => {
+                  setSelectedYear(null);
+                }}
               >
-                {showsByYear.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={entry.color}
-                    stroke={selectedYear === entry.year ? '#000000' : entry.color}
-                    strokeWidth={selectedYear === entry.year ? 2 : 0}
-                    strokeOpacity={1}
-                    style={{
-                      filter: selectedYear === entry.year ? 'brightness(1.1)' : 'none',
-                    }}
-                  />
-                ))}
-                <LabelList
+                <XAxis
+                  dataKey="year"
+                  tickFormatter={(value) => value.toString()}
+                  fontSize={12}
+                />
+                <YAxis
+                  allowDecimals={false}
+                  fontSize={12}
+                />
+                <Tooltip
+                  formatter={(value, name) => [value, 'Shows']}
+                  labelFormatter={(label) => `Year: ${label}`}
+                  cursor={false}
+                />
+                <Bar
                   dataKey="count"
-                  position="center"
-                  content={({ x, y, width, height, value, index }) => {
-                    const entry = showsByYear[index];
-                    if (!entry) return null;
+                  name="Shows"
+                  onClick={(data) => {
+                    const yearData = data as unknown as YearData;
+                    setSelectedYear(yearData.year);
+                    scrollToYear(yearData.year);
+                  }}
+                  cursor="pointer"
+                >
+                  {showsByYear.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={entry.color}
+                      stroke={selectedYear === entry.year ? '#000000' : entry.color}
+                      strokeWidth={selectedYear === entry.year ? 2 : 0}
+                      strokeOpacity={1}
+                      style={{
+                        filter: selectedYear === entry.year ? 'brightness(1.1)' : 'none',
+                      }}
+                    />
+                  ))}
+                  <LabelList
+                    dataKey="count"
+                    position="center"
+                    content={({ x, y, width, height, value, index }) => {
+                      const entry = showsByYear[index];
+                      if (!entry) return null;
 
-                    const luminance = getLuminance(entry.color);
-                    const textColor = luminance > 0.5 ? '#000000' : '#FFFFFF';
-                    const xPos = (Number(x) || 0) + (Number(width) || 0) / 2;
-                    const yPos = (Number(y) || 0) + (Number(height) || 0) / 2;
-                    const isSingleShow = value === 1;
+                      const luminance = getLuminance(entry.color);
+                      const textColor = luminance > 0.5 ? '#000000' : '#FFFFFF';
+                      const xPos = (Number(x) || 0) + (Number(width) || 0) / 2;
+                      const yPos = (Number(y) || 0) + (Number(height) || 0) / 2;
+                      const isSingleShow = value === 1;
 
-                    return (
-                      <g>
-                        {isSingleShow ? (
-                          // Single show layout - everything on one line
-                          <text
-                            x={xPos}
-                            y={yPos}
-                            fill={textColor}
-                            textAnchor="middle"
-                            dominantBaseline="central"
-                            className="text-xs"
-                          >
-                            {value} ({entry.percentage.toFixed(1)}%)
-                          </text>
-                        ) : (
-                          // Multiple shows layout - stacked
-                          <>
+                      return (
+                        <g>
+                          {isSingleShow ? (
+                            // Single show layout - everything on one line
                             <text
                               x={xPos}
-                              y={yPos - 8}
-                              fill={textColor}
-                              textAnchor="middle"
-                              dominantBaseline="central"
-                              className="font-bold text-sm"
-                            >
-                              {value}
-                            </text>
-                            <text
-                              x={xPos}
-                              y={yPos + 8}
+                              y={yPos}
                               fill={textColor}
                               textAnchor="middle"
                               dominantBaseline="central"
                               className="text-xs"
                             >
-                              {entry.percentage.toFixed(1)}%
+                              {value} ({entry.percentage.toFixed(1)}%)
                             </text>
-                          </>
-                        )}
-                      </g>
-                    );
-                  }}
-                />
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+                          ) : (
+                            // Multiple shows layout - stacked
+                            <>
+                              <text
+                                x={xPos}
+                                y={yPos - 8}
+                                fill={textColor}
+                                textAnchor="middle"
+                                dominantBaseline="central"
+                                className="font-bold text-sm"
+                              >
+                                {value}
+                              </text>
+                              <text
+                                x={xPos}
+                                y={yPos + 8}
+                                fill={textColor}
+                                textAnchor="middle"
+                                dominantBaseline="central"
+                                className="text-xs"
+                              >
+                                {entry.percentage.toFixed(1)}%
+                              </text>
+                            </>
+                          )}
+                        </g>
+                      );
+                    }}
+                  />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
-      <div className="rounded-md border" ref={tableRef}>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Venue</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {showsWithSetLists.map((show) => {
-              const showId = show.id.toString();
-              const showYear = new Date(show.date).getFullYear();
-              const isExpanded = expandedShows[showId] || false;
-              const songsBySet = show.songs.reduce(
-                (acc: Record<string, PhishSong[]>, song) => {
-                  const setKey = song.set;
-                  if (!acc[setKey]) {
-                    acc[setKey] = [];
-                  }
-                  acc[setKey].push(song);
-                  return acc;
-                },
-                {}
-              );
-
-              return (
-                <React.Fragment key={showId}>
-                  <TableRow
-                    data-year={showYear}
-                    className={cn(
-                      "cursor-pointer hover:bg-muted/50",
-                      selectedYear === showYear && "bg-muted"
-                    )}
-                    onClick={() =>
-                      setExpandedShows((prev) => ({
-                        ...prev,
-                        [showId]: !isExpanded,
-                      }))
+      <div className="pt-[480px]">
+        <div className="rounded-md border" ref={tableRef}>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Date</TableHead>
+                <TableHead>Venue</TableHead>
+                <TableHead>Location</TableHead>
+                <TableHead className="w-[50px]"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {showsWithSetLists.map((show) => {
+                const showId = show.id.toString();
+                const showYear = new Date(show.date).getFullYear();
+                const isExpanded = expandedShows[showId] || false;
+                const songsBySet = show.songs.reduce(
+                  (acc: Record<string, PhishSong[]>, song) => {
+                    const setKey = song.set;
+                    if (!acc[setKey]) {
+                      acc[setKey] = [];
                     }
-                  >
-                    <TableCell>
-                      {new Date(show.date).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {show.venue}
-                    </TableCell>
-                    <TableCell>
-                      {show.city}, {show.state}, {show.country}
-                    </TableCell>
-                    <TableCell>
-                      <ChevronDown
-                        className={cn(
-                          "h-4 w-4 transition-transform duration-200",
-                          isExpanded && "transform rotate-180"
-                        )}
-                      />
-                    </TableCell>
-                  </TableRow>
-                  {isExpanded && (
-                    <TableRow className="bg-muted/50">
-                      <TableCell colSpan={4} className="p-4">
-                        <div className="space-y-4">
-                          {Object.entries(songsBySet).map(([setName, songs]) => (
-                            <div key={`${showId}-${setName}`} className="space-y-2">
-                              <h4 className="font-medium text-sm">
-                                {setName === "e" ? "Encore" : `Set ${setName}`}
-                              </h4>
-                              <ol className="list-decimal list-inside text-sm space-y-1">
-                                {songs.map((song) => (
-                                  <li key={song.uniqueid} className="text-sm">
-                                    {song.name}
-                                    {song.transition === 2 && " >"}
-                                    {song.transition === 3 && " ->"}
-                                    {song.isjam && " [jam]"}
-                                  </li>
-                                ))}
-                              </ol>
-                            </div>
-                          ))}
-                          {show.setListNotes && (
-                            <div className="mt-4">
-                              <h4 className="font-medium text-sm">Notes:</h4>
-                              <div
-                                className="text-sm text-muted-foreground whitespace-pre-wrap"
-                                dangerouslySetInnerHTML={{
-                                  __html: show.setListNotes,
-                                }}
-                              />
-                            </div>
+                    acc[setKey].push(song);
+                    return acc;
+                  },
+                  {}
+                );
+
+                return (
+                  <React.Fragment key={showId}>
+                    <TableRow
+                      data-year={showYear}
+                      className={cn(
+                        "cursor-pointer hover:bg-muted/50",
+                        selectedYear === showYear && "bg-muted"
+                      )}
+                      onClick={() =>
+                        setExpandedShows((prev) => ({
+                          ...prev,
+                          [showId]: !isExpanded,
+                        }))
+                      }
+                    >
+                      <TableCell>
+                        {new Date(show.date).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {show.venue}
+                      </TableCell>
+                      <TableCell>
+                        {show.city}, {show.state}, {show.country}
+                      </TableCell>
+                      <TableCell>
+                        <ChevronDown
+                          className={cn(
+                            "h-4 w-4 transition-transform duration-200",
+                            isExpanded && "transform rotate-180"
                           )}
-                        </div>
+                        />
                       </TableCell>
                     </TableRow>
-                  )}
-                </React.Fragment>
-              );
-            })}
-          </TableBody>
-        </Table>
+                    {isExpanded && (
+                      <TableRow className="bg-muted/50">
+                        <TableCell colSpan={4} className="p-4">
+                          <div className="space-y-4">
+                            {Object.entries(songsBySet).map(([setName, songs]) => (
+                              <div key={`${showId}-${setName}`} className="space-y-2">
+                                <h4 className="font-medium text-sm">
+                                  {setName === "e" ? "Encore" : `Set ${setName}`}
+                                </h4>
+                                <ol className="list-decimal list-inside text-sm space-y-1">
+                                  {songs.map((song) => (
+                                    <li key={song.uniqueid} className="text-sm">
+                                      {song.name}
+                                      {song.transition === 2 && " >"}
+                                      {song.transition === 3 && " ->"}
+                                      {song.isjam && " [jam]"}
+                                    </li>
+                                  ))}
+                                </ol>
+                              </div>
+                            ))}
+                            {show.setListNotes && (
+                              <div className="mt-4">
+                                <h4 className="font-medium text-sm">Notes:</h4>
+                                <div
+                                  className="text-sm text-muted-foreground whitespace-pre-wrap"
+                                  dangerouslySetInnerHTML={{
+                                    __html: show.setListNotes,
+                                  }}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );
