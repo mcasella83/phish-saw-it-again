@@ -20,31 +20,29 @@ export default function Header({ showNavigation = false, activeTab = "shows", on
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b bg-gradient-to-r from-primary/5 to-primary/10 backdrop-blur-sm">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/">
-          <div className="flex items-center gap-4">
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <IoMusicalNotes className="h-8 w-8 text-primary" />
-                <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent text-2xl font-bold">
-                  I Saw It Again
-                </span>
+        <div className="flex items-center gap-4">
+          <IoMusicalNotes className="h-8 w-8 text-primary" />
+          <div>
+            <Link href="/">
+              <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent text-2xl font-bold">
+                I Saw It Again
+              </span>
+            </Link>
+            {username && (
+              <div className="text-sm">
+                Welcome, {username}
+                {onSignOut && (
+                  <button 
+                    onClick={onSignOut}
+                    className="ml-2 text-blue-500 hover:text-blue-600 transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                )}
               </div>
-              {username && (
-                <div className="text-sm">
-                  Welcome, {username}
-                  {onSignOut && (
-                    <button 
-                      onClick={onSignOut}
-                      className="ml-2 text-blue-500 hover:text-blue-600 transition-colors"
-                    >
-                      Sign Out
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
+            )}
           </div>
-        </Link>
+        </div>
         {showNavigation && (
           <NavigationMenu>
             <NavigationMenuList>
