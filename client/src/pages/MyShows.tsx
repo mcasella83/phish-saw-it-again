@@ -59,26 +59,20 @@ export default function MyShows({
     if (!tableRef.current) return;
 
     // Find the first show of the selected year
-    const firstShowOfYear = showsWithSetLists.find(
-      show => new Date(show.date).getFullYear() === year
+    const yearRow = tableRef.current.querySelector(
+      `[data-year="${year}"]`
     );
 
-    if (firstShowOfYear) {
-      const yearRow = tableRef.current.querySelector(
-        `[data-year="${year}"]`
-      );
+    if (yearRow) {
+      // Calculate offset for the sticky histogram (height + padding)
+      const histogramOffset = 400; // 300px height + 100px for padding and margins
+      const elementPosition = yearRow.getBoundingClientRect().top + window.pageYOffset;
+      const offsetPosition = elementPosition - histogramOffset;
 
-      if (yearRow) {
-        // Calculate offset for the sticky histogram (height + padding)
-        const histogramOffset = 400; // 300px height + 100px for padding and margins
-        const elementPosition = yearRow.getBoundingClientRect().top + window.pageYOffset;
-        const offsetPosition = elementPosition - histogramOffset;
-
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: 'smooth'
-        });
-      }
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
     }
   };
 
@@ -156,7 +150,12 @@ export default function MyShows({
                     key={`cell-${index}`}
                     fill={entry.color}
                     stroke={selectedYear === entry.year ? '#000000' : 'transparent'}
-                    strokeWidth={selectedYear === entry.year ? 2 : 0}
+                    strokeWidth={selectedYear === entry.year ? 1 : 0}
+                    strokeOpacity={1}
+                    style={{
+                      strokeDasharray: 'none',
+                      paintOrder: 'stroke'
+                    }}
                   />
                 ))}
               </Bar>
