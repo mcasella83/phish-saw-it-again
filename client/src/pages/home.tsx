@@ -6,25 +6,14 @@ import {
   processShowsData,
   getUniqueSongsFromSetlists,
   getVenueStatsFromSetlists,
-  type SongStats,
-  type VenueStats,
 } from "@/lib/phish-processing";
 import { useToast } from "@/hooks/use-toast";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import MyShows from "./MyShows";
-import MySongs from "./MySongs";
-import MyVenues from "./MyVenues";
-import { PhishShowSetlist } from "@/lib/types";
 import { LoadingModal } from "@/components/ui/LoadingModal";
 import { useUser } from "@/lib/stores/user";
+import { useAppData } from "@/lib/stores/app-data";
 import { useLocation } from "wouter";
 
 export default function HomePage() {
-  const [showsWithSetLists, setShowsWithSetlists] = useState<
-    PhishShowSetlist[] | null
-  >(null);
-  const [songStats, setSongStats] = useState<SongStats[] | null>(null);
-  const [venueStats, setVenueStats] = useState<VenueStats[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingShowCount, setLoadingShowCount] = useState(0);
   const [loadingMaxShowCount, setLoadingMaxShowCount] = useState(0);
@@ -32,12 +21,14 @@ export default function HomePage() {
   const [currentShowVenue, setCurrentShowVenue] = useState<string>("");
   const { toast } = useToast();
   const { user, setUser } = useUser();
+  const { setShows, setSongs, setVenues, clearData } = useAppData();
   const [, setLocation] = useLocation();
 
   const handleSubmit = async (data: User) => {
     try {
       setLoading(true);
       setUser(data);
+      clearData(); // Clear existing data when loading new user
       const showsData = await getShowsByUsername(data.username);
       console.log("Shows data received:", showsData);
 
@@ -57,12 +48,12 @@ export default function HomePage() {
           },
         );
 
-        setShowsWithSetlists(processedShows);
+        setShows(processedShows);
         // Process songs and venues after shows are loaded
         const processedSongs = getUniqueSongsFromSetlists(processedShows);
         const processedVenues = getVenueStatsFromSetlists(processedShows);
-        setSongStats(processedSongs);
-        setVenueStats(processedVenues);
+        setSongs(processedSongs);
+        setVenues(processedVenues);
 
         // Navigate to My Shows page after successful data load
         setLocation("/my-shows");
@@ -72,9 +63,7 @@ export default function HomePage() {
     } catch (error) {
       console.error("Error in handleSubmit:", error);
       setUser(null);
-      setShowsWithSetlists(null);
-      setSongStats(null);
-      setVenueStats(null);
+      clearData();
 
       toast({
         title: "Failed to fetch shows",

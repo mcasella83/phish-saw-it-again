@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -7,21 +7,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { SongStats } from "@/lib/phish-processing";
 import { useUser } from "@/lib/stores/user";
+import { useAppData } from "@/lib/stores/app-data";
+import { useLocation } from "wouter";
 
 export default function MySongs() {
-  const [songs, setSongs] = useState<SongStats[] | null>(null);
   const user = useUser((state) => state.user);
+  const { songs } = useAppData();
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
-    // If we navigate directly to this page and don't have a user,
-    // we'll redirect to home in a future update
-    if (!user) return;
-
-    // For now, we'll just show the empty state
-    // In a future update, we'll fetch songs for the current user
-  }, [user]);
+    if (!user) {
+      setLocation("/");
+      return;
+    }
+  }, [user, setLocation]);
 
   if (!songs) {
     return (

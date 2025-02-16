@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { VenueStats } from "@/lib/phish-processing";
 import {
   Table,
   TableBody,
@@ -11,20 +10,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useUser } from "@/lib/stores/user";
+import { useAppData } from "@/lib/stores/app-data";
+import { useLocation } from "wouter";
 
 export default function MyVenues() {
-  const [venues, setVenues] = useState<VenueStats[] | null>(null);
   const [expandedVenues, setExpandedVenues] = useState<Record<string, boolean>>({});
   const user = useUser((state) => state.user);
+  const { venues } = useAppData();
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
-    // If we navigate directly to this page and don't have a user,
-    // we'll redirect to home in a future update
-    if (!user) return;
-
-    // For now, we'll just show the empty state
-    // In a future update, we'll fetch venues for the current user
-  }, [user]);
+    if (!user) {
+      setLocation("/");
+      return;
+    }
+  }, [user, setLocation]);
 
   if (!venues || venues.length === 0) {
     return (
@@ -58,7 +58,6 @@ export default function MyVenues() {
               return (
                 <React.Fragment key={venueKey}>
                   <TableRow
-                    key={`row-${venueKey}`}
                     className="cursor-pointer hover:bg-muted/50"
                     onClick={() =>
                       setExpandedVenues((prev) => ({
@@ -82,7 +81,7 @@ export default function MyVenues() {
                     </TableCell>
                   </TableRow>
                   {isExpanded && (
-                    <TableRow key={`expanded-${venueKey}`} className="bg-muted/50">
+                    <TableRow className="bg-muted/50">
                       <TableCell colSpan={4} className="p-4">
                         <h4 className="text-sm font-medium mb-2">Show Dates:</h4>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">

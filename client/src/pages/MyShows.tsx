@@ -13,8 +13,7 @@ import {
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LabelList } from "recharts";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/lib/stores/user";
-import { getShowsByUsername } from "@/lib/phish-api";
-import { processShowsData } from "@/lib/phish-processing";
+import { useAppData } from "@/lib/stores/app-data";
 
 interface YearData {
   year: number;
@@ -35,15 +34,15 @@ const getLuminance = (color: string): number => {
   const p = 2 * l - q;
 
   const rgb = [
-    h + 1/3,
+    h + 1 / 3,
     h,
-    h - 1/3
-  ].map(t => {
+    h - 1 / 3,
+  ].map((t) => {
     if (t < 0) t += 1;
     if (t > 1) t -= 1;
-    if (t < 1/6) return p + (q - p) * 6 * t;
-    if (t < 1/2) return q;
-    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
     return p;
   });
 
@@ -51,78 +50,24 @@ const getLuminance = (color: string): number => {
 };
 
 export default function MyShows() {
-  const [showsWithSetLists, setShowsWithSetlists] = useState<PhishShowSetlist[] | null>(null);
   const [expandedShows, setExpandedShows] = useState<Record<string, boolean>>({});
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [loadingShowCount, setLoadingShowCount] = useState(0);
-  const [loadingMaxShowCount, setLoadingMaxShowCount] = useState(0);
-  const [currentShowDate, setCurrentShowDate] = useState<string>("");
-  const [currentShowVenue, setCurrentShowVenue] = useState<string>("");
   const tableRef = useRef<HTMLDivElement>(null);
   const user = useUser((state) => state.user);
+  const { shows: showsWithSetLists } = useAppData();
   const { toast } = useToast();
 
   useEffect(() => {
-    // If we navigate directly to this page and don't have a user,
-    // we'll redirect to home in a future update
-    if (!user) return;
-
-    const fetchShows = async () => {
-      try {
-        setLoading(true);
-        const showsData = await getShowsByUsername(user.username);
-        console.log("Shows data received:", showsData);
-
-        if (!showsData.error && showsData.data) {
-          setLoadingMaxShowCount(
-            Math.min(showsData.data.length, showsData.data.length),
-          );
-
-          const processedShows = await processShowsData(
-            showsData,
-            (current, total, show) => {
-              setLoadingShowCount(current);
-              if (show) {
-                setCurrentShowDate(show.showdate);
-                setCurrentShowVenue(show.venue);
-              }
-            },
-          );
-
-          setShowsWithSetlists(processedShows);
-        } else {
-          throw new Error(showsData.error_message || "Failed to fetch shows");
-        }
-      } catch (error) {
-        console.error("Error in fetchShows:", error);
-        setShowsWithSetlists(null);
-
-        toast({
-          title: "Failed to fetch shows",
-          description:
-            error instanceof Error
-              ? error.message
-              : "An unexpected error occurred",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-        setLoadingShowCount(0);
-        setLoadingMaxShowCount(0);
-        setCurrentShowDate("");
-        setCurrentShowVenue("");
-      }
-    };
-
-    fetchShows();
-  }, [user, toast]);
+    if (!user) {
+      window.location.href = "/";
+    }
+  }, [user]);
 
   const showsByYear = useMemo(() => {
     if (!showsWithSetLists?.length) return [];
 
     const counts: Record<number, number> = {};
-    showsWithSetLists.forEach(show => {
+    showsWithSetLists.forEach((show) => {
       const year = new Date(show.date).getFullYear();
       counts[year] = (counts[year] || 0) + 1;
     });
@@ -134,7 +79,7 @@ export default function MyShows() {
         year: parseInt(year),
         count,
         percentage: (count / totalShows) * 100,
-        color: `hsl(${Math.random() * 360}, 70%, 50%)`
+        color: `hsl(${Math.random() * 360}, 70%, 50%)`,
       }))
       .sort((a, b) => a.year - b.year);
   }, [showsWithSetLists]);
@@ -147,27 +92,16 @@ export default function MyShows() {
     );
 
     if (yearRow) {
-      const histogramOffset = 400; 
+      const histogramOffset = 400;
       const elementPosition = yearRow.getBoundingClientRect().top + window.pageYOffset;
       const offsetPosition = elementPosition - histogramOffset;
 
       window.scrollTo({
         top: offsetPosition,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
   };
-
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
-        <Loader2 className="h-8 w-8 animate-spin" />
-        <p className="text-muted-foreground">
-          Loading shows... ({loadingShowCount} out of {loadingMaxShowCount})
-        </p>
-      </div>
-    );
-  }
 
   if (!showsWithSetLists || showsWithSetLists.length === 0) {
     return (
@@ -213,7 +147,7 @@ export default function MyShows() {
                   fontSize={12}
                 />
                 <Tooltip
-                  formatter={(value, name) => [value, 'Shows']}
+                  formatter={(value, name) => [value, "Shows"]}
                   labelFormatter={(label) => `Year: ${label}`}
                   cursor={false}
                 />
@@ -231,11 +165,11 @@ export default function MyShows() {
                     <Cell
                       key={`cell-${index}`}
                       fill={entry.color}
-                      stroke={selectedYear === entry.year ? '#000000' : entry.color}
+                      stroke={selectedYear === entry.year ? "#000000" : entry.color}
                       strokeWidth={selectedYear === entry.year ? 2 : 0}
                       strokeOpacity={1}
                       style={{
-                        filter: selectedYear === entry.year ? 'brightness(1.1)' : 'none',
+                        filter: selectedYear === entry.year ? "brightness(1.1)" : "none",
                       }}
                     />
                   ))}
@@ -247,7 +181,7 @@ export default function MyShows() {
                       if (!entry) return null;
 
                       const luminance = getLuminance(entry.color);
-                      const textColor = luminance > 0.5 ? '#000000' : '#FFFFFF';
+                      const textColor = luminance > 0.5 ? "#000000" : "#FFFFFF";
                       const xPos = (Number(x) || 0) + (Number(width) || 0) / 2;
                       const yPos = (Number(y) || 0) + (Number(height) || 0) / 2;
                       const isSingleShow = value === 1;
