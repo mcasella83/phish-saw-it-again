@@ -20,6 +20,7 @@ import {
   loadShowsFromCache,
   saveShowsToCache,
 } from "@/lib/storage-utils";
+import Header from "@/components/layout/Header";
 
 const STORAGE_KEY = "phish-explorer-username";
 
@@ -169,40 +170,47 @@ export default function HomePage({
     }
   };
 
-  if (user && showsWithSetLists) {
-    return (
-      <div className="w-full px-8 py-8">
-        <div className="max-w-4xl mx-auto mb-6">
-          <h1 className="text-2xl font-bold">Welcome, {user.username}!</h1>
-          <button
-            onClick={handleSignOut}
-            className="text-sm text-muted-foreground hover:text-foreground mt-2"
-          >
-            Sign Out
-          </button>
-        </div>
-        <div className="space-y-4">{getContent()}</div>
-      </div>
-    );
-  }
-
   return (
     <>
-      <LoadingModal
-        isOpen={loading}
-        current={loadingShowCount}
-        total={loadingMaxShowCount}
-        currentShowDate={currentShowDate}
-        currentShowVenue={currentShowVenue}
+      <Header
+        showNavigation={!!user}
+        activeTab={initialTab}
+        onTabChange={onTabChange}
+        isLoggedIn={!!user}
+        username={user?.username || ""}
       />
-      <div className="min-h-[80vh] flex items-center justify-center">
-        <div className="w-full max-w-md p-6 bg-card rounded-lg shadow-sm">
-          <h1 className="text-2xl font-bold text-center mb-6">
-            Welcome to Phish.net Explorer
-          </h1>
-          <UserForm onSubmit={handleSubmit} />
+      {user && showsWithSetLists ? (
+        <div className="w-full px-8 py-8 mt-16">
+          <div className="max-w-4xl mx-auto mb-6">
+            <h1 className="text-2xl font-bold">Welcome, {user.username}!</h1>
+            <button
+              onClick={handleSignOut}
+              className="text-sm text-muted-foreground hover:text-foreground mt-2"
+            >
+              Sign Out
+            </button>
+          </div>
+          <div className="space-y-4">{getContent()}</div>
         </div>
-      </div>
+      ) : (
+        <>
+          <LoadingModal
+            isOpen={loading}
+            current={loadingShowCount}
+            total={loadingMaxShowCount}
+            currentShowDate={currentShowDate}
+            currentShowVenue={currentShowVenue}
+          />
+          <div className="min-h-[80vh] flex items-center justify-center mt-16">
+            <div className="w-full max-w-md p-6 bg-card rounded-lg shadow-sm">
+              <h1 className="text-2xl font-bold text-center mb-6">
+                Welcome to Phish.net Explorer
+              </h1>
+              <UserForm onSubmit={handleSubmit} />
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 }
