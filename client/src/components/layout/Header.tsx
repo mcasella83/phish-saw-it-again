@@ -1,6 +1,11 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from "@/components/ui/navigation-menu";
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+} from "@/components/ui/navigation-menu";
 import { IoMusicalNotes } from "react-icons/io5";
 
 export default function Header() {
@@ -12,7 +17,7 @@ export default function Header() {
             <a className="text-2xl font-bold flex items-center gap-2 hover:opacity-80 transition-opacity">
               <IoMusicalNotes className="h-8 w-8 text-primary" />
               <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                PhishTracker
+                I Saw It Again
               </span>
             </a>
           </Link>
