@@ -17,9 +17,9 @@ function Router() {
       <main className="container mx-auto px-4 py-8 mt-20">
         <Switch>
           <Route path="/" component={HomePage} />
-          <Route path="/my-shows" component={MyShows} />
-          <Route path="/my-songs" component={MySongs} />
-          <Route path="/my-venues" component={MyVenues} />
+          <Route path="/my-shows" component={() => <MyShows />} />
+          <Route path="/my-songs" component={() => <MySongs />} />
+          <Route path="/my-venues" component={() => <MyVenues />} />
           <Route component={NotFound} />
         </Switch>
       </main>

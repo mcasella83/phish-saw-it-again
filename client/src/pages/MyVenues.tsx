@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { VenueStats } from "@/lib/phish-processing";
@@ -10,13 +10,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useUser } from "@/lib/stores/user";
 
-interface MyVenuesProps {
-  venues: VenueStats[] | null;
-}
-
-export default function MyVenues({ venues }: MyVenuesProps) {
+export default function MyVenues() {
+  const [venues, setVenues] = useState<VenueStats[] | null>(null);
   const [expandedVenues, setExpandedVenues] = useState<Record<string, boolean>>({});
+  const user = useUser((state) => state.user);
+
+  useEffect(() => {
+    // If we navigate directly to this page and don't have a user,
+    // we'll redirect to home in a future update
+    if (!user) return;
+
+    // For now, we'll just show the empty state
+    // In a future update, we'll fetch venues for the current user
+  }, [user]);
 
   if (!venues || venues.length === 0) {
     return (

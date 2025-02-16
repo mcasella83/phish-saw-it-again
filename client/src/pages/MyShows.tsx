@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Loader2, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PhishShowSetlist, PhishSong } from "@/lib/types";
@@ -11,13 +11,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LabelList } from "recharts";
-
-interface MyShowsProps {
-  showsWithSetLists: PhishShowSetlist[];
-  loading: boolean;
-  loadingShowCount: number;
-  loadingMaxShowCount: number;
-}
+import { useToast } from "@/hooks/use-toast";
+import { useUser } from "@/lib/stores/user";
+import { getShowsByUsername } from "@/lib/phish-api";
+import { processShowsData } from "@/lib/phish-processing";
 
 interface YearData {
   year: number;
@@ -53,15 +50,73 @@ const getLuminance = (color: string): number => {
   return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
 };
 
-export default function MyShows({
-  showsWithSetLists,
-  loading,
-  loadingShowCount,
-  loadingMaxShowCount
-}: MyShowsProps) {
+export default function MyShows() {
+  const [showsWithSetLists, setShowsWithSetlists] = useState<PhishShowSetlist[] | null>(null);
   const [expandedShows, setExpandedShows] = useState<Record<string, boolean>>({});
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [loadingShowCount, setLoadingShowCount] = useState(0);
+  const [loadingMaxShowCount, setLoadingMaxShowCount] = useState(0);
+  const [currentShowDate, setCurrentShowDate] = useState<string>("");
+  const [currentShowVenue, setCurrentShowVenue] = useState<string>("");
   const tableRef = useRef<HTMLDivElement>(null);
+  const user = useUser((state) => state.user);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // If we navigate directly to this page and don't have a user,
+    // we'll redirect to home in a future update
+    if (!user) return;
+
+    const fetchShows = async () => {
+      try {
+        setLoading(true);
+        const showsData = await getShowsByUsername(user.username);
+        console.log("Shows data received:", showsData);
+
+        if (!showsData.error && showsData.data) {
+          setLoadingMaxShowCount(
+            Math.min(showsData.data.length, showsData.data.length),
+          );
+
+          const processedShows = await processShowsData(
+            showsData,
+            (current, total, show) => {
+              setLoadingShowCount(current);
+              if (show) {
+                setCurrentShowDate(show.showdate);
+                setCurrentShowVenue(show.venue);
+              }
+            },
+          );
+
+          setShowsWithSetlists(processedShows);
+        } else {
+          throw new Error(showsData.error_message || "Failed to fetch shows");
+        }
+      } catch (error) {
+        console.error("Error in fetchShows:", error);
+        setShowsWithSetlists(null);
+
+        toast({
+          title: "Failed to fetch shows",
+          description:
+            error instanceof Error
+              ? error.message
+              : "An unexpected error occurred",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+        setLoadingShowCount(0);
+        setLoadingMaxShowCount(0);
+        setCurrentShowDate("");
+        setCurrentShowVenue("");
+      }
+    };
+
+    fetchShows();
+  }, [user, toast]);
 
   const showsByYear = useMemo(() => {
     if (!showsWithSetLists?.length) return [];
@@ -130,7 +185,7 @@ export default function MyShows({
       <div className="max-w-4xl mx-auto">
         <h2 className="text-xl font-semibold">My Shows ({showsWithSetLists.length})</h2>
       </div>
-      <div className="sticky top-4 z-10 bg-background rounded-md border p-4 mb-4 shadow-sm w-full">
+      <div className="sticky top-20 z-10 bg-background rounded-md border p-4 mb-4 shadow-sm w-full">
         <div className="max-w-[95%] mx-auto">
           <h3 className="text-lg font-medium mb-4">Shows by Year</h3>
           <div className="h-[300px] w-full">
@@ -200,7 +255,6 @@ export default function MyShows({
                       return (
                         <g>
                           {isSingleShow ? (
-                            // Single show layout - everything on one line
                             <text
                               x={xPos}
                               y={yPos}
@@ -212,7 +266,6 @@ export default function MyShows({
                               {value} ({entry.percentage.toFixed(1)}%)
                             </text>
                           ) : (
-                            // Multiple shows layout - stacked
                             <>
                               <text
                                 x={xPos}

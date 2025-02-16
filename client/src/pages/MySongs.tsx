@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -7,12 +8,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { SongStats } from "@/lib/phish-processing";
+import { useUser } from "@/lib/stores/user";
 
-interface MySongsProps {
-  songs: SongStats[] | null;
-}
+export default function MySongs() {
+  const [songs, setSongs] = useState<SongStats[] | null>(null);
+  const user = useUser((state) => state.user);
 
-export default function MySongs({ songs }: MySongsProps) {
+  useEffect(() => {
+    // If we navigate directly to this page and don't have a user,
+    // we'll redirect to home in a future update
+    if (!user) return;
+
+    // For now, we'll just show the empty state
+    // In a future update, we'll fetch songs for the current user
+  }, [user]);
+
   if (!songs) {
     return (
       <div className="space-y-4">
