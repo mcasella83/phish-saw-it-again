@@ -189,31 +189,53 @@ export default function MyShows({
                     position="center"
                     content={({ x, y, width, height, value, index }) => {
                       const entry = showsByYear[index];
+                      if (!entry) return null;
+
                       const luminance = getLuminance(entry.color);
                       const textColor = luminance > 0.5 ? '#000000' : '#FFFFFF';
+                      const xPos = (Number(x) || 0) + (Number(width) || 0) / 2;
+                      const yPos = (Number(y) || 0) + (Number(height) || 0) / 2;
+                      const isSingleShow = value === 1;
 
                       return (
                         <g>
-                          <text
-                            x={(x || 0) + (width || 0) / 2}
-                            y={(y || 0) + (height || 0) / 2 - 8}
-                            fill={textColor}
-                            textAnchor="middle"
-                            dominantBaseline="central"
-                            className="font-bold text-sm"
-                          >
-                            {value}
-                          </text>
-                          <text
-                            x={(x || 0) + (width || 0) / 2}
-                            y={(y || 0) + (height || 0) / 2 + 8}
-                            fill={textColor}
-                            textAnchor="middle"
-                            dominantBaseline="central"
-                            className="text-xs"
-                          >
-                            {entry.percentage.toFixed(1)}%
-                          </text>
+                          {isSingleShow ? (
+                            // Single show layout - everything on one line
+                            <text
+                              x={xPos}
+                              y={yPos}
+                              fill={textColor}
+                              textAnchor="middle"
+                              dominantBaseline="central"
+                              className="text-xs"
+                            >
+                              {value} ({entry.percentage.toFixed(1)}%)
+                            </text>
+                          ) : (
+                            // Multiple shows layout - stacked
+                            <>
+                              <text
+                                x={xPos}
+                                y={yPos - 8}
+                                fill={textColor}
+                                textAnchor="middle"
+                                dominantBaseline="central"
+                                className="font-bold text-sm"
+                              >
+                                {value}
+                              </text>
+                              <text
+                                x={xPos}
+                                y={yPos + 8}
+                                fill={textColor}
+                                textAnchor="middle"
+                                dominantBaseline="central"
+                                className="text-xs"
+                              >
+                                {entry.percentage.toFixed(1)}%
+                              </text>
+                            </>
+                          )}
                         </g>
                       );
                     }}
