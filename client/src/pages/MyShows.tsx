@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef } from "react";
-import { Loader2, ChevronDown } from "lucide-react";
+import { Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PhishShowSetlist, PhishSong } from "@/lib/types";
 import {
@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LabelList } from "recharts";
 
 interface MyShowsProps {
@@ -38,15 +39,15 @@ const getLuminance = (color: string): number => {
   const p = 2 * l - q;
 
   const rgb = [
-    h + 1/3,
+    h + 1 / 3,
     h,
-    h - 1/3
-  ].map(t => {
+    h - 1 / 3,
+  ].map((t) => {
     if (t < 0) t += 1;
     if (t > 1) t -= 1;
-    if (t < 1/6) return p + (q - p) * 6 * t;
-    if (t < 1/2) return q;
-    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
     return p;
   });
 
@@ -57,17 +58,18 @@ export default function MyShows({
   showsWithSetLists,
   loading,
   loadingShowCount,
-  loadingMaxShowCount
+  loadingMaxShowCount,
 }: MyShowsProps) {
   const [expandedShows, setExpandedShows] = useState<Record<string, boolean>>({});
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [isHistogramCollapsed, setIsHistogramCollapsed] = useState(false);
   const tableRef = useRef<HTMLDivElement>(null);
 
   const showsByYear = useMemo(() => {
     if (!showsWithSetLists?.length) return [];
 
     const counts: Record<number, number> = {};
-    showsWithSetLists.forEach(show => {
+    showsWithSetLists.forEach((show) => {
       const year = new Date(show.date).getFullYear();
       counts[year] = (counts[year] || 0) + 1;
     });
@@ -79,7 +81,7 @@ export default function MyShows({
         year: parseInt(year),
         count,
         percentage: (count / totalShows) * 100,
-        color: `hsl(${Math.random() * 360}, 70%, 50%)`
+        color: `hsl(${Math.random() * 360}, 70%, 50%)`,
       }))
       .sort((a, b) => a.year - b.year);
   }, [showsWithSetLists]);
@@ -98,7 +100,7 @@ export default function MyShows({
 
       window.scrollTo({
         top: offsetPosition,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
   };
@@ -128,8 +130,29 @@ export default function MyShows({
   return (
     <div className="space-y-4">
       <div className="fixed top-16 left-0 right-0 z-50 bg-background px-8">
-        <h2 className="text-xl font-semibold mb-4">My Shows ({showsWithSetLists.length})</h2>
-        <div className="rounded-md border p-4 shadow-sm w-full">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">My Shows ({showsWithSetLists.length})</h2>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsHistogramCollapsed(!isHistogramCollapsed)}
+            className="flex items-center gap-2"
+          >
+            {isHistogramCollapsed ? (
+              <>
+                Show Histogram <ChevronDown className="h-4 w-4" />
+              </>
+            ) : (
+              <>
+                Hide Histogram <ChevronUp className="h-4 w-4" />
+              </>
+            )}
+          </Button>
+        </div>
+        <div className={cn(
+          "rounded-md border p-4 shadow-sm w-full transition-all duration-300",
+          isHistogramCollapsed ? "h-0 p-0 overflow-hidden border-0" : "h-[380px]"
+        )}>
           <h3 className="text-lg font-medium mb-4">Shows by Year</h3>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -156,7 +179,7 @@ export default function MyShows({
                   fontSize={12}
                 />
                 <Tooltip
-                  formatter={(value, name) => [value, 'Shows']}
+                  formatter={(value, name) => [value, "Shows"]}
                   labelFormatter={(label) => `Year: ${label}`}
                   cursor={false}
                 />
@@ -174,11 +197,11 @@ export default function MyShows({
                     <Cell
                       key={`cell-${index}`}
                       fill={entry.color}
-                      stroke={selectedYear === entry.year ? '#000000' : entry.color}
+                      stroke={selectedYear === entry.year ? "#000000" : entry.color}
                       strokeWidth={selectedYear === entry.year ? 2 : 0}
                       strokeOpacity={1}
                       style={{
-                        filter: selectedYear === entry.year ? 'brightness(1.1)' : 'none',
+                        filter: selectedYear === entry.year ? "brightness(1.1)" : "none",
                       }}
                     />
                   ))}
@@ -190,7 +213,7 @@ export default function MyShows({
                       if (!entry) return null;
 
                       const luminance = getLuminance(entry.color);
-                      const textColor = luminance > 0.5 ? '#000000' : '#FFFFFF';
+                      const textColor = luminance > 0.5 ? "#000000" : "#FFFFFF";
                       const xPos = (Number(x) || 0) + (Number(width) || 0) / 2;
                       const yPos = (Number(y) || 0) + (Number(height) || 0) / 2;
                       const isSingleShow = value === 1;
@@ -198,7 +221,6 @@ export default function MyShows({
                       return (
                         <g>
                           {isSingleShow ? (
-                            // Single show layout - everything on one line
                             <text
                               x={xPos}
                               y={yPos}
@@ -210,7 +232,6 @@ export default function MyShows({
                               {value} ({entry.percentage.toFixed(1)}%)
                             </text>
                           ) : (
-                            // Multiple shows layout - stacked
                             <>
                               <text
                                 x={xPos}
@@ -244,7 +265,10 @@ export default function MyShows({
           </div>
         </div>
       </div>
-      <div className="pt-[480px]">
+      <div className={cn(
+        "transition-all duration-300",
+        isHistogramCollapsed ? "pt-[120px]" : "pt-[480px]"
+      )}>
         <div className="rounded-md border" ref={tableRef}>
           <Table>
             <TableHeader>
