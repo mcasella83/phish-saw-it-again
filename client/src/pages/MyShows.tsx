@@ -335,28 +335,33 @@ export default function MyShows({
                       <TableRow className="bg-muted/50">
                         <TableCell colSpan={4} className="p-4">
                           <div className="space-y-4">
-                            {Object.entries(songsBySet).map(([setName, songs]) => (
-                              <div key={`${showId}-${setName}`} className="space-y-2">
-                                <h4 className="font-medium text-sm">
-                                  {setName === "e" ? "Encore" : `Set ${setName}`}
-                                </h4>
-                                <ol className="list-decimal list-inside text-sm space-y-1">
-                                  {songs.map((song) => (
-                                    <li key={song.uniqueid} className="text-sm">
-                                      {song.name}
-                                      {song.transition === 2 && " >"}
-                                      {song.transition === 3 && " ->"}
-                                      {song.isjam && " [jam]"}
-                                    </li>
-                                  ))}
-                                </ol>
-                              </div>
-                            ))}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {Object.entries(songsBySet).map(([setName, songs]) => (
+                                <div 
+                                  key={`${showId}-${setName}`} 
+                                  className="space-y-2 bg-muted/30 p-4 rounded-lg"
+                                >
+                                  <h4 className="font-medium text-sm border-b pb-2">
+                                    {setName === "e" ? "Encore" : `Set ${setName}`}
+                                  </h4>
+                                  <ol className="list-decimal list-inside text-sm space-y-1">
+                                    {songs.map((song) => (
+                                      <li key={song.uniqueid} className="text-sm">
+                                        {song.name}
+                                        {song.transition === 2 && " >"}
+                                        {song.transition === 3 && " ->"}
+                                        {song.isjam && " [jam]"}
+                                      </li>
+                                    ))}
+                                  </ol>
+                                </div>
+                              ))}
+                            </div>
                             {show.setListNotes && (
-                              <div className="mt-4">
+                              <div className="mt-6 border-t pt-4">
                                 <h4 className="font-medium text-sm">Notes:</h4>
                                 <div
-                                  className="text-sm text-muted-foreground whitespace-pre-wrap"
+                                  className="text-sm text-muted-foreground whitespace-pre-wrap mt-2"
                                   dangerouslySetInnerHTML={{
                                     __html: show.setListNotes,
                                   }}
