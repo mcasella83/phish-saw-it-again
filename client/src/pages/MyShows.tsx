@@ -19,11 +19,17 @@ interface MyShowsProps {
   loadingMaxShowCount: number;
 }
 
-export default function MyShows({ 
-  showsWithSetLists, 
-  loading, 
-  loadingShowCount, 
-  loadingMaxShowCount 
+interface YearData {
+  year: number;
+  count: number;
+  color: string;
+}
+
+export default function MyShows({
+  showsWithSetLists,
+  loading,
+  loadingShowCount,
+  loadingMaxShowCount
 }: MyShowsProps) {
   const [expandedShows, setExpandedShows] = useState<Record<string, boolean>>({});
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
@@ -63,7 +69,15 @@ export default function MyShows({
       );
 
       if (yearRow) {
-        yearRow.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Calculate offset for the sticky histogram (height + padding)
+        const histogramOffset = 400; // 300px height + 100px for padding and margins
+        const elementPosition = yearRow.getBoundingClientRect().top + window.pageYOffset;
+        const offsetPosition = elementPosition - histogramOffset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
       }
     }
   };
@@ -98,41 +112,42 @@ export default function MyShows({
         <h3 className="text-lg font-medium mb-4">Shows by Year</h3>
         <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart 
-              data={showsByYear} 
+            <BarChart
+              data={showsByYear}
               margin={{ top: 20, right: 0, left: -20, bottom: 5 }}
               onClick={(data) => {
                 if (data && data.activePayload && data.activePayload[0]) {
-                  const year = data.activePayload[0].payload.year;
+                  const year = (data.activePayload[0].payload as YearData).year;
                   setSelectedYear(year);
                   scrollToYear(year);
                 }
               }}
             >
-              <XAxis 
-                dataKey="year" 
+              <XAxis
+                dataKey="year"
                 tickFormatter={(value) => value.toString()}
                 fontSize={12}
               />
-              <YAxis 
+              <YAxis
                 allowDecimals={false}
                 fontSize={12}
               />
-              <Tooltip 
+              <Tooltip
                 formatter={(value, name) => [value, 'Shows']}
                 labelFormatter={(label) => `Year: ${label}`}
-                cursor={{ 
+                cursor={{
                   fill: 'transparent',
                   stroke: 'var(--foreground)',
                   strokeWidth: 1
                 }}
               />
-              <Bar 
-                dataKey="count" 
+              <Bar
+                dataKey="count"
                 name="Shows"
                 onClick={(data) => {
-                  setSelectedYear(data.year);
-                  scrollToYear(data.year);
+                  const yearData = data as unknown as YearData;
+                  setSelectedYear(yearData.year);
+                  scrollToYear(yearData.year);
                 }}
                 cursor="pointer"
               >
