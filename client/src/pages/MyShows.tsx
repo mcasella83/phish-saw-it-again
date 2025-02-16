@@ -19,11 +19,11 @@ interface MyShowsProps {
   loadingMaxShowCount: number;
 }
 
-export default function MyShows({
-  showsWithSetLists,
-  loading,
-  loadingShowCount,
-  loadingMaxShowCount
+export default function MyShows({ 
+  showsWithSetLists, 
+  loading, 
+  loadingShowCount, 
+  loadingMaxShowCount 
 }: MyShowsProps) {
   const [expandedShows, setExpandedShows] = useState<Record<string, boolean>>({});
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
@@ -63,20 +63,7 @@ export default function MyShows({
       );
 
       if (yearRow) {
-        // Add offset to account for the sticky histogram
-        const histogramHeight = 400; // Height of histogram + padding
-        const scrollOptions = {
-          behavior: 'smooth' as const,
-          block: 'start' as const,
-        };
-
-        yearRow.scrollIntoView(scrollOptions);
-
-        // Additional offset to account for the sticky histogram
-        window.scrollBy({
-          top: -histogramHeight,
-          behavior: 'smooth'
-        });
+        yearRow.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
   };
@@ -111,8 +98,8 @@ export default function MyShows({
         <h3 className="text-lg font-medium mb-4">Shows by Year</h3>
         <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={showsByYear}
+            <BarChart 
+              data={showsByYear} 
               margin={{ top: 20, right: 0, left: -20, bottom: 5 }}
               onClick={(data) => {
                 if (data && data.activePayload && data.activePayload[0]) {
@@ -122,31 +109,30 @@ export default function MyShows({
                 }
               }}
             >
-              <XAxis
-                dataKey="year"
+              <XAxis 
+                dataKey="year" 
                 tickFormatter={(value) => value.toString()}
                 fontSize={12}
               />
-              <YAxis
+              <YAxis 
                 allowDecimals={false}
                 fontSize={12}
               />
-              <Tooltip
+              <Tooltip 
                 formatter={(value, name) => [value, 'Shows']}
                 labelFormatter={(label) => `Year: ${label}`}
-                cursor={{
+                cursor={{ 
                   fill: 'transparent',
                   stroke: 'var(--foreground)',
                   strokeWidth: 1
                 }}
               />
-              <Bar
-                dataKey="count"
+              <Bar 
+                dataKey="count" 
                 name="Shows"
                 onClick={(data) => {
-                  const year = data.payload.year;
-                  setSelectedYear(year);
-                  scrollToYear(year);
+                  setSelectedYear(data.year);
+                  scrollToYear(data.year);
                 }}
                 cursor="pointer"
               >
