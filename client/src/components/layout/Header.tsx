@@ -12,13 +12,15 @@ interface HeaderProps {
   showNavigation?: boolean;
   activeTab?: string;
   onTabChange?: (value: string) => void;
+  username?: string;
+  onSignOut?: () => void;
 }
 
-export default function Header({ showNavigation = false, activeTab = "shows", onTabChange }: HeaderProps) {
+export default function Header({ showNavigation = false, activeTab = "shows", onTabChange, username, onSignOut }: HeaderProps) {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b bg-gradient-to-r from-primary/5 to-primary/10 backdrop-blur-sm">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col">
           <Link href="/">
             <a className="text-2xl font-bold flex items-center gap-2 hover:opacity-80 transition-opacity">
               <IoMusicalNotes className="h-8 w-8 text-primary" />
@@ -27,6 +29,19 @@ export default function Header({ showNavigation = false, activeTab = "shows", on
               </span>
             </a>
           </Link>
+          {username && (
+            <div className="text-sm mt-1 flex items-center gap-2">
+              <span>Welcome, {username}</span>
+              {onSignOut && (
+                <button 
+                  onClick={onSignOut}
+                  className="text-blue-500 hover:text-blue-600 transition-colors"
+                >
+                  Sign Out
+                </button>
+              )}
+            </div>
+          )}
         </div>
         {showNavigation && (
           <NavigationMenu>
