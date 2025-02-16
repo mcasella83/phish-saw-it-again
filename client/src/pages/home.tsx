@@ -16,6 +16,11 @@ import MySongs from "./MySongs";
 import MyVenues from "./MyVenues";
 import { PhishShowSetlist } from "@/lib/types";
 import { LoadingModal } from "@/components/ui/LoadingModal";
+import { 
+  clearShowsCache, 
+  loadShowsFromCache, 
+  saveShowsToCache 
+} from "@/lib/storage-utils";
 
 const STORAGE_KEY = "phish-explorer-username";
 
@@ -38,6 +43,17 @@ export default function HomePage() {
       setLoading(true);
       const userData: User = { username };
       setUser(userData);
+
+      // Try to load from cache first
+      const cachedData = loadShowsFromCache();
+      if (cachedData) {
+        console.log("Loading data from cache");
+        setShowsWithSetlists(cachedData.shows);
+        setSongStats(cachedData.songs);
+        setVenueStats(cachedData.venues);
+        return;
+      }
+
       const showsData = await getShowsByUsername(username);
       console.log("Shows data received:", showsData);
 
@@ -57,9 +73,17 @@ export default function HomePage() {
           }
         );
 
-        setShowsWithSetlists(processedShows);
         const processedSongs = getUniqueSongsFromSetlists(processedShows);
         const processedVenues = getVenueStatsFromSetlists(processedShows);
+
+        // Save processed data to local storage
+        saveShowsToCache({
+          shows: processedShows,
+          songs: processedSongs,
+          venues: processedVenues
+        });
+
+        setShowsWithSetlists(processedShows);
         setSongStats(processedSongs);
         setVenueStats(processedVenues);
       } else {
@@ -71,6 +95,7 @@ export default function HomePage() {
       setShowsWithSetlists(null);
       setSongStats(null);
       setVenueStats(null);
+      clearShowsCache();
       localStorage.removeItem(STORAGE_KEY);
 
       toast({
@@ -107,19 +132,22 @@ export default function HomePage() {
     }
   };
 
+  const handleSignOut = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    clearShowsCache();
+    setUser(null);
+    setShowsWithSetlists(null);
+    setSongStats(null);
+    setVenueStats(null);
+  };
+
   if (user && showsWithSetLists) {
     return (
       <div className="w-full px-8 py-8">
         <div className="max-w-4xl mx-auto mb-6">
           <h1 className="text-2xl font-bold">Welcome, {user.username}!</h1>
           <button
-            onClick={() => {
-              localStorage.removeItem(STORAGE_KEY);
-              setUser(null);
-              setShowsWithSetlists(null);
-              setSongStats(null);
-              setVenueStats(null);
-            }}
+            onClick={handleSignOut}
             className="text-sm text-muted-foreground hover:text-foreground mt-2"
           >
             Sign Out
