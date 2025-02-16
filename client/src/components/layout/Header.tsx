@@ -31,7 +31,7 @@ export default function Header({
             <a className="text-2xl font-bold flex flex-col items-center hover:opacity-80 transition-opacity">
               <div className="flex items-center gap-2">
                 <IoMusicalNotes className="h-8 w-8 text-primary" />
-                <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                <span className="text-primary">
                   I Saw It Again
                 </span>
               </div>
