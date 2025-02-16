@@ -10,7 +10,6 @@ import {
   type VenueStats,
 } from "@/lib/phish-processing";
 import { useToast } from "@/hooks/use-toast";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MyShows from "./MyShows";
 import MySongs from "./MySongs";
 import MyVenues from "./MyVenues";
@@ -26,9 +25,7 @@ const STORAGE_KEY = "phish-explorer-username";
 
 export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
-  const [showsWithSetLists, setShowsWithSetlists] = useState<
-    PhishShowSetlist[] | null
-  >(null);
+  const [showsWithSetLists, setShowsWithSetlists] = useState<PhishShowSetlist[] | null>(null);
   const [songStats, setSongStats] = useState<SongStats[] | null>(null);
   const [venueStats, setVenueStats] = useState<VenueStats[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -36,6 +33,7 @@ export default function HomePage() {
   const [loadingMaxShowCount, setLoadingMaxShowCount] = useState(0);
   const [currentShowDate, setCurrentShowDate] = useState<string>("");
   const [currentShowVenue, setCurrentShowVenue] = useState<string>("");
+  const [activeTab, setActiveTab] = useState("shows");
   const { toast } = useToast();
 
   const loadUserData = async (username: string) => {
@@ -141,6 +139,26 @@ export default function HomePage() {
     setVenueStats(null);
   };
 
+  const getContent = () => {
+    switch (activeTab) {
+      case "shows":
+        return (
+          <MyShows
+            showsWithSetLists={showsWithSetLists}
+            loading={loading}
+            loadingShowCount={loadingShowCount}
+            loadingMaxShowCount={loadingMaxShowCount}
+          />
+        );
+      case "songs":
+        return <MySongs songs={songStats} />;
+      case "venues":
+        return <MyVenues venues={venueStats} />;
+      default:
+        return null;
+    }
+  };
+
   if (user && showsWithSetLists) {
     return (
       <div className="w-full px-8 py-8">
@@ -153,27 +171,9 @@ export default function HomePage() {
             Sign Out
           </button>
         </div>
-        <Tabs defaultValue="shows" className="space-y-4">
-          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-3">
-            <TabsTrigger value="shows">My Shows</TabsTrigger>
-            <TabsTrigger value="songs">My Songs</TabsTrigger>
-            <TabsTrigger value="venues">My Venues</TabsTrigger>
-          </TabsList>
-          <TabsContent value="shows" className="space-y-4">
-            <MyShows
-              showsWithSetLists={showsWithSetLists}
-              loading={loading}
-              loadingShowCount={loadingShowCount}
-              loadingMaxShowCount={loadingMaxShowCount}
-            />
-          </TabsContent>
-          <TabsContent value="songs" className="space-y-4">
-            <MySongs songs={songStats} />
-          </TabsContent>
-          <TabsContent value="venues" className="space-y-4">
-            <MyVenues venues={venueStats} />
-          </TabsContent>
-        </Tabs>
+        <div className="space-y-4">
+          {getContent()}
+        </div>
       </div>
     );
   }

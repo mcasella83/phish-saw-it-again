@@ -5,14 +5,24 @@ import { Toaster } from "@/components/ui/toaster";
 import Header from "@/components/layout/Header";
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home";
+import { useState } from "react";
 
 function Router() {
+  const [activeTab, setActiveTab] = useState("shows");
+  const isLoggedIn = localStorage.getItem("phish-explorer-username") !== null;
+
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header 
+        showNavigation={isLoggedIn} 
+        activeTab={activeTab} 
+        onTabChange={setActiveTab}
+      />
       <main className="container mx-auto px-4 py-8 mt-16">
         <Switch>
-          <Route path="/" component={HomePage} />
+          <Route path="/">
+            <HomePage initialTab={activeTab} onTabChange={setActiveTab} />
+          </Route>
           <Route component={NotFound} />
         </Switch>
       </main>

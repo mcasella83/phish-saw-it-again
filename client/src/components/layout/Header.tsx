@@ -8,7 +8,13 @@ import {
 } from "@/components/ui/navigation-menu";
 import { IoMusicalNotes } from "react-icons/io5";
 
-export default function Header() {
+interface HeaderProps {
+  showNavigation?: boolean;
+  activeTab?: string;
+  onTabChange?: (value: string) => void;
+}
+
+export default function Header({ showNavigation = false, activeTab = "shows", onTabChange }: HeaderProps) {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b bg-gradient-to-r from-primary/5 to-primary/10 backdrop-blur-sm">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -22,6 +28,42 @@ export default function Header() {
             </a>
           </Link>
         </div>
+        {showNavigation && (
+          <NavigationMenu>
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuLink
+                  className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
+                    activeTab === "shows" ? "bg-accent/50" : ""
+                  }`}
+                  onClick={() => onTabChange?.("shows")}
+                >
+                  My Shows
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink
+                  className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
+                    activeTab === "songs" ? "bg-accent/50" : ""
+                  }`}
+                  onClick={() => onTabChange?.("songs")}
+                >
+                  My Songs
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink
+                  className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
+                    activeTab === "venues" ? "bg-accent/50" : ""
+                  }`}
+                  onClick={() => onTabChange?.("venues")}
+                >
+                  My Venues
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+        )}
       </div>
     </header>
   );
