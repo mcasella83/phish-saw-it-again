@@ -178,17 +178,12 @@ export default function HomePage({
         onTabChange={onTabChange}
         isLoggedIn={!!user}
         username={user?.username || ""}
+        handleSignOut={handleSignOut}
       />
       {user && showsWithSetLists ? (
         <div className="w-full px-8 py-8 mt-16">
           <div className="max-w-4xl mx-auto mb-6">
             <h1 className="text-2xl font-bold">Welcome, {user.username}!</h1>
-            <button
-              onClick={handleSignOut}
-              className="text-sm text-muted-foreground hover:text-foreground mt-2"
-            >
-              Sign Out
-            </button>
           </div>
           <div className="space-y-4">{getContent()}</div>
         </div>

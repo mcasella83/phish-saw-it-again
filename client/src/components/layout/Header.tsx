@@ -23,6 +23,12 @@ export default function Header({
   isLoggedIn = false,
   username = "" 
 }: HeaderProps) {
+  const handleSignOut = () => {
+    // Clear all cached data
+    localStorage.removeItem("phish-explorer-username");
+    window.location.reload();
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -36,9 +42,17 @@ export default function Header({
                 </span>
               </div>
               {isLoggedIn && username && (
-                <span className="text-sm text-muted-foreground mt-1">
-                  Viewing stats for: {username}
-                </span>
+                <div className="flex items-center gap-4 text-sm mt-1">
+                  <span className="text-muted-foreground">
+                    Viewing stats for: {username}
+                  </span>
+                  <button
+                    onClick={handleSignOut}
+                    className="text-blue-500 hover:text-blue-700 transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                </div>
               )}
             </a>
           </Link>
