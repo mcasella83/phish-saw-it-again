@@ -109,12 +109,14 @@ export default function MyShows({
             <BarChart
               data={showsByYear}
               margin={{ top: 20, right: 0, left: -20, bottom: 5 }}
-              onClick={(data) => {
-                if (data && data.activePayload && data.activePayload[0]) {
-                  const year = (data.activePayload[0].payload as YearData).year;
+              onMouseMove={(state) => {
+                if (state && state.activePayload && state.activePayload[0]) {
+                  const year = (state.activePayload[0].payload as YearData).year;
                   setSelectedYear(year);
-                  scrollToYear(year);
                 }
+              }}
+              onMouseLeave={() => {
+                setSelectedYear(null);
               }}
             >
               <XAxis
@@ -129,11 +131,7 @@ export default function MyShows({
               <Tooltip
                 formatter={(value, name) => [value, 'Shows']}
                 labelFormatter={(label) => `Year: ${label}`}
-                cursor={{
-                  fill: 'transparent',
-                  stroke: '#000000',
-                  strokeWidth: 1
-                }}
+                cursor={false}
               />
               <Bar
                 dataKey="count"
@@ -149,12 +147,11 @@ export default function MyShows({
                   <Cell
                     key={`cell-${index}`}
                     fill={entry.color}
-                    stroke={selectedYear === entry.year ? '#000000' : 'transparent'}
-                    strokeWidth={selectedYear === entry.year ? 1 : 0}
+                    stroke={selectedYear === entry.year ? '#000000' : entry.color}
+                    strokeWidth={selectedYear === entry.year ? 2 : 0}
                     strokeOpacity={1}
                     style={{
-                      strokeDasharray: 'none',
-                      paintOrder: 'stroke'
+                      filter: selectedYear === entry.year ? 'brightness(1.1)' : 'none',
                     }}
                   />
                 ))}
