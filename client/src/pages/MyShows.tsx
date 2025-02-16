@@ -137,7 +137,7 @@ export default function MyShows({
                 labelFormatter={(label) => `Year: ${label}`}
                 cursor={{
                   fill: 'transparent',
-                  stroke: 'var(--foreground)',
+                  stroke: '#000000',
                   strokeWidth: 1
                 }}
               />
@@ -155,7 +155,7 @@ export default function MyShows({
                   <Cell
                     key={`cell-${index}`}
                     fill={entry.color}
-                    stroke={selectedYear === entry.year ? 'var(--foreground)' : 'transparent'}
+                    stroke={selectedYear === entry.year ? '#000000' : 'transparent'}
                     strokeWidth={selectedYear === entry.year ? 2 : 0}
                   />
                 ))}
