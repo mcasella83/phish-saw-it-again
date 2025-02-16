@@ -37,7 +37,7 @@ export default function Header({
               </div>
               {isLoggedIn && username && (
                 <span className="text-sm text-muted-foreground mt-1">
-                  {username}
+                  Viewing stats for: {username}
                 </span>
               )}
             </a>
