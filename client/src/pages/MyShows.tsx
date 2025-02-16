@@ -152,7 +152,12 @@ export default function MyShows({
                 cursor="pointer"
               >
                 {showsByYear.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={entry.color}
+                    stroke={selectedYear === entry.year ? 'var(--foreground)' : 'transparent'}
+                    strokeWidth={selectedYear === entry.year ? 2 : 0}
+                  />
                 ))}
               </Bar>
             </BarChart>
