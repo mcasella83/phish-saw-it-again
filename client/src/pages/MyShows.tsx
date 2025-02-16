@@ -128,13 +128,13 @@ export default function MyShows({
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">My Shows ({showsWithSetLists.length})</h2>
-      <div className="sticky top-4 z-10 bg-background rounded-md border p-4 mb-4 shadow-sm">
+      <div className="sticky top-4 z-10 bg-background rounded-md border p-4 mb-4 shadow-sm -mx-4 sm:-mx-6 md:-mx-8 lg:-mx-12">
         <h3 className="text-lg font-medium mb-4">Shows by Year</h3>
-        <div className="h-[300px]">
+        <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={showsByYear}
-              margin={{ top: 20, right: 0, left: -20, bottom: 5 }}
+              margin={{ top: 20, right: 20, left: -20, bottom: 5 }}
               onMouseMove={(state) => {
                 if (state && state.activePayload && state.activePayload[0]) {
                   const year = (state.activePayload[0].payload as YearData).year;
