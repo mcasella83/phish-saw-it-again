@@ -5,16 +5,22 @@ import { Toaster } from "@/components/ui/toaster";
 import Header from "@/components/layout/Header";
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function Router() {
   const [activeTab, setActiveTab] = useState("shows");
-  const username = localStorage.getItem("phish-explorer-username");
+  const [username, setUsername] = useState<string | null>(null);
   const isLoggedIn = username !== null;
+
+  useEffect(() => {
+    // Check login status on mount and localStorage changes
+    const storedUsername = localStorage.getItem("phish-explorer-username");
+    setUsername(storedUsername);
+  }, []);
 
   const handleSignOut = () => {
     localStorage.removeItem("phish-explorer-username");
-    window.location.reload();
+    setUsername(null);
   };
 
   return (
