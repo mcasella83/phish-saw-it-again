@@ -1,6 +1,6 @@
 import UserForm from "@/components/UserForm";
 import type { User } from "@shared/schema";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getShowsByUsername } from "@/lib/phish-api";
 import {
   processShowsData,
@@ -17,6 +17,8 @@ import MyVenues from "./MyVenues";
 import { PhishShowSetlist } from "@/lib/types";
 import { LoadingModal } from "@/components/ui/LoadingModal";
 
+const STORAGE_KEY = "phish-explorer-username";
+
 export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
   const [showsWithSetLists, setShowsWithSetlists] = useState<
@@ -31,16 +33,17 @@ export default function HomePage() {
   const [currentShowVenue, setCurrentShowVenue] = useState<string>("");
   const { toast } = useToast();
 
-  const handleSubmit = async (data: User) => {
+  const loadUserData = async (username: string) => {
     try {
       setLoading(true);
-      setUser(data);
-      const showsData = await getShowsByUsername(data.username);
+      const userData: User = { username };
+      setUser(userData);
+      const showsData = await getShowsByUsername(username);
       console.log("Shows data received:", showsData);
 
       if (!showsData.error && showsData.data) {
         setLoadingMaxShowCount(
-          Math.min(showsData.data.length, showsData.data.length),
+          Math.min(showsData.data.length, showsData.data.length)
         );
 
         const processedShows = await processShowsData(
@@ -51,11 +54,10 @@ export default function HomePage() {
               setCurrentShowDate(show.showdate);
               setCurrentShowVenue(show.venue);
             }
-          },
+          }
         );
 
         setShowsWithSetlists(processedShows);
-        // Process songs and venues after shows are loaded
         const processedSongs = getUniqueSongsFromSetlists(processedShows);
         const processedVenues = getVenueStatsFromSetlists(processedShows);
         setSongStats(processedSongs);
@@ -64,11 +66,12 @@ export default function HomePage() {
         throw new Error(showsData.error_message || "Failed to fetch shows");
       }
     } catch (error) {
-      console.error("Error in handleSubmit:", error);
+      console.error("Error in loadUserData:", error);
       setUser(null);
       setShowsWithSetlists(null);
       setSongStats(null);
       setVenueStats(null);
+      localStorage.removeItem(STORAGE_KEY);
 
       toast({
         title: "Failed to fetch shows",
@@ -87,11 +90,40 @@ export default function HomePage() {
     }
   };
 
+  useEffect(() => {
+    const savedUsername = localStorage.getItem(STORAGE_KEY);
+    if (savedUsername) {
+      loadUserData(savedUsername);
+    }
+  }, []);
+
+  const handleSubmit = async (data: User) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, data.username);
+      await loadUserData(data.username);
+    } catch (error) {
+      localStorage.removeItem(STORAGE_KEY);
+      throw error;
+    }
+  };
+
   if (user && showsWithSetLists) {
     return (
       <div className="w-full px-8 py-8">
         <div className="max-w-4xl mx-auto mb-6">
           <h1 className="text-2xl font-bold">Welcome, {user.username}!</h1>
+          <button
+            onClick={() => {
+              localStorage.removeItem(STORAGE_KEY);
+              setUser(null);
+              setShowsWithSetlists(null);
+              setSongStats(null);
+              setVenueStats(null);
+            }}
+            className="text-sm text-muted-foreground hover:text-foreground mt-2"
+          >
+            Sign Out
+          </button>
         </div>
         <Tabs defaultValue="shows" className="space-y-4">
           <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-3">
