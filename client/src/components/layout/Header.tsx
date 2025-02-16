@@ -6,6 +6,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
+import { clearShowsCache } from "@/lib/storage-utils";
 import { IoMusicalNotes } from "react-icons/io5";
 
 interface HeaderProps {
@@ -16,16 +17,17 @@ interface HeaderProps {
   username?: string;
 }
 
-export default function Header({ 
-  showNavigation = false, 
-  activeTab = "shows", 
+export default function Header({
+  showNavigation = false,
+  activeTab = "shows",
   onTabChange,
   isLoggedIn = false,
-  username = "" 
+  username = "",
 }: HeaderProps) {
   const handleSignOut = () => {
     // Clear all cached data
     localStorage.removeItem("phish-explorer-username");
+    clearShowsCache();
     window.location.reload();
   };
 
@@ -37,9 +39,7 @@ export default function Header({
             <a className="text-2xl font-bold flex flex-col items-center hover:opacity-80 transition-opacity">
               <div className="flex items-center gap-2">
                 <IoMusicalNotes className="h-8 w-8 text-primary" />
-                <span className="text-primary">
-                  I Saw It Again
-                </span>
+                <span className="text-primary">I Saw It Again</span>
               </div>
               {isLoggedIn && username && (
                 <div className="flex items-center gap-4 text-sm mt-1">
