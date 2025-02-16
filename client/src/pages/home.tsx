@@ -138,8 +138,11 @@ export default function HomePage({
   };
 
   const handleSignOut = () => {
-    localStorage.removeItem(STORAGE_KEY);
+    // Clear all cached data first
     clearShowsCache();
+    localStorage.removeItem(STORAGE_KEY);
+
+    // Reset all state
     setUser(null);
     setShowsWithSetlists(null);
     setSongStats(null);
