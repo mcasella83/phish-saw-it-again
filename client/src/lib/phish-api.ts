@@ -22,6 +22,12 @@ export async function getShowsByUsername(
   }
   const data: PhishShowApiResponse = await response.json();
   console.log("API response data:", data);
+  console.log("retrieved %d shows", data.data.length);
+
+  data.data = data.data.filter((show) => {
+    return show.artist_name === "Phish";
+  });
+  console.log("filtered %d Phish shows", data.data.length);
 
   if (data.error && data.error_message) {
     throw new Error(data.error_message);

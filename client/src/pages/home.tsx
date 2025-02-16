@@ -18,7 +18,7 @@ import { LoadingModal } from "@/components/ui/LoadingModal";
 import {
   clearShowsCache,
   loadShowsFromCache,
-  saveShowsToCache
+  saveShowsToCache,
 } from "@/lib/storage-utils";
 
 const STORAGE_KEY = "phish-explorer-username";
@@ -28,9 +28,14 @@ interface HomePageProps {
   onTabChange?: (tab: string) => void;
 }
 
-export default function HomePage({ initialTab = "shows", onTabChange }: HomePageProps) {
+export default function HomePage({
+  initialTab = "shows",
+  onTabChange,
+}: HomePageProps) {
   const [user, setUser] = useState<User | null>(null);
-  const [showsWithSetLists, setShowsWithSetlists] = useState<PhishShowSetlist[] | null>(null);
+  const [showsWithSetLists, setShowsWithSetlists] = useState<
+    PhishShowSetlist[] | null
+  >(null);
   const [songStats, setSongStats] = useState<SongStats[] | null>(null);
   const [venueStats, setVenueStats] = useState<VenueStats[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -57,12 +62,10 @@ export default function HomePage({ initialTab = "shows", onTabChange }: HomePage
       }
 
       const showsData = await getShowsByUsername(username);
-      console.log("Shows data received:", showsData);
+      console.log("Shows data received:", showsData.data.length);
 
       if (!showsData.error && showsData.data) {
-        setLoadingMaxShowCount(
-          Math.min(showsData.data.length, showsData.data.length)
-        );
+        setLoadingMaxShowCount(showsData.data.length);
 
         const processedShows = await processShowsData(
           showsData,
@@ -72,7 +75,7 @@ export default function HomePage({ initialTab = "shows", onTabChange }: HomePage
               setCurrentShowDate(show.showdate);
               setCurrentShowVenue(show.venue);
             }
-          }
+          },
         );
 
         const processedSongs = getUniqueSongsFromSetlists(processedShows);
@@ -82,7 +85,7 @@ export default function HomePage({ initialTab = "shows", onTabChange }: HomePage
         saveShowsToCache({
           shows: processedShows,
           songs: processedSongs,
-          venues: processedVenues
+          venues: processedVenues,
         });
 
         setShowsWithSetlists(processedShows);
@@ -175,9 +178,7 @@ export default function HomePage({ initialTab = "shows", onTabChange }: HomePage
             Sign Out
           </button>
         </div>
-        <div className="space-y-4">
-          {getContent()}
-        </div>
+        <div className="space-y-4">{getContent()}</div>
       </div>
     );
   }

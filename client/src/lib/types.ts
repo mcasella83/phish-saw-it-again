@@ -4,6 +4,7 @@ export interface PhishShow {
   venue: string;
   location: string;
   rating: number;
+  artist_name: string;
 }
 
 export interface PhishShowApiResponse {
