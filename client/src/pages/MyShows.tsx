@@ -92,7 +92,7 @@ export default function MyShows({
     );
 
     if (yearRow) {
-      const histogramOffset = 400; 
+      const histogramOffset = 400;
       const elementPosition = yearRow.getBoundingClientRect().top + window.pageYOffset;
       const offsetPosition = elementPosition - histogramOffset;
 
@@ -116,7 +116,7 @@ export default function MyShows({
 
   if (!showsWithSetLists || showsWithSetLists.length === 0) {
     return (
-      <div className="space-y-4 max-w-4xl mx-auto">
+      <div className="space-y-4">
         <h2 className="text-xl font-semibold">My Shows</h2>
         <p className="text-muted-foreground">
           No show data available. Add some shows to see your concert history!
@@ -127,126 +127,122 @@ export default function MyShows({
 
   return (
     <div className="space-y-4">
-      <div className="max-w-4xl mx-auto">
-        <h2 className="text-xl font-semibold">My Shows ({showsWithSetLists.length})</h2>
-      </div>
-      <div className="sticky top-4 z-10 bg-background rounded-md border p-4 mb-4 shadow-sm w-full">
-        <div className="max-w-[95%] mx-auto">
-          <h3 className="text-lg font-medium mb-4">Shows by Year</h3>
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={showsByYear}
-                margin={{ top: 20, right: 20, left: -20, bottom: 5 }}
-                onMouseMove={(state) => {
-                  if (state && state.activePayload && state.activePayload[0]) {
-                    const year = (state.activePayload[0].payload as YearData).year;
-                    setSelectedYear(year);
-                  }
+      <h2 className="text-xl font-semibold">My Shows ({showsWithSetLists.length})</h2>
+      <div className="sticky top-4 z-10 bg-background rounded-md border p-4 shadow-sm w-full">
+        <h3 className="text-lg font-medium mb-4">Shows by Year</h3>
+        <div className="h-[300px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={showsByYear}
+              margin={{ top: 20, right: 20, left: -20, bottom: 5 }}
+              onMouseMove={(state) => {
+                if (state && state.activePayload && state.activePayload[0]) {
+                  const year = (state.activePayload[0].payload as YearData).year;
+                  setSelectedYear(year);
+                }
+              }}
+              onMouseLeave={() => {
+                setSelectedYear(null);
+              }}
+            >
+              <XAxis
+                dataKey="year"
+                tickFormatter={(value) => value.toString()}
+                fontSize={12}
+              />
+              <YAxis
+                allowDecimals={false}
+                fontSize={12}
+              />
+              <Tooltip
+                formatter={(value, name) => [value, 'Shows']}
+                labelFormatter={(label) => `Year: ${label}`}
+                cursor={false}
+              />
+              <Bar
+                dataKey="count"
+                name="Shows"
+                onClick={(data) => {
+                  const yearData = data as unknown as YearData;
+                  setSelectedYear(yearData.year);
+                  scrollToYear(yearData.year);
                 }}
-                onMouseLeave={() => {
-                  setSelectedYear(null);
-                }}
+                cursor="pointer"
               >
-                <XAxis
-                  dataKey="year"
-                  tickFormatter={(value) => value.toString()}
-                  fontSize={12}
-                />
-                <YAxis
-                  allowDecimals={false}
-                  fontSize={12}
-                />
-                <Tooltip
-                  formatter={(value, name) => [value, 'Shows']}
-                  labelFormatter={(label) => `Year: ${label}`}
-                  cursor={false}
-                />
-                <Bar
+                {showsByYear.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={entry.color}
+                    stroke={selectedYear === entry.year ? '#000000' : entry.color}
+                    strokeWidth={selectedYear === entry.year ? 2 : 0}
+                    strokeOpacity={1}
+                    style={{
+                      filter: selectedYear === entry.year ? 'brightness(1.1)' : 'none',
+                    }}
+                  />
+                ))}
+                <LabelList
                   dataKey="count"
-                  name="Shows"
-                  onClick={(data) => {
-                    const yearData = data as unknown as YearData;
-                    setSelectedYear(yearData.year);
-                    scrollToYear(yearData.year);
-                  }}
-                  cursor="pointer"
-                >
-                  {showsByYear.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={entry.color}
-                      stroke={selectedYear === entry.year ? '#000000' : entry.color}
-                      strokeWidth={selectedYear === entry.year ? 2 : 0}
-                      strokeOpacity={1}
-                      style={{
-                        filter: selectedYear === entry.year ? 'brightness(1.1)' : 'none',
-                      }}
-                    />
-                  ))}
-                  <LabelList
-                    dataKey="count"
-                    position="center"
-                    content={({ x, y, width, height, value, index }) => {
-                      const entry = showsByYear[index];
-                      if (!entry) return null;
+                  position="center"
+                  content={({ x, y, width, height, value, index }) => {
+                    const entry = showsByYear[index];
+                    if (!entry) return null;
 
-                      const luminance = getLuminance(entry.color);
-                      const textColor = luminance > 0.5 ? '#000000' : '#FFFFFF';
-                      const xPos = (Number(x) || 0) + (Number(width) || 0) / 2;
-                      const yPos = (Number(y) || 0) + (Number(height) || 0) / 2;
-                      const isSingleShow = value === 1;
+                    const luminance = getLuminance(entry.color);
+                    const textColor = luminance > 0.5 ? '#000000' : '#FFFFFF';
+                    const xPos = (Number(x) || 0) + (Number(width) || 0) / 2;
+                    const yPos = (Number(y) || 0) + (Number(height) || 0) / 2;
+                    const isSingleShow = value === 1;
 
-                      return (
-                        <g>
-                          {isSingleShow ? (
-                            // Single show layout - everything on one line
+                    return (
+                      <g>
+                        {isSingleShow ? (
+                          // Single show layout - everything on one line
+                          <text
+                            x={xPos}
+                            y={yPos}
+                            fill={textColor}
+                            textAnchor="middle"
+                            dominantBaseline="central"
+                            className="text-xs"
+                          >
+                            {value} ({entry.percentage.toFixed(1)}%)
+                          </text>
+                        ) : (
+                          // Multiple shows layout - stacked
+                          <>
                             <text
                               x={xPos}
-                              y={yPos}
+                              y={yPos - 8}
+                              fill={textColor}
+                              textAnchor="middle"
+                              dominantBaseline="central"
+                              className="font-bold text-sm"
+                            >
+                              {value}
+                            </text>
+                            <text
+                              x={xPos}
+                              y={yPos + 8}
                               fill={textColor}
                               textAnchor="middle"
                               dominantBaseline="central"
                               className="text-xs"
                             >
-                              {value} ({entry.percentage.toFixed(1)}%)
+                              {entry.percentage.toFixed(1)}%
                             </text>
-                          ) : (
-                            // Multiple shows layout - stacked
-                            <>
-                              <text
-                                x={xPos}
-                                y={yPos - 8}
-                                fill={textColor}
-                                textAnchor="middle"
-                                dominantBaseline="central"
-                                className="font-bold text-sm"
-                              >
-                                {value}
-                              </text>
-                              <text
-                                x={xPos}
-                                y={yPos + 8}
-                                fill={textColor}
-                                textAnchor="middle"
-                                dominantBaseline="central"
-                                className="text-xs"
-                              >
-                                {entry.percentage.toFixed(1)}%
-                              </text>
-                            </>
-                          )}
-                        </g>
-                      );
-                    }}
-                  />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+                          </>
+                        )}
+                      </g>
+                    );
+                  }}
+                />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
-      <div className="rounded-md border max-w-4xl mx-auto" ref={tableRef}>
+      <div className="rounded-md border" ref={tableRef}>
         <Table>
           <TableHeader>
             <TableRow>

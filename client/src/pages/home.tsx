@@ -182,9 +182,6 @@ export default function HomePage({
       />
       {user && showsWithSetLists ? (
         <div className="w-full px-8 py-8 mt-16">
-          <div className="max-w-4xl mx-auto mb-6">
-            <h1 className="text-2xl font-bold">Welcome, {user.username}!</h1>
-          </div>
           <div className="space-y-4">{getContent()}</div>
         </div>
       ) : (
