@@ -63,7 +63,20 @@ export default function MyShows({
       );
 
       if (yearRow) {
-        yearRow.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Add offset to account for the sticky histogram
+        const histogramHeight = 400; // Height of histogram + padding
+        const scrollOptions = {
+          behavior: 'smooth' as const,
+          block: 'start' as const,
+        };
+
+        yearRow.scrollIntoView(scrollOptions);
+
+        // Additional offset to account for the sticky histogram
+        window.scrollBy({
+          top: -histogramHeight,
+          behavior: 'smooth'
+        });
       }
     }
   };
