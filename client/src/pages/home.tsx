@@ -23,7 +23,12 @@ import {
 
 const STORAGE_KEY = "phish-explorer-username";
 
-export default function HomePage() {
+interface HomePageProps {
+  initialTab?: string;
+  onTabChange?: (tab: string) => void;
+}
+
+export default function HomePage({ initialTab = "shows", onTabChange }: HomePageProps) {
   const [user, setUser] = useState<User | null>(null);
   const [showsWithSetLists, setShowsWithSetlists] = useState<PhishShowSetlist[] | null>(null);
   const [songStats, setSongStats] = useState<SongStats[] | null>(null);
@@ -33,7 +38,6 @@ export default function HomePage() {
   const [loadingMaxShowCount, setLoadingMaxShowCount] = useState(0);
   const [currentShowDate, setCurrentShowDate] = useState<string>("");
   const [currentShowVenue, setCurrentShowVenue] = useState<string>("");
-  const [activeTab, setActiveTab] = useState("shows");
   const { toast } = useToast();
 
   const loadUserData = async (username: string) => {
@@ -140,7 +144,7 @@ export default function HomePage() {
   };
 
   const getContent = () => {
-    switch (activeTab) {
+    switch (initialTab) {
       case "shows":
         return (
           <MyShows

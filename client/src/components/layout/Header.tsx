@@ -32,34 +32,34 @@ export default function Header({ showNavigation = false, activeTab = "shows", on
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <NavigationMenuLink
+                <button
                   className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
                     activeTab === "shows" ? "bg-accent/50" : ""
                   }`}
                   onClick={() => onTabChange?.("shows")}
                 >
                   My Shows
-                </NavigationMenuLink>
+                </button>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuLink
+                <button
                   className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
                     activeTab === "songs" ? "bg-accent/50" : ""
                   }`}
                   onClick={() => onTabChange?.("songs")}
                 >
                   My Songs
-                </NavigationMenuLink>
+                </button>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuLink
+                <button
                   className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
                     activeTab === "venues" ? "bg-accent/50" : ""
                   }`}
                   onClick={() => onTabChange?.("venues")}
                 >
                   My Venues
-                </NavigationMenuLink>
+                </button>
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
