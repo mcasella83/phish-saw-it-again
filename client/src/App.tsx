@@ -5,27 +5,12 @@ import { Toaster } from "@/components/ui/toaster";
 import Header from "@/components/layout/Header";
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 function Router() {
   const [activeTab, setActiveTab] = useState("shows");
-  const [username, setUsername] = useState<string | null>(localStorage.getItem("phish-explorer-username"));
+  const username = localStorage.getItem("phish-explorer-username");
   const isLoggedIn = username !== null;
-
-  // Update username when localStorage changes
-  useEffect(() => {
-    const checkUsername = () => {
-      const storedUsername = localStorage.getItem("phish-explorer-username");
-      setUsername(storedUsername);
-    };
-
-    // Check initially
-    checkUsername();
-
-    // Listen for storage changes
-    window.addEventListener('storage', checkUsername);
-    return () => window.removeEventListener('storage', checkUsername);
-  }, []);
 
   return (
     <div className="min-h-screen bg-background">

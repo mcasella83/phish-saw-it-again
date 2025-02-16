@@ -141,7 +141,6 @@ export default function HomePage({ initialTab = "shows", onTabChange }: HomePage
     setShowsWithSetlists(null);
     setSongStats(null);
     setVenueStats(null);
-    window.dispatchEvent(new Event('storage'));
   };
 
   const getContent = () => {
