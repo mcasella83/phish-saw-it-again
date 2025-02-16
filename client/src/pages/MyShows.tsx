@@ -144,8 +144,9 @@ export default function MyShows({
                 dataKey="count" 
                 name="Shows"
                 onClick={(data) => {
-                  setSelectedYear(data.year);
-                  scrollToYear(data.year);
+                  const year = data.payload.year;
+                  setSelectedYear(year);
+                  scrollToYear(year);
                 }}
                 cursor="pointer"
               >
