@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -7,22 +6,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useUser } from "@/lib/stores/user";
-import { useAppData } from "@/lib/stores/app-data";
-import { useLocation } from "wouter";
+import { SongStats } from "@/lib/phish-processing";
 
-export default function MySongs() {
-  const user = useUser((state) => state.user);
-  const { songs } = useAppData();
-  const [, setLocation] = useLocation();
+interface MySongsProps {
+  songs: SongStats[] | null;
+}
 
-  useEffect(() => {
-    if (!user) {
-      setLocation("/");
-      return;
-    }
-  }, [user, setLocation]);
-
+export default function MySongs({ songs }: MySongsProps) {
   if (!songs) {
     return (
       <div className="space-y-4">

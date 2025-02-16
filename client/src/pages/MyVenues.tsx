@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { VenueStats } from "@/lib/phish-processing";
 import {
   Table,
   TableBody,
@@ -9,22 +10,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useUser } from "@/lib/stores/user";
-import { useAppData } from "@/lib/stores/app-data";
-import { useLocation } from "wouter";
 
-export default function MyVenues() {
+interface MyVenuesProps {
+  venues: VenueStats[] | null;
+}
+
+export default function MyVenues({ venues }: MyVenuesProps) {
   const [expandedVenues, setExpandedVenues] = useState<Record<string, boolean>>({});
-  const user = useUser((state) => state.user);
-  const { venues } = useAppData();
-  const [, setLocation] = useLocation();
-
-  useEffect(() => {
-    if (!user) {
-      setLocation("/");
-      return;
-    }
-  }, [user, setLocation]);
 
   if (!venues || venues.length === 0) {
     return (
@@ -58,6 +50,7 @@ export default function MyVenues() {
               return (
                 <React.Fragment key={venueKey}>
                   <TableRow
+                    key={`row-${venueKey}`}
                     className="cursor-pointer hover:bg-muted/50"
                     onClick={() =>
                       setExpandedVenues((prev) => ({
@@ -81,7 +74,7 @@ export default function MyVenues() {
                     </TableCell>
                   </TableRow>
                   {isExpanded && (
-                    <TableRow className="bg-muted/50">
+                    <TableRow key={`expanded-${venueKey}`} className="bg-muted/50">
                       <TableCell colSpan={4} className="p-4">
                         <h4 className="text-sm font-medium mb-2">Show Dates:</h4>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">

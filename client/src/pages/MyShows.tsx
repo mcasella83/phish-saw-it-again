@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import { Loader2, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PhishShowSetlist, PhishSong } from "@/lib/types";
@@ -11,9 +11,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LabelList } from "recharts";
-import { useToast } from "@/hooks/use-toast";
-import { useUser } from "@/lib/stores/user";
-import { useAppData } from "@/lib/stores/app-data";
+
+interface MyShowsProps {
+  showsWithSetLists: PhishShowSetlist[];
+  loading: boolean;
+  loadingShowCount: number;
+  loadingMaxShowCount: number;
+}
 
 interface YearData {
   year: number;
@@ -34,40 +38,36 @@ const getLuminance = (color: string): number => {
   const p = 2 * l - q;
 
   const rgb = [
-    h + 1 / 3,
+    h + 1/3,
     h,
-    h - 1 / 3,
-  ].map((t) => {
+    h - 1/3
+  ].map(t => {
     if (t < 0) t += 1;
     if (t > 1) t -= 1;
-    if (t < 1 / 6) return p + (q - p) * 6 * t;
-    if (t < 1 / 2) return q;
-    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    if (t < 1/6) return p + (q - p) * 6 * t;
+    if (t < 1/2) return q;
+    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
     return p;
   });
 
   return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
 };
 
-export default function MyShows() {
+export default function MyShows({
+  showsWithSetLists,
+  loading,
+  loadingShowCount,
+  loadingMaxShowCount
+}: MyShowsProps) {
   const [expandedShows, setExpandedShows] = useState<Record<string, boolean>>({});
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const tableRef = useRef<HTMLDivElement>(null);
-  const user = useUser((state) => state.user);
-  const { shows: showsWithSetLists } = useAppData();
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (!user) {
-      window.location.href = "/";
-    }
-  }, [user]);
 
   const showsByYear = useMemo(() => {
     if (!showsWithSetLists?.length) return [];
 
     const counts: Record<number, number> = {};
-    showsWithSetLists.forEach((show) => {
+    showsWithSetLists.forEach(show => {
       const year = new Date(show.date).getFullYear();
       counts[year] = (counts[year] || 0) + 1;
     });
@@ -79,7 +79,7 @@ export default function MyShows() {
         year: parseInt(year),
         count,
         percentage: (count / totalShows) * 100,
-        color: `hsl(${Math.random() * 360}, 70%, 50%)`,
+        color: `hsl(${Math.random() * 360}, 70%, 50%)`
       }))
       .sort((a, b) => a.year - b.year);
   }, [showsWithSetLists]);
@@ -92,16 +92,27 @@ export default function MyShows() {
     );
 
     if (yearRow) {
-      const histogramOffset = 400;
+      const histogramOffset = 400; 
       const elementPosition = yearRow.getBoundingClientRect().top + window.pageYOffset;
       const offsetPosition = elementPosition - histogramOffset;
 
       window.scrollTo({
         top: offsetPosition,
-        behavior: "smooth",
+        behavior: 'smooth'
       });
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <p className="text-muted-foreground">
+          Loading shows... ({loadingShowCount} out of {loadingMaxShowCount})
+        </p>
+      </div>
+    );
+  }
 
   if (!showsWithSetLists || showsWithSetLists.length === 0) {
     return (
@@ -119,7 +130,7 @@ export default function MyShows() {
       <div className="max-w-4xl mx-auto">
         <h2 className="text-xl font-semibold">My Shows ({showsWithSetLists.length})</h2>
       </div>
-      <div className="sticky top-20 z-10 bg-background rounded-md border p-4 mb-4 shadow-sm w-full">
+      <div className="sticky top-4 z-10 bg-background rounded-md border p-4 mb-4 shadow-sm w-full">
         <div className="max-w-[95%] mx-auto">
           <h3 className="text-lg font-medium mb-4">Shows by Year</h3>
           <div className="h-[300px] w-full">
@@ -147,7 +158,7 @@ export default function MyShows() {
                   fontSize={12}
                 />
                 <Tooltip
-                  formatter={(value, name) => [value, "Shows"]}
+                  formatter={(value, name) => [value, 'Shows']}
                   labelFormatter={(label) => `Year: ${label}`}
                   cursor={false}
                 />
@@ -165,11 +176,11 @@ export default function MyShows() {
                     <Cell
                       key={`cell-${index}`}
                       fill={entry.color}
-                      stroke={selectedYear === entry.year ? "#000000" : entry.color}
+                      stroke={selectedYear === entry.year ? '#000000' : entry.color}
                       strokeWidth={selectedYear === entry.year ? 2 : 0}
                       strokeOpacity={1}
                       style={{
-                        filter: selectedYear === entry.year ? "brightness(1.1)" : "none",
+                        filter: selectedYear === entry.year ? 'brightness(1.1)' : 'none',
                       }}
                     />
                   ))}
@@ -181,7 +192,7 @@ export default function MyShows() {
                       if (!entry) return null;
 
                       const luminance = getLuminance(entry.color);
-                      const textColor = luminance > 0.5 ? "#000000" : "#FFFFFF";
+                      const textColor = luminance > 0.5 ? '#000000' : '#FFFFFF';
                       const xPos = (Number(x) || 0) + (Number(width) || 0) / 2;
                       const yPos = (Number(y) || 0) + (Number(height) || 0) / 2;
                       const isSingleShow = value === 1;
@@ -189,6 +200,7 @@ export default function MyShows() {
                       return (
                         <g>
                           {isSingleShow ? (
+                            // Single show layout - everything on one line
                             <text
                               x={xPos}
                               y={yPos}
@@ -200,6 +212,7 @@ export default function MyShows() {
                               {value} ({entry.percentage.toFixed(1)}%)
                             </text>
                           ) : (
+                            // Multiple shows layout - stacked
                             <>
                               <text
                                 x={xPos}

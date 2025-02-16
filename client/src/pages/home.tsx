@@ -6,29 +6,35 @@ import {
   processShowsData,
   getUniqueSongsFromSetlists,
   getVenueStatsFromSetlists,
+  type SongStats,
+  type VenueStats,
 } from "@/lib/phish-processing";
 import { useToast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import MyShows from "./MyShows";
+import MySongs from "./MySongs";
+import MyVenues from "./MyVenues";
+import { PhishShowSetlist } from "@/lib/types";
 import { LoadingModal } from "@/components/ui/LoadingModal";
-import { useUser } from "@/lib/stores/user";
-import { useAppData } from "@/lib/stores/app-data";
-import { useLocation } from "wouter";
 
 export default function HomePage() {
+  const [user, setUser] = useState<User | null>(null);
+  const [showsWithSetLists, setShowsWithSetlists] = useState<
+    PhishShowSetlist[] | null
+  >(null);
+  const [songStats, setSongStats] = useState<SongStats[] | null>(null);
+  const [venueStats, setVenueStats] = useState<VenueStats[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingShowCount, setLoadingShowCount] = useState(0);
   const [loadingMaxShowCount, setLoadingMaxShowCount] = useState(0);
   const [currentShowDate, setCurrentShowDate] = useState<string>("");
   const [currentShowVenue, setCurrentShowVenue] = useState<string>("");
   const { toast } = useToast();
-  const { user, setUser } = useUser();
-  const { setShows, setSongs, setVenues, clearData } = useAppData();
-  const [, setLocation] = useLocation();
 
   const handleSubmit = async (data: User) => {
     try {
       setLoading(true);
       setUser(data);
-      clearData(); // Clear existing data when loading new user
       const showsData = await getShowsByUsername(data.username);
       console.log("Shows data received:", showsData);
 
@@ -48,22 +54,21 @@ export default function HomePage() {
           },
         );
 
-        setShows(processedShows);
+        setShowsWithSetlists(processedShows);
         // Process songs and venues after shows are loaded
         const processedSongs = getUniqueSongsFromSetlists(processedShows);
         const processedVenues = getVenueStatsFromSetlists(processedShows);
-        setSongs(processedSongs);
-        setVenues(processedVenues);
-
-        // Navigate to My Shows page after successful data load
-        setLocation("/my-shows");
+        setSongStats(processedSongs);
+        setVenueStats(processedVenues);
       } else {
         throw new Error(showsData.error_message || "Failed to fetch shows");
       }
     } catch (error) {
       console.error("Error in handleSubmit:", error);
       setUser(null);
-      clearData();
+      setShowsWithSetlists(null);
+      setSongStats(null);
+      setVenueStats(null);
 
       toast({
         title: "Failed to fetch shows",
@@ -81,6 +86,37 @@ export default function HomePage() {
       setCurrentShowVenue("");
     }
   };
+
+  if (user && showsWithSetLists) {
+    return (
+      <div className="w-full px-8 py-8">
+        <div className="max-w-4xl mx-auto mb-6">
+          <h1 className="text-2xl font-bold">Welcome, {user.username}!</h1>
+        </div>
+        <Tabs defaultValue="shows" className="space-y-4">
+          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-3">
+            <TabsTrigger value="shows">My Shows</TabsTrigger>
+            <TabsTrigger value="songs">My Songs</TabsTrigger>
+            <TabsTrigger value="venues">My Venues</TabsTrigger>
+          </TabsList>
+          <TabsContent value="shows">
+            <MyShows
+              showsWithSetLists={showsWithSetLists}
+              loading={loading}
+              loadingShowCount={loadingShowCount}
+              loadingMaxShowCount={loadingMaxShowCount}
+            />
+          </TabsContent>
+          <TabsContent value="songs">
+            <MySongs songs={songStats} />
+          </TabsContent>
+          <TabsContent value="venues">
+            <MyVenues venues={venueStats} />
+          </TabsContent>
+        </Tabs>
+      </div>
+    );
+  }
 
   return (
     <>
