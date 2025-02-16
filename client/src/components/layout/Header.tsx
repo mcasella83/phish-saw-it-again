@@ -20,29 +20,29 @@ export default function Header({ showNavigation = false, activeTab = "shows", on
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b bg-gradient-to-r from-primary/5 to-primary/10 backdrop-blur-sm">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex flex-col">
-          <Link href="/">
+        <Link href="/">
+          <div className="flex flex-col">
             <a className="text-2xl font-bold flex items-center gap-2 hover:opacity-80 transition-opacity">
               <IoMusicalNotes className="h-8 w-8 text-primary" />
               <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                 I Saw It Again
               </span>
             </a>
-          </Link>
-          {username && (
-            <div className="text-sm mt-1 flex items-center gap-2">
-              <span>Welcome, {username}</span>
-              {onSignOut && (
-                <button 
-                  onClick={onSignOut}
-                  className="text-blue-500 hover:text-blue-600 transition-colors"
-                >
-                  Sign Out
-                </button>
-              )}
-            </div>
-          )}
-        </div>
+            {username && (
+              <div className="text-sm text-left mt-1">
+                Welcome, {username}
+                {onSignOut && (
+                  <button 
+                    onClick={onSignOut}
+                    className="ml-2 text-blue-500 hover:text-blue-600 transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </Link>
         {showNavigation && (
           <NavigationMenu>
             <NavigationMenuList>
