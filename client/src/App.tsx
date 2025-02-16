@@ -13,7 +13,8 @@ function Router() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto px-4 py-8 mt-16">
+      {/* Increase top margin to prevent content from going under the header */}
+      <main className="container mx-auto px-4 py-8 mt-20">
         <Switch>
           <Route path="/" component={HomePage} />
           <Route path="/my-shows" component={MyShows} />
