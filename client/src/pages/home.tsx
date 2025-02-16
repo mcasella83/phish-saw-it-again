@@ -89,10 +89,12 @@ export default function HomePage() {
 
   if (user && showsWithSetLists) {
     return (
-      <div className="max-w-4xl mx-auto py-8">
-        <h1 className="text-2xl font-bold mb-6">Welcome, {user.username}!</h1>
+      <div className="w-full px-8 py-8">
+        <div className="max-w-4xl mx-auto mb-6">
+          <h1 className="text-2xl font-bold">Welcome, {user.username}!</h1>
+        </div>
         <Tabs defaultValue="shows" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-3">
             <TabsTrigger value="shows">My Shows</TabsTrigger>
             <TabsTrigger value="songs">My Songs</TabsTrigger>
             <TabsTrigger value="venues">My Venues</TabsTrigger>
