@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import { Loader2, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PhishShowSetlist, PhishSong } from "@/lib/types";
@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 interface MyShowsProps {
   showsWithSetLists: PhishShowSetlist[];
@@ -26,8 +26,9 @@ export default function MyShows({
   loadingMaxShowCount 
 }: MyShowsProps) {
   const [expandedShows, setExpandedShows] = useState<Record<string, boolean>>({});
+  const tableRef = useRef<HTMLDivElement>(null);
 
-  // Calculate show counts per year
+  // Calculate show counts per year and assign random colors
   const showsByYear = useMemo(() => {
     if (!showsWithSetLists?.length) return [];
 
@@ -40,10 +41,31 @@ export default function MyShows({
     return Object.entries(counts)
       .map(([year, count]) => ({
         year: parseInt(year),
-        count
+        count,
+        // Generate a random but visually pleasing color using HSL
+        color: `hsl(${Math.random() * 360}, 70%, 50%)`
       }))
       .sort((a, b) => a.year - b.year);
   }, [showsWithSetLists]);
+
+  const scrollToYear = (year: number) => {
+    if (!tableRef.current) return;
+
+    // Find the first show of the selected year
+    const firstShowOfYear = showsWithSetLists.find(
+      show => new Date(show.date).getFullYear() === year
+    );
+
+    if (firstShowOfYear) {
+      const yearRow = tableRef.current.querySelector(
+        `[data-year="${year}"]`
+      );
+
+      if (yearRow) {
+        yearRow.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -72,7 +94,7 @@ export default function MyShows({
       <h2 className="text-xl font-semibold">My Shows ({showsWithSetLists.length})</h2>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2">
-          <div className="rounded-md border">
+          <div className="rounded-md border" ref={tableRef}>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -85,6 +107,7 @@ export default function MyShows({
               <TableBody>
                 {showsWithSetLists.map((show) => {
                   const showId = show.id.toString();
+                  const showYear = new Date(show.date).getFullYear();
                   const isExpanded = expandedShows[showId] || false;
                   const songsBySet = show.songs.reduce(
                     (acc: Record<string, PhishSong[]>, song) => {
@@ -101,6 +124,7 @@ export default function MyShows({
                   return (
                     <React.Fragment key={showId}>
                       <TableRow
+                        data-year={showYear}
                         className="cursor-pointer hover:bg-muted/50"
                         onClick={() =>
                           setExpandedShows((prev) => ({
@@ -176,7 +200,15 @@ export default function MyShows({
           <h3 className="text-lg font-medium mb-4">Shows by Year</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={showsByYear} margin={{ top: 20, right: 0, left: -20, bottom: 5 }}>
+              <BarChart 
+                data={showsByYear} 
+                margin={{ top: 20, right: 0, left: -20, bottom: 5 }}
+                onClick={(data) => {
+                  if (data && data.activePayload && data.activePayload[0]) {
+                    scrollToYear(data.activePayload[0].payload.year);
+                  }
+                }}
+              >
                 <XAxis 
                   dataKey="year" 
                   tickFormatter={(value) => value.toString()}
@@ -189,12 +221,18 @@ export default function MyShows({
                 <Tooltip 
                   formatter={(value, name) => [value, 'Shows']}
                   labelFormatter={(label) => `Year: ${label}`}
+                  cursor={{ fill: 'var(--muted)' }}
                 />
                 <Bar 
                   dataKey="count" 
-                  fill="var(--primary)" 
                   name="Shows"
-                />
+                  onClick={(data) => scrollToYear(data.year)}
+                  cursor="pointer"
+                >
+                  {showsByYear.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
