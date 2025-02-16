@@ -130,30 +130,30 @@ export default function MyShows({
   return (
     <div className="space-y-4">
       <div className="fixed top-16 left-0 right-0 z-50 bg-background px-8">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">My Shows ({showsWithSetLists.length})</h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsHistogramCollapsed(!isHistogramCollapsed)}
-            className="flex items-center gap-2"
-          >
-            {isHistogramCollapsed ? (
-              <>
-                Show Histogram <ChevronDown className="h-4 w-4" />
-              </>
-            ) : (
-              <>
-                Hide Histogram <ChevronUp className="h-4 w-4" />
-              </>
-            )}
-          </Button>
-        </div>
+        <h2 className="text-xl font-semibold mb-4">My Shows ({showsWithSetLists.length})</h2>
         <div className={cn(
           "rounded-md border p-4 shadow-sm w-full transition-all duration-300",
           isHistogramCollapsed ? "h-0 p-0 overflow-hidden border-0" : "h-[380px]"
         )}>
-          <h3 className="text-lg font-medium mb-4">Shows by Year</h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-medium">Shows by Year</h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsHistogramCollapsed(!isHistogramCollapsed)}
+              className="flex items-center gap-2"
+            >
+              {isHistogramCollapsed ? (
+                <>
+                  Show <ChevronDown className="h-4 w-4" />
+                </>
+              ) : (
+                <>
+                  Hide <ChevronUp className="h-4 w-4" />
+                </>
+              )}
+            </Button>
+          </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
