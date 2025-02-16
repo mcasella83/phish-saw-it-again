@@ -94,9 +94,12 @@ export default function MyShows({
     );
 
     if (yearRow) {
-      const histogramOffset = 400;
+      const headerHeight = 64; // Fixed header height
+      const histogramHeight = isHistogramCollapsed ? 120 : 480; // Histogram section height
+      const padding = 16; // Padding for better visibility
+
       const elementPosition = yearRow.getBoundingClientRect().top + window.pageYOffset;
-      const offsetPosition = elementPosition - histogramOffset;
+      const offsetPosition = elementPosition - (headerHeight + histogramHeight + padding);
 
       window.scrollTo({
         top: offsetPosition,
@@ -337,8 +340,8 @@ export default function MyShows({
                           <div className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                               {Object.entries(songsBySet).map(([setName, songs]) => (
-                                <div 
-                                  key={`${showId}-${setName}`} 
+                                <div
+                                  key={`${showId}-${setName}`}
                                   className="space-y-2 bg-muted/30 p-4 rounded-lg"
                                 >
                                   <h4 className="font-medium text-sm border-b pb-2">
