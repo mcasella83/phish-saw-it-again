@@ -7,11 +7,11 @@ export interface SongStats {
   name: string;
   playCount: number;
   dates: string[];
-  isBustout?: boolean;
-  isFirstTime?: boolean;
-  isLastTime?: boolean;
-  isFirstTimeOpener?: boolean;
-  isFirstTimeCloser?: boolean;
+  isBustout: boolean;
+  isFirstTime: boolean;
+  isLastTime: boolean;
+  isFirstTimeOpener: boolean;
+  isFirstTimeCloser: boolean;
 }
 
 export interface VenueStats {
@@ -48,6 +48,12 @@ export function getUniqueSongsFromSetlists(
       name,
       playCount: stats.count,
       dates: Array.from(stats.dates).sort((a, b) => b.localeCompare(a)),
+      // For testing, set some songs to have these flags
+      isBustout: stats.count === 1,
+      isFirstTime: stats.count === 1,
+      isLastTime: name.startsWith('A'), // Just for testing
+      isFirstTimeOpener: name.length > 10, // Just for testing
+      isFirstTimeCloser: stats.count < 3, // Just for testing
     }))
     .sort((a, b) => b.playCount - a.playCount);
 }
