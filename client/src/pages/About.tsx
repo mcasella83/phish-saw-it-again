@@ -16,16 +16,16 @@ export default function About() {
           <h2 className="text-xl font-semibold">About this site</h2>
           <h3>I love Phish and all the surrounding statistics.</h3>
           <h3>
-            This site was inspired by The Number Line, and I used it as a chance to
-            learn React.{" "}
+            This site was inspired by The Number Line, and I used it as a chance
+            to learn React.{" "}
           </h3>
           <h3>
             To use the site, you just need a profile with your shows at{" "}
             <a href="https://phish.net">https://phish.net</a>
           </h3>
         </div>
-        
-        <div className="space-y-4">
+
+        <div className="space-y-4 mt-16">
           <h2 className="text-xl font-semibold">Changelog</h2>
           <Table>
             <TableHeader>
@@ -42,8 +42,8 @@ export default function About() {
                 <TableCell>
                   <ul className="list-disc list-inside">
                     <li>
-                      Initial version to retrieve information about Show, Songs, and
-                      Venues
+                      Initial version to retrieve information about Show, Songs,
+                      and Venues
                     </li>
                   </ul>
                 </TableCell>
