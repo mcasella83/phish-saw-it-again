@@ -3,6 +3,7 @@ import {
   PhishShowSetlist,
   PhishSetlistApiResponse,
   PhishSong,
+  createDefaultPhishSong,
 } from "./types";
 import { decodeHtmlEntities, encodeUTF8 } from "./utils";
 
@@ -52,8 +53,8 @@ export async function getShowSetList(id: string): Promise<PhishShowSetlist> {
   }
 
   const apiResponse: PhishSetlistApiResponse = await response.json();
-  
-  const songs: PhishSong[] = apiResponse.data.map(songData => {
+
+  const songs: PhishSong[] = apiResponse.data.map((songData) => {
     const song = createDefaultPhishSong();
     song.name = songData.song;
     song.date = songData.showdate;
