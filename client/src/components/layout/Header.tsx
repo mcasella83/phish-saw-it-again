@@ -55,52 +55,54 @@ export default function Header({
             )}
           </a>
         </div>
-        {showNavigation && (
-          <NavigationMenu>
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <button
-                  className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
-                    activeTab === "shows" ? "bg-accent/50" : ""
-                  }`}
-                  onClick={() => onTabChange?.("shows")}
-                >
-                  My Shows
-                </button>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <button
-                  className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
-                    activeTab === "songs" ? "bg-accent/50" : ""
-                  }`}
-                  onClick={() => onTabChange?.("songs")}
-                >
-                  My Songs
-                </button>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <button
-                  className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
-                    activeTab === "venues" ? "bg-accent/50" : ""
-                  }`}
-                  onClick={() => onTabChange?.("venues")}
-                >
-                  My Venues
-                </button>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <button
-                  className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
-                    activeTab === "about" ? "bg-accent/50" : ""
-                  }`}
-                  onClick={() => onTabChange?.("about")}
-                >
-                  About
-                </button>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
-        )}
+        <NavigationMenu>
+          <NavigationMenuList>
+            {showNavigation && (
+              <>
+                <NavigationMenuItem>
+                  <button
+                    className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
+                      activeTab === "shows" ? "bg-accent/50" : ""
+                    }`}
+                    onClick={() => onTabChange?.("shows")}
+                  >
+                    My Shows
+                  </button>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <button
+                    className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
+                      activeTab === "songs" ? "bg-accent/50" : ""
+                    }`}
+                    onClick={() => onTabChange?.("songs")}
+                  >
+                    My Songs
+                  </button>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <button
+                    className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
+                      activeTab === "venues" ? "bg-accent/50" : ""
+                    }`}
+                    onClick={() => onTabChange?.("venues")}
+                  >
+                    My Venues
+                  </button>
+                </NavigationMenuItem>
+              </>
+            )}
+            <NavigationMenuItem>
+              <button
+                className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
+                  activeTab === "about" ? "bg-accent/50" : ""
+                }`}
+                onClick={() => onTabChange?.("about")}
+              >
+                About
+              </button>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
       </div>
     </header>
   );
