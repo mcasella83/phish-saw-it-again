@@ -146,6 +146,7 @@ export default function HomePage({
 
   const getContent = () => {
     switch (initialTab) {
+      case "login":
       case "shows":
         return (
           <MyShows
