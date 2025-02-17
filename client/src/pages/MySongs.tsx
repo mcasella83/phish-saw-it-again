@@ -39,7 +39,7 @@ export default function MySongs({ songs }: MySongsProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Song Name</TableHead>
+              <TableHead className="min-w-[300px]">Song Name</TableHead>
               <TableHead className="w-24 text-right">Times Seen</TableHead>
               <TableHead>First Seen</TableHead>
               <TableHead>Last Seen</TableHead>
@@ -60,15 +60,25 @@ export default function MySongs({ songs }: MySongsProps) {
                     }))
                   }
                 >
-                  <TableCell>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span>{song.name}</span>
-                      <div className="flex gap-1 flex-wrap">
-                        {song.isBustout && <SongTag type="bustout" />}
-                        {song.isFirstTime && <SongTag type="firstTime" />}
-                        {song.isLastTime && <SongTag type="lastTime" />}
-                        {song.isFirstTimeOpener && <SongTag type="firstOpener" />}
-                        {song.isFirstTimeCloser && <SongTag type="firstCloser" />}
+                  <TableCell className="min-w-[300px]">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-medium">{song.name}</span>
+                      <div className="flex flex-wrap gap-1">
+                        {song.isBustout && (
+                          <SongTag type="bustout" className="ml-2" />
+                        )}
+                        {song.isFirstTime && (
+                          <SongTag type="firstTime" className="ml-2" />
+                        )}
+                        {song.isLastTime && (
+                          <SongTag type="lastTime" className="ml-2" />
+                        )}
+                        {song.isFirstTimeOpener && (
+                          <SongTag type="firstOpener" className="ml-2" />
+                        )}
+                        {song.isFirstTimeCloser && (
+                          <SongTag type="firstCloser" className="ml-2" />
+                        )}
                       </div>
                     </div>
                   </TableCell>
