@@ -1,3 +1,4 @@
+
 export interface PhishShow {
   showid: string;
   showdate: string;
@@ -7,17 +8,38 @@ export interface PhishShow {
   artist_name: string;
 }
 
+export const createDefaultPhishShow = (): PhishShow => ({
+  showid: "",
+  showdate: "",
+  venue: "",
+  location: "",
+  rating: 0,
+  artist_name: "Phish"
+});
+
 export interface PhishShowApiResponse {
   error: boolean;
   error_message?: string;
   data: PhishShow[];
 }
 
+export const createDefaultPhishShowApiResponse = (): PhishShowApiResponse => ({
+  error: false,
+  error_message: undefined,
+  data: []
+});
+
 export interface PhishSetlistApiResponse {
   error: boolean;
   error_message?: string;
   data: ApiSong[];
 }
+
+export const createDefaultPhishSetlistApiResponse = (): PhishSetlistApiResponse => ({
+  error: false,
+  error_message: undefined,
+  data: []
+});
 
 export interface ApiSong {
   showid: number;
@@ -59,6 +81,46 @@ export interface ApiSong {
   artist_name: string;
 }
 
+export const createDefaultApiSong = (): ApiSong => ({
+  showid: 0,
+  showdate: "",
+  permalink: "",
+  showyear: "",
+  uniqueid: 0,
+  meta: "",
+  reviews: 0,
+  exclude: 0,
+  setlistnotes: "",
+  soundcheck: "",
+  songid: 0,
+  position: 0,
+  transition: 0,
+  footnote: "",
+  set: "",
+  isjam: 0,
+  isreprise: 0,
+  isjamchart: 0,
+  jamchart_description: "",
+  tracktime: "",
+  gap: 0,
+  tourid: 0,
+  tourname: "",
+  tourwhen: "",
+  song: "",
+  nickname: "",
+  slug: "",
+  is_original: 0,
+  venueid: 0,
+  venue: "",
+  city: "",
+  state: "",
+  country: "",
+  trans_mark: "",
+  artistid: 0,
+  artist_slug: "",
+  artist_name: ""
+});
+
 export interface PhishShowSetlist {
   id: number;
   date: string;
@@ -69,6 +131,17 @@ export interface PhishShowSetlist {
   state: string;
   country: string;
 }
+
+export const createDefaultPhishShowSetlist = (): PhishShowSetlist => ({
+  id: 0,
+  date: "",
+  songs: [],
+  setListNotes: "",
+  venue: "",
+  city: "",
+  state: "",
+  country: ""
+});
 
 export interface PhishSong {
   name: string;
@@ -82,3 +155,12 @@ export interface PhishSong {
   uniqueid: number;
   isBustout: boolean;
 }
+
+export const createDefaultPhishSong = (): PhishSong => ({
+  name: "",
+  date: "",
+  position: 0,
+  set: "",
+  uniqueid: 0,
+  isBustout: false
+});
