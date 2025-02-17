@@ -23,6 +23,9 @@ function Router() {
       />
       <main className="container mx-auto px-4 py-8 mt-16">
         <Switch>
+          <Route path="/about">
+            <About />
+          </Route>
           <Route path="/">
             <HomePage initialTab={activeTab} onTabChange={setActiveTab} />
           </Route>
