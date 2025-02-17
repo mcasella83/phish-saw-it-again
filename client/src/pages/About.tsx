@@ -11,7 +11,6 @@ import {
 export default function About() {
   return (
     <div className="space-y-4">
-      This is a test
       <h2 className="text-xl font-semibold">Changelog</h2>
       <Table>
         <TableHeader>
