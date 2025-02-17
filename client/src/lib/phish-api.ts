@@ -53,25 +53,6 @@ export async function getShowSetList(id: string): Promise<PhishShowSetlist> {
   }
 
   const apiResponse: PhishSetlistApiResponse = await response.json();
-
-  const songs: PhishSong[] = apiResponse.data.map((songData) => {
-    const song = createDefaultPhishSong();
-    song.name = songData.song;
-    song.date = songData.showdate;
-    song.position = songData.position;
-    song.set = songData.set;
-    song.transition = songData.transition;
-    song.isjam = !!songData.isjam;
-    song.gap = songData.gap;
-    song.nickname = songData.nickname;
-    song.uniqueid = songData.uniqueid;
-    return song;
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch show setlists");
-  }
-  const apiResponse: PhishSetlistApiResponse = await response.json();
   console.log("API response data:", apiResponse);
 
   if (apiResponse.error && apiResponse.error_message) {
@@ -82,18 +63,23 @@ export async function getShowSetList(id: string): Promise<PhishShowSetlist> {
     throw new Error("No setlist data found for this show");
   }
 
-  // Map the API response to our PhishShowSetlist type
-  const songs: PhishSong[] = apiResponse.data.map((song) => ({
-    name: song.song,
-    date: song.showdate,
-    position: song.position,
-    set: song.set,
-    transition: song.transition,
-    isjam: song.isjam === 1,
-    gap: song.gap,
-    nickname: song.nickname,
-    uniqueid: song.uniqueid,
-  }));
+  // Map the API response to our PhishShowSetlist type using the createDefaultPhishSong
+  const songs: PhishSong[] = apiResponse.data.map((songData) => {
+    const song = createDefaultPhishSong(); // This includes all required boolean fields
+    song.name = songData.song;
+    song.date = songData.showdate;
+    song.position = songData.position;
+    song.set = songData.set;
+    song.transition = songData.transition;
+    song.isjam = !!songData.isjam;
+    song.gap = songData.gap;
+    song.nickname = songData.nickname;
+    song.uniqueid = songData.uniqueid;
+
+    // These are set to their default values from createDefaultPhishSong
+    // but could be updated based on API data if available
+    return song;
+  });
 
   // Sort songs by set and position
   songs.sort((a, b) => {

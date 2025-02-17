@@ -15,6 +15,7 @@ import MySongs from "./MySongs";
 import MyVenues from "./MyVenues";
 import { PhishShowSetlist } from "@/lib/types";
 import { LoadingModal } from "@/components/ui/LoadingModal";
+import { SongTagsDemo } from "@/components/SongTagsDemo"; //Using import style from edited snippet
 import {
   clearShowsCache,
   loadShowsFromCache,
@@ -186,6 +187,10 @@ export default function HomePage({
                 Welcome to Phish.net Explorer
               </h1>
               <UserForm onSubmit={handleSubmit} />
+              <div className="mt-8">
+                <h2 className="text-xl font-semibold mb-4 text-center">Sample Song Tags</h2>
+                <SongTagsDemo />
+              </div>
             </div>
           </div>
         </>
