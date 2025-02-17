@@ -1,4 +1,3 @@
-
 export interface PhishShow {
   showid: string;
   showdate: string;
@@ -14,7 +13,7 @@ export const createDefaultPhishShow = (): PhishShow => ({
   venue: "",
   location: "",
   rating: 0,
-  artist_name: "Phish"
+  artist_name: "Phish",
 });
 
 export interface PhishShowApiResponse {
@@ -26,7 +25,7 @@ export interface PhishShowApiResponse {
 export const createDefaultPhishShowApiResponse = (): PhishShowApiResponse => ({
   error: false,
   error_message: undefined,
-  data: []
+  data: [],
 });
 
 export interface PhishSetlistApiResponse {
@@ -35,11 +34,12 @@ export interface PhishSetlistApiResponse {
   data: ApiSong[];
 }
 
-export const createDefaultPhishSetlistApiResponse = (): PhishSetlistApiResponse => ({
-  error: false,
-  error_message: undefined,
-  data: []
-});
+export const createDefaultPhishSetlistApiResponse =
+  (): PhishSetlistApiResponse => ({
+    error: false,
+    error_message: undefined,
+    data: [],
+  });
 
 export interface ApiSong {
   showid: number;
@@ -118,7 +118,7 @@ export const createDefaultApiSong = (): ApiSong => ({
   trans_mark: "",
   artistid: 0,
   artist_slug: "",
-  artist_name: ""
+  artist_name: "",
 });
 
 export interface PhishShowSetlist {
@@ -140,7 +140,7 @@ export const createDefaultPhishShowSetlist = (): PhishShowSetlist => ({
   venue: "",
   city: "",
   state: "",
-  country: ""
+  country: "",
 });
 
 export interface PhishSong {
@@ -154,6 +154,10 @@ export interface PhishSong {
   nickname?: string;
   uniqueid: number;
   isBustout: boolean;
+  isFirstTime: boolean;
+  isLastTime: boolean;
+  isFirstTimeOpener: boolean;
+  isFirstTimeCloser: boolean;
 }
 
 export const createDefaultPhishSong = (): PhishSong => ({
@@ -162,5 +166,9 @@ export const createDefaultPhishSong = (): PhishSong => ({
   position: 0,
   set: "",
   uniqueid: 0,
-  isBustout: false
+  isBustout: true,
+  isFirstTime: true,
+  isLastTime: true,
+  isFirstTimeOpener: true,
+  isFirstTimeCloser: true,
 });
