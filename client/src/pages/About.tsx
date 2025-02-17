@@ -35,6 +35,12 @@ export default function About() {
           </TableRow>
         </TableBody>
       </Table>
+      <footer className="mt-8 text-sm text-gray-600">
+        Any issues or feedback, contact{" "}
+        <a href="mailto:sawitagainstats@gmail.com" className="text-blue-600 hover:underline">
+          sawitagainstats@gmail.com
+        </a>
+      </footer>
     </div>
   );
 }
