@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -17,9 +18,7 @@ interface MySongsProps {
 }
 
 export default function MySongs({ songs }: MySongsProps) {
-  const [expandedSongs, setExpandedSongs] = useState<Record<string, boolean>>(
-    {},
-  );
+  const [expandedSongs, setExpandedSongs] = useState<Record<string, boolean>>({});
 
   if (!songs) {
     return (
@@ -52,39 +51,57 @@ export default function MySongs({ songs }: MySongsProps) {
             {songs.map((song) => {
               const isExpanded = expandedSongs[song.name] || false;
               return (
-                <TableRow
-                  key={song.name}
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() =>
-                    setExpandedSongs((prev) => ({
-                      ...prev,
-                      [song.name]: !isExpanded,
-                    }))
-                  }
-                >
-                  <TableCell className="min-w-[300px]">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-medium">{song.name}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">{song.playCount}</TableCell>
-                  <TableCell>
-                    {new Date(song.dates[0]).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    {new Date(
-                      song.dates[song.dates.length - 1],
-                    ).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    <ChevronDown
-                      className={cn(
-                        "h-4 w-4 transition-transform duration-200",
-                        isExpanded && "transform rotate-180",
-                      )}
-                    />
-                  </TableCell>
-                </TableRow>
+                <>
+                  <TableRow
+                    key={song.name}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() =>
+                      setExpandedSongs((prev) => ({
+                        ...prev,
+                        [song.name]: !prev[song.name],
+                      }))
+                    }
+                  >
+                    <TableCell className="min-w-[300px]">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-medium">{song.name}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">{song.playCount}</TableCell>
+                    <TableCell>
+                      {new Date(song.dates[0]).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(
+                        song.dates[song.dates.length - 1],
+                      ).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      <ChevronDown
+                        className={cn(
+                          "h-4 w-4 transition-transform duration-200",
+                          isExpanded && "transform rotate-180",
+                        )}
+                      />
+                    </TableCell>
+                  </TableRow>
+                  {isExpanded && (
+                    <TableRow>
+                      <TableCell colSpan={5} className="bg-muted/30 p-4">
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Show Dates:</h4>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                            {song.dates.map((date) => (
+                              <div key={date} className="text-sm">
+                                {new Date(date).toLocaleDateString()}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </>
               );
             })}
           </TableBody>
