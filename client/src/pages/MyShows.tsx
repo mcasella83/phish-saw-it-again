@@ -235,6 +235,9 @@ export default function MyShows({
                         const entry = showsByYear[index];
                         if (!entry) return null;
 
+                        // Don't render labels if width is too small
+                        if ((Number(width) || 0) < 40) return null;
+
                         const luminance = getLuminance(entry.color);
                         const textColor =
                           luminance > 0.5 ? "#000000" : "#FFFFFF";
