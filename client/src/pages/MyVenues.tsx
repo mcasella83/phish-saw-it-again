@@ -36,8 +36,8 @@ export default function MyVenues({ venues }: MyVenuesProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Venue</TableHead>
-              <TableHead>Location</TableHead>
+              <TableHead className="min-w-[200px]">Venue</TableHead>
+              <TableHead className="hidden md:table-cell">Location</TableHead>
               <TableHead className="text-right">Shows</TableHead>
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
@@ -60,7 +60,7 @@ export default function MyVenues({ venues }: MyVenuesProps) {
                     }
                   >
                     <TableCell className="font-medium">{venue.name}</TableCell>
-                    <TableCell>
+                    <TableCell className="hidden md:table-cell">
                       {venue.city}, {venue.state}, {venue.country}
                     </TableCell>
                     <TableCell className="text-right">{venue.showCount}</TableCell>
