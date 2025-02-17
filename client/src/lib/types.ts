@@ -80,4 +80,5 @@ export interface PhishSong {
   gap?: number;
   nickname?: string;
   uniqueid: number;
+  isBustout?: boolean;
 }
