@@ -15,13 +15,24 @@ import MySongs from "./MySongs";
 import MyVenues from "./MyVenues";
 import { PhishShowSetlist } from "@/lib/types";
 import { LoadingModal } from "@/components/ui/LoadingModal";
-import { SongTagsDemo } from "@/components/SongTagsDemo"; //Using import style from edited snippet
+import { SongTagsDemo } from "@/components/SongTagsDemo";
 import {
   clearShowsCache,
   loadShowsFromCache,
   saveShowsToCache,
 } from "@/lib/storage-utils";
 import Header from "@/components/layout/Header";
+
+// New About component
+const About = () => {
+  return (
+    <div>
+      <h1>About Phish Explorer</h1>
+      <p>This is a simple application to explore Phish show data.</p>
+    </div>
+  );
+};
+
 
 const STORAGE_KEY = "phish-explorer-username";
 
@@ -156,6 +167,8 @@ export default function HomePage({
         return <MySongs songs={songStats} />;
       case "venues":
         return <MyVenues venues={venueStats} />;
+      case "about":
+        return <About />;
       default:
         return null;
     }
