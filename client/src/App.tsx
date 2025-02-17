@@ -6,6 +6,7 @@ import Header from "@/components/layout/Header";
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home";
 import { useState } from "react";
+import About from "@/pages/About";
 
 function Router() {
   const [activeTab, setActiveTab] = useState("shows");
