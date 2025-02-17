@@ -183,7 +183,7 @@ export default function HomePage({
             currentShowDate={currentShowDate}
             currentShowVenue={currentShowVenue}
           />
-          <div className="min-h-[80vh] flex items-center justify-center mt-16">
+          <div className="min-h-[80vh] flex items-center justify-center">
             <div className="w-full max-w-md p-6 bg-card rounded-lg shadow-sm">
               <UserForm onSubmit={handleSubmit} />
               <div className="mt-8"></div>
