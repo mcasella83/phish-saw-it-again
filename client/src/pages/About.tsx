@@ -10,7 +10,7 @@ import {
 
 export default function About() {
   return (
-    <div className="min-h-screen flex flex-col space-y-4">
+    <div className="flex flex-col space-y-4">
       <h2 className="text-xl font-semibold">About this site</h2>
       <h3>I love Phish and all the surrounding statistics.</h3>
       <h3>
