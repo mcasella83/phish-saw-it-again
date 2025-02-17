@@ -7,6 +7,11 @@ export interface SongStats {
   name: string;
   playCount: number;
   dates: string[];
+  isBustout?: boolean;
+  isFirstTime?: boolean;
+  isLastTime?: boolean;
+  isFirstTimeOpener?: boolean;
+  isFirstTimeCloser?: boolean;
 }
 
 export interface VenueStats {

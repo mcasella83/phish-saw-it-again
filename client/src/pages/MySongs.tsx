@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { SongStats } from "@/lib/phish-processing";
+import { SongTag } from "@/components/SongTag";
 
 interface MySongsProps {
   songs: SongStats[] | null;
@@ -49,56 +50,46 @@ export default function MySongs({ songs }: MySongsProps) {
             {songs.map((song) => {
               const isExpanded = expandedSongs[song.name] || false;
               return (
-                <>
-                  <TableRow
-                    key={song.name}
-                    className="cursor-pointer hover:bg-muted/50"
-                    onClick={() =>
-                      setExpandedSongs((prev) => ({
-                        ...prev,
-                        [song.name]: !isExpanded,
-                      }))
-                    }
-                  >
-                    <TableCell>{song.name}</TableCell>
-                    <TableCell className="text-right">{song.playCount}</TableCell>
-                    <TableCell>
-                      {new Date(song.dates[0]).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      {new Date(
-                        song.dates[song.dates.length - 1],
-                      ).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <ChevronDown
-                        className={cn(
-                          "h-4 w-4 transition-transform duration-200",
-                          isExpanded && "transform rotate-180"
-                        )}
-                      />
-                    </TableCell>
-                  </TableRow>
-                  {isExpanded && (
-                    <TableRow className="bg-muted/50">
-                      <TableCell colSpan={5} className="p-4">
-                        <div className="space-y-2">
-                          <h4 className="font-medium text-sm">Performance Dates:</h4>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                            {song.dates.map((date, index) => (
-                              <div
-                                key={date}
-                                className="text-sm p-2 bg-muted/30 rounded"
-                              >
-                                {new Date(date).toLocaleDateString()}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </>
+                <TableRow
+                  key={song.name}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() =>
+                    setExpandedSongs((prev) => ({
+                      ...prev,
+                      [song.name]: !isExpanded,
+                    }))
+                  }
+                >
+                  <TableCell>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span>{song.name}</span>
+                      <div className="flex gap-1 flex-wrap">
+                        {song.isBustout && <SongTag type="bustout" />}
+                        {song.isFirstTime && <SongTag type="firstTime" />}
+                        {song.isLastTime && <SongTag type="lastTime" />}
+                        {song.isFirstTimeOpener && <SongTag type="firstOpener" />}
+                        {song.isFirstTimeCloser && <SongTag type="firstCloser" />}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">{song.playCount}</TableCell>
+                  <TableCell>
+                    {new Date(song.dates[0]).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    {new Date(
+                      song.dates[song.dates.length - 1],
+                    ).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    <ChevronDown
+                      className={cn(
+                        "h-4 w-4 transition-transform duration-200",
+                        isExpanded && "transform rotate-180"
+                      )}
+                    />
+                  </TableCell>
+                </TableRow>
               );
             })}
           </TableBody>
