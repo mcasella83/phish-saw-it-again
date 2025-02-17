@@ -10,7 +10,7 @@ import {
 
 export default function About() {
   return (
-    <div className="space-y-4">
+    <div className="min-h-screen flex flex-col space-y-4">
       <h2 className="text-xl font-semibold">About this site</h2>
       <h3>I love Phish and all the surrounding statistics.</h3>
       <h3>
@@ -45,7 +45,8 @@ export default function About() {
           </TableRow>
         </TableBody>
       </Table>
-      <footer className="mt-8 text-sm text-gray-600">
+      <div className="flex-grow"></div>
+      <footer className="mt-auto pt-8 pb-4 text-sm text-gray-600">
         Issues or feedback? contact{" "}
         <a
           href="mailto:sawitagainstats@gmail.com"
