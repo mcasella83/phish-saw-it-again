@@ -30,7 +30,8 @@ export async function getShowsByUsername(
   });
   console.log("filtered %d Phish shows", data.data.length);
 
-  data.data = data.data.reverse();
+  //need to reverse the list later, only when we display
+  //data.data = data.data.reverse();
 
   if (data.error && data.error_message) {
     throw new Error(data.error_message);

@@ -69,7 +69,7 @@ export default function HomePage({
       if (!showsData.error && showsData.data) {
         setLoadingMaxShowCount(showsData.data.length);
 
-        const processedShows = await processShowsData(
+        let processedShows = await processShowsData(
           showsData,
           (current, total, show) => {
             setLoadingShowCount(current);
@@ -82,6 +82,8 @@ export default function HomePage({
 
         const processedSongs = getUniqueSongsFromSetlists(processedShows);
         const processedVenues = getVenueStatsFromSetlists(processedShows);
+
+        processedShows = processedShows.reverse();
 
         // Save processed data to local storage
         saveShowsToCache({
@@ -188,7 +190,9 @@ export default function HomePage({
               </h1>
               <UserForm onSubmit={handleSubmit} />
               <div className="mt-8">
-                <h2 className="text-xl font-semibold mb-4 text-center">Sample Song Tags</h2>
+                <h2 className="text-xl font-semibold mb-4 text-center">
+                  Sample Song Tags
+                </h2>
                 <SongTagsDemo />
               </div>
             </div>

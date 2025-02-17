@@ -17,7 +17,9 @@ interface MySongsProps {
 }
 
 export default function MySongs({ songs }: MySongsProps) {
-  const [expandedSongs, setExpandedSongs] = useState<Record<string, boolean>>({});
+  const [expandedSongs, setExpandedSongs] = useState<Record<string, boolean>>(
+    {},
+  );
 
   if (!songs) {
     return (
@@ -63,23 +65,6 @@ export default function MySongs({ songs }: MySongsProps) {
                   <TableCell className="min-w-[300px]">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-medium">{song.name}</span>
-                      <div className="flex flex-wrap gap-1">
-                        {song.isBustout && (
-                          <SongTag type="bustout" className="ml-2" />
-                        )}
-                        {song.isFirstTime && (
-                          <SongTag type="firstTime" className="ml-2" />
-                        )}
-                        {song.isLastTime && (
-                          <SongTag type="lastTime" className="ml-2" />
-                        )}
-                        {song.isFirstTimeOpener && (
-                          <SongTag type="firstOpener" className="ml-2" />
-                        )}
-                        {song.isFirstTimeCloser && (
-                          <SongTag type="firstCloser" className="ml-2" />
-                        )}
-                      </div>
                     </div>
                   </TableCell>
                   <TableCell className="text-right">{song.playCount}</TableCell>
@@ -95,7 +80,7 @@ export default function MySongs({ songs }: MySongsProps) {
                     <ChevronDown
                       className={cn(
                         "h-4 w-4 transition-transform duration-200",
-                        isExpanded && "transform rotate-180"
+                        isExpanded && "transform rotate-180",
                       )}
                     />
                   </TableCell>

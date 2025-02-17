@@ -8,6 +8,7 @@ export const SongTagsDemo = () => {
       <SongTag type="lastTime" />
       <SongTag type="firstOpener" />
       <SongTag type="firstCloser" />
+      <SongTag type="firstEncore" />
     </div>
   );
 };

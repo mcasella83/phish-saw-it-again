@@ -154,10 +154,11 @@ export interface PhishSong {
   nickname?: string;
   uniqueid: number;
   isBustout: boolean;
-  isFirstTime: boolean;
-  isLastTime: boolean;
-  isFirstTimeOpener: boolean;
-  isFirstTimeCloser: boolean;
+  isFirstTimeHeard: boolean;
+  isLastTimeHeard: boolean;
+  isFirstTimeHeardOpener: boolean;
+  isFirstTimeHeardCloser: boolean;
+  isFirstTimeHeardEncore: boolean;
 }
 
 export const createDefaultPhishSong = (): PhishSong => ({
@@ -166,9 +167,10 @@ export const createDefaultPhishSong = (): PhishSong => ({
   position: 0,
   set: "",
   uniqueid: 0,
-  isBustout: true,
-  isFirstTime: true,
-  isLastTime: true,
-  isFirstTimeOpener: true,
-  isFirstTimeCloser: true,
+  isBustout: false,
+  isFirstTimeHeard: false,
+  isLastTimeHeard: false,
+  isFirstTimeHeardOpener: false,
+  isFirstTimeHeardCloser: false,
+  isFirstTimeHeardEncore: false,
 });

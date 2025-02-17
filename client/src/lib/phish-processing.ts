@@ -1,4 +1,4 @@
-import { PhishShowApiResponse, PhishShowSetlist } from "./types";
+import { PhishShowApiResponse, PhishShowSetlist, PhishSong } from "./types";
 import { getShowSetList } from "./phish-api";
 
 const LIMIT_SHOWS = -1; //2;
@@ -26,7 +26,10 @@ export interface VenueStats {
 export function getUniqueSongsFromSetlists(
   setlists: PhishShowSetlist[],
 ): SongStats[] {
-  const songMap = new Map<string, { count: number; dates: Set<string> }>();
+  const songMap = new Map<
+    string,
+    { count: number; dates: Set<string>; lastTime: PhishSong }
+  >();
 
   setlists.forEach((setlist) => {
     setlist.songs.forEach((song) => {
@@ -34,10 +37,16 @@ export function getUniqueSongsFromSetlists(
       if (existingEntry) {
         existingEntry.count++;
         existingEntry.dates.add(song.date);
+        existingEntry.lastTime.isLastTimeHeard = false;
+        existingEntry.lastTime = song;
+        song.isLastTimeHeard = true;
       } else {
+        song.isFirstTimeHeard = true;
+        song.isLastTimeHeard = true;
         songMap.set(song.name, {
           count: 1,
           dates: new Set([song.date]),
+          lastTime: song,
         });
       }
     });
@@ -51,7 +60,7 @@ export function getUniqueSongsFromSetlists(
       // For testing, set some songs to have these flags
       isBustout: stats.count === 1,
       isFirstTime: stats.count === 1,
-      isLastTime: name.startsWith('A'), // Just for testing
+      isLastTime: name.startsWith("A"), // Just for testing
       isFirstTimeOpener: name.length > 10, // Just for testing
       isFirstTimeCloser: stats.count < 3, // Just for testing
     }))

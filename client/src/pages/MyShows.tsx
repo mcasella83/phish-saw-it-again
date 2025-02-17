@@ -2,6 +2,7 @@ import React, { useState, useMemo, useRef } from "react";
 import { Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PhishShowSetlist, PhishSong } from "@/lib/types";
+import { SongTag } from "@/components/SongTag";
 import {
   Table,
   TableBody,
@@ -11,7 +12,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LabelList } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+  LabelList,
+} from "recharts";
 
 interface MyShowsProps {
   showsWithSetLists: PhishShowSetlist[];
@@ -38,11 +48,7 @@ const getLuminance = (color: string): number => {
   const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
   const p = 2 * l - q;
 
-  const rgb = [
-    h + 1 / 3,
-    h,
-    h - 1 / 3,
-  ].map((t) => {
+  const rgb = [h + 1 / 3, h, h - 1 / 3].map((t) => {
     if (t < 0) t += 1;
     if (t > 1) t -= 1;
     if (t < 1 / 6) return p + (q - p) * 6 * t;
@@ -60,7 +66,9 @@ export default function MyShows({
   loadingShowCount,
   loadingMaxShowCount,
 }: MyShowsProps) {
-  const [expandedShows, setExpandedShows] = useState<Record<string, boolean>>({});
+  const [expandedShows, setExpandedShows] = useState<Record<string, boolean>>(
+    {},
+  );
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [isHistogramCollapsed, setIsHistogramCollapsed] = useState(false);
   const tableRef = useRef<HTMLDivElement>(null);
@@ -89,17 +97,17 @@ export default function MyShows({
   const scrollToYear = (year: number) => {
     if (!tableRef.current) return;
 
-    const yearRow = tableRef.current.querySelector(
-      `[data-year="${year}"]`
-    );
+    const yearRow = tableRef.current.querySelector(`[data-year="${year}"]`);
 
     if (yearRow) {
       const headerHeight = 64; // Fixed header height
       const histogramHeight = isHistogramCollapsed ? 120 : 480; // Histogram section height
       const padding = 16; // Padding for better visibility
 
-      const elementPosition = yearRow.getBoundingClientRect().top + window.pageYOffset;
-      const offsetPosition = elementPosition - (headerHeight + histogramHeight + padding);
+      const elementPosition =
+        yearRow.getBoundingClientRect().top + window.pageYOffset;
+      const offsetPosition =
+        elementPosition - (headerHeight + histogramHeight + padding);
 
       window.scrollTo({
         top: offsetPosition,
@@ -133,7 +141,9 @@ export default function MyShows({
   return (
     <div className="space-y-4">
       <div className="fixed top-16 left-0 right-0 z-50 bg-background px-8">
-        <h2 className="text-xl font-semibold mb-4">My Shows ({showsWithSetLists.length})</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          My Shows ({showsWithSetLists.length})
+        </h2>
         <div className="rounded-md border shadow-sm w-full">
           <div className="flex justify-between items-center p-4">
             <h3 className="text-lg font-medium">Shows by Year</h3>
@@ -154,18 +164,25 @@ export default function MyShows({
               )}
             </Button>
           </div>
-          <div className={cn(
-            "transition-all duration-300 border-t",
-            isHistogramCollapsed ? "h-0 overflow-hidden" : "h-[340px] p-4"
-          )}>
+          <div
+            className={cn(
+              "transition-all duration-300 border-t",
+              isHistogramCollapsed ? "h-0 overflow-hidden" : "h-[340px] p-4",
+            )}
+          >
             <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={showsByYear}
                   margin={{ top: 20, right: 20, left: -20, bottom: 5 }}
                   onMouseMove={(state) => {
-                    if (state && state.activePayload && state.activePayload[0]) {
-                      const year = (state.activePayload[0].payload as YearData).year;
+                    if (
+                      state &&
+                      state.activePayload &&
+                      state.activePayload[0]
+                    ) {
+                      const year = (state.activePayload[0].payload as YearData)
+                        .year;
                       setSelectedYear(year);
                     }
                   }}
@@ -178,10 +195,7 @@ export default function MyShows({
                     tickFormatter={(value) => value.toString()}
                     fontSize={12}
                   />
-                  <YAxis
-                    allowDecimals={false}
-                    fontSize={12}
-                  />
+                  <YAxis allowDecimals={false} fontSize={12} />
                   <Tooltip
                     formatter={(value, name) => [value, "Shows"]}
                     labelFormatter={(label) => `Year: ${label}`}
@@ -201,11 +215,16 @@ export default function MyShows({
                       <Cell
                         key={`cell-${index}`}
                         fill={entry.color}
-                        stroke={selectedYear === entry.year ? "#000000" : entry.color}
+                        stroke={
+                          selectedYear === entry.year ? "#000000" : entry.color
+                        }
                         strokeWidth={selectedYear === entry.year ? 2 : 0}
                         strokeOpacity={1}
                         style={{
-                          filter: selectedYear === entry.year ? "brightness(1.1)" : "none",
+                          filter:
+                            selectedYear === entry.year
+                              ? "brightness(1.1)"
+                              : "none",
                         }}
                       />
                     ))}
@@ -217,9 +236,12 @@ export default function MyShows({
                         if (!entry) return null;
 
                         const luminance = getLuminance(entry.color);
-                        const textColor = luminance > 0.5 ? "#000000" : "#FFFFFF";
-                        const xPos = (Number(x) || 0) + (Number(width) || 0) / 2;
-                        const yPos = (Number(y) || 0) + (Number(height) || 0) / 2;
+                        const textColor =
+                          luminance > 0.5 ? "#000000" : "#FFFFFF";
+                        const xPos =
+                          (Number(x) || 0) + (Number(width) || 0) / 2;
+                        const yPos =
+                          (Number(y) || 0) + (Number(height) || 0) / 2;
                         const isSingleShow = value === 1;
 
                         return (
@@ -270,10 +292,12 @@ export default function MyShows({
           </div>
         </div>
       </div>
-      <div className={cn(
-        "transition-all duration-300",
-        isHistogramCollapsed ? "pt-[120px]" : "pt-[480px]"
-      )}>
+      <div
+        className={cn(
+          "transition-all duration-300",
+          isHistogramCollapsed ? "pt-[120px]" : "pt-[480px]",
+        )}
+      >
         <div className="rounded-md border" ref={tableRef}>
           <Table>
             <TableHeader>
@@ -298,7 +322,7 @@ export default function MyShows({
                     acc[setKey].push(song);
                     return acc;
                   },
-                  {}
+                  {},
                 );
 
                 return (
@@ -307,7 +331,7 @@ export default function MyShows({
                       data-year={showYear}
                       className={cn(
                         "cursor-pointer hover:bg-muted/50",
-                        selectedYear === showYear && "bg-muted"
+                        selectedYear === showYear && "bg-muted",
                       )}
                       onClick={() =>
                         setExpandedShows((prev) => ({
@@ -329,7 +353,7 @@ export default function MyShows({
                         <ChevronDown
                           className={cn(
                             "h-4 w-4 transition-transform duration-200",
-                            isExpanded && "transform rotate-180"
+                            isExpanded && "transform rotate-180",
                           )}
                         />
                       </TableCell>
@@ -339,26 +363,63 @@ export default function MyShows({
                         <TableCell colSpan={4} className="p-4">
                           <div className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                              {Object.entries(songsBySet).map(([setName, songs]) => (
-                                <div
-                                  key={`${showId}-${setName}`}
-                                  className="space-y-2 bg-muted/30 p-4 rounded-lg"
-                                >
-                                  <h4 className="font-medium text-sm border-b pb-2">
-                                    {setName === "e" ? "Encore" : `Set ${setName}`}
-                                  </h4>
-                                  <ol className="list-decimal list-inside text-sm space-y-1">
-                                    {songs.map((song) => (
-                                      <li key={song.uniqueid} className="text-sm">
-                                        {song.name}
-                                        {song.transition === 2 && " >"}
-                                        {song.transition === 3 && " ->"}
-                                        {song.isjam && " [jam]"}
-                                      </li>
-                                    ))}
-                                  </ol>
-                                </div>
-                              ))}
+                              {Object.entries(songsBySet).map(
+                                ([setName, songs]) => (
+                                  <div
+                                    key={`${showId}-${setName}`}
+                                    className="space-y-2 bg-muted/30 p-4 rounded-lg"
+                                  >
+                                    <h4 className="font-medium text-sm border-b pb-2">
+                                      {setName === "e"
+                                        ? "Encore"
+                                        : `Set ${setName}`}
+                                    </h4>
+                                    <ol className="list-decimal list-inside text-sm space-y-1">
+                                      {songs.map((song) => (
+                                        <li
+                                          key={song.uniqueid}
+                                          className="text-sm"
+                                        >
+                                          {song.name}
+                                          {song.transition === 2 && " >"}
+                                          {song.transition === 3 && " ->"}
+                                          {song.isjam && " [jam]"}
+                                          {song.isBustout && (
+                                            <SongTag
+                                              type="bustout"
+                                              className="ml-2"
+                                            />
+                                          )}
+                                          {song.isFirstTimeHeard && (
+                                            <SongTag
+                                              type="firstTime"
+                                              className="ml-2"
+                                            />
+                                          )}
+                                          {song.isFirstTimeHeardOpener && (
+                                            <SongTag
+                                              type="firstOpener"
+                                              className="ml-2"
+                                            />
+                                          )}
+                                          {song.isFirstTimeHeardCloser && (
+                                            <SongTag
+                                              type="firstCloser"
+                                              className="ml-2"
+                                            />
+                                          )}
+                                          {song.isLastTimeHeard && (
+                                            <SongTag
+                                              type="lastTime"
+                                              className="ml-2"
+                                            />
+                                          )}
+                                        </li>
+                                      ))}
+                                    </ol>
+                                  </div>
+                                ),
+                              )}
                             </div>
                             {show.setListNotes && (
                               <div className="mt-6 border-t pt-4">
