@@ -189,12 +189,15 @@ export default function HomePage({
             currentShowVenue={currentShowVenue}
           />
           <div className="flex flex-col gap-8 px-4">
-            <About />
-            <div className="flex items-center justify-center">
-              <div className="w-full max-w-md p-6 bg-card rounded-lg shadow-sm">
-                <UserForm onSubmit={handleSubmit} />
+            {initialTab === "about" ? (
+              <About />
+            ) : (
+              <div className="flex items-center justify-center">
+                <div className="w-full max-w-md p-6 bg-card rounded-lg shadow-sm">
+                  <UserForm onSubmit={handleSubmit} />
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </>
       )}
