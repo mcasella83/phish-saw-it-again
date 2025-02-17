@@ -23,15 +23,7 @@ import {
 } from "@/lib/storage-utils";
 import Header from "@/components/layout/Header";
 
-// New About component
-const About = () => {
-  return (
-    <div>
-      <h1>About Phish Explorer</h1>
-      <p>This is a simple application to explore Phish show data.</p>
-    </div>
-  );
-};
+import About from './About';
 
 
 const STORAGE_KEY = "phish-explorer-username";
