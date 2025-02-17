@@ -10,8 +10,8 @@ import {
 
 export default function About() {
   return (
-    <div className="flex flex-col min-h-screen">
-      <div className="flex-grow">
+    <div className="flex flex-col min-h-screen relative">
+      <div className="pb-16">
         <div className="space-y-4 mb-8">
           <h2 className="text-xl font-semibold">About this site</h2>
           <h3>I love Phish and all the surrounding statistics.</h3>
@@ -53,7 +53,7 @@ export default function About() {
         </div>
       </div>
 
-      <footer className="mt-auto py-4 text-sm text-gray-600 border-t">
+      <footer className="fixed bottom-0 left-0 right-0 py-4 text-sm text-gray-600 border-t bg-background">
         <div className="container mx-auto text-center">
           Issues or feedback? contact{" "}
           <a
