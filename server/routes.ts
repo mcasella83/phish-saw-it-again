@@ -2,9 +2,17 @@ import type { Express } from "express";
 import { createServer } from "http";
 import { storage } from "./storage";
 import { userSchema } from "@shared/schema";
-import { pool } from './db'; // Import pool from db.ts
+import { Pool } from 'pg'; // Add PostgreSQL pool import
 
-
+// Assuming pool is initialized elsewhere, e.g., in a separate module
+const pool = new Pool({
+  // Your database connection details here
+  user: 'your_db_user',
+  host: 'your_db_host',
+  database: 'your_db_name',
+  password: 'your_db_password',
+  port: 5432, // or your port
+});
 
 
 export function registerRoutes(app: Express) {
