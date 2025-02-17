@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -18,7 +17,9 @@ interface MySongsProps {
 }
 
 export default function MySongs({ songs }: MySongsProps) {
-  const [expandedSongs, setExpandedSongs] = useState<Record<string, boolean>>({});
+  const [expandedSongs, setExpandedSongs] = useState<Record<string, boolean>>(
+    {},
+  );
 
   if (!songs) {
     return (
@@ -67,14 +68,12 @@ export default function MySongs({ songs }: MySongsProps) {
                         <span className="font-medium">{song.name}</span>
                       </div>
                     </TableCell>
-                    <TableCell className="text-right">{song.playCount}</TableCell>
-                    <TableCell>
-                      {new Date(song.dates[0]).toLocaleDateString()}
+                    <TableCell className="text-right">
+                      {song.playCount}
                     </TableCell>
+                    <TableCell>{song.occurrences[0]}</TableCell>
                     <TableCell>
-                      {new Date(
-                        song.dates[song.dates.length - 1],
-                      ).toLocaleDateString()}
+                      {song.occurrences[song.occurrences.length - 1]}
                     </TableCell>
                     <TableCell>
                       <ChevronDown
@@ -91,9 +90,9 @@ export default function MySongs({ songs }: MySongsProps) {
                         <div className="space-y-2">
                           <h4 className="font-medium">Show Dates:</h4>
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                            {song.dates.map((date) => (
-                              <div key={date} className="text-sm">
-                                {new Date(date).toLocaleDateString()}
+                            {song.occurrences.map((occurrence) => (
+                              <div key={occurrence} className="text-sm">
+                                {occurrence}
                               </div>
                             ))}
                           </div>

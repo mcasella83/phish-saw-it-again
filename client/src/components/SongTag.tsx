@@ -7,7 +7,8 @@ type TagType =
   | "lastTime"
   | "firstOpener"
   | "firstCloser"
-  | "firstEncore";
+  | "firstEncore"
+  | "only";
 
 interface SongTagProps {
   type: TagType;
@@ -19,8 +20,9 @@ const tagStyles: Record<TagType, string> = {
   firstTime: "bg-green-500 hover:bg-green-600",
   lastTime: "bg-red-500 hover:bg-red-600",
   firstOpener: "bg-blue-500 hover:bg-blue-600",
-  firstCloser: "bg-orange-500 hover:bg-orange-600",
-  firstEncore: "bg-yellow-500 hover:bg-yellow-600",
+  firstCloser: "bg-blue-500 hover:bg-blue-600",
+  firstEncore: "bg-blue-500 hover:bg-blue-600",
+  only: "bg-orange-500 hover:bg-orange-600",
 };
 
 const tagLabels: Record<TagType, string> = {
@@ -30,6 +32,7 @@ const tagLabels: Record<TagType, string> = {
   firstOpener: "Open",
   firstCloser: "Close",
   firstEncore: "Encore",
+  only: "Only",
 };
 
 export const SongTag = ({ type, className }: SongTagProps) => {

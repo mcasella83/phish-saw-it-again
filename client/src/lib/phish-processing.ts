@@ -6,12 +6,7 @@ const LIMIT_SHOWS = -1; //2;
 export interface SongStats {
   name: string;
   playCount: number;
-  dates: string[];
-  isBustout: boolean;
-  isFirstTime: boolean;
-  isLastTime: boolean;
-  isFirstTimeOpener: boolean;
-  isFirstTimeCloser: boolean;
+  occurrences: string[];
 }
 
 export interface VenueStats {
@@ -28,15 +23,16 @@ export function getUniqueSongsFromSetlists(
 ): SongStats[] {
   const songMap = new Map<
     string,
-    { count: number; dates: Set<string>; lastTime: PhishSong }
+    { count: number; occurrences: string[]; lastTime: PhishSong }
   >();
 
   setlists.forEach((setlist) => {
     setlist.songs.forEach((song) => {
       const existingEntry = songMap.get(song.name);
+      const songDisplay = song.date + ", " + song.venue;
       if (existingEntry) {
         existingEntry.count++;
-        existingEntry.dates.add(song.date);
+        existingEntry.occurrences.push(songDisplay);
         existingEntry.lastTime.isLastTimeHeard = false;
         existingEntry.lastTime = song;
         song.isLastTimeHeard = true;
@@ -45,7 +41,7 @@ export function getUniqueSongsFromSetlists(
         song.isLastTimeHeard = true;
         songMap.set(song.name, {
           count: 1,
-          dates: new Set([song.date]),
+          occurrences: [songDisplay],
           lastTime: song,
         });
       }
@@ -56,13 +52,16 @@ export function getUniqueSongsFromSetlists(
     .map(([name, stats]) => ({
       name,
       playCount: stats.count,
-      dates: Array.from(stats.dates).sort((a, b) => b.localeCompare(a)),
-      // For testing, set some songs to have these flags
-      isBustout: stats.count === 1,
-      isFirstTime: stats.count === 1,
-      isLastTime: name.startsWith("A"), // Just for testing
-      isFirstTimeOpener: name.length > 10, // Just for testing
-      isFirstTimeCloser: stats.count < 3, // Just for testing
+      occurrences: stats.occurrences,
+      //occurrences: Array.from(stats.occurrences).sort((a, b) =>
+      //  b.localeCompare(a),
+      //),
+      // // For testing, set some songs to have these flags
+      // isBustout: stats.count === 1,
+      // isFirstTime: stats.count === 1,
+      // isLastTime: name.startsWith("A"), // Just for testing
+      // isFirstTimeOpener: name.length > 10, // Just for testing
+      // isFirstTimeCloser: stats.count < 3, // Just for testing
     }))
     .sort((a, b) => b.playCount - a.playCount);
 }

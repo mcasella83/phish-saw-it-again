@@ -383,20 +383,35 @@ export default function MyShows({
                                           {song.name}
                                           {song.transition === 2 && " >"}
                                           {song.transition === 3 && " ->"}
-                                          {song.isjam && " [jam]"}
+                                          {/*song.isjam && " [jam]"*/}
                                           {song.isBustout && (
                                             <SongTag
                                               type="bustout"
                                               className="ml-2"
                                             />
                                           )}
-                                          {song.isFirstTimeHeard && (
-                                            <SongTag
-                                              type="firstTime"
-                                              className="ml-2"
-                                            />
-                                          )}
-                                          {song.isFirstTimeHeardOpener && (
+                                          {song.isFirstTimeHeard &&
+                                            !song.isLastTimeHeard && (
+                                              <SongTag
+                                                type="firstTime"
+                                                className="ml-2"
+                                              />
+                                            )}
+                                          {song.isLastTimeHeard &&
+                                            !song.isFirstTimeHeard && (
+                                              <SongTag
+                                                type="lastTime"
+                                                className="ml-2"
+                                              />
+                                            )}
+                                          {song.isLastTimeHeard &&
+                                            song.isFirstTimeHeard && (
+                                              <SongTag
+                                                type="only"
+                                                className="ml-2"
+                                              />
+                                            )}
+                                          {/* {song.isFirstTimeHeardOpener && (
                                             <SongTag
                                               type="firstOpener"
                                               className="ml-2"
@@ -407,13 +422,7 @@ export default function MyShows({
                                               type="firstCloser"
                                               className="ml-2"
                                             />
-                                          )}
-                                          {song.isLastTimeHeard && (
-                                            <SongTag
-                                              type="lastTime"
-                                              className="ml-2"
-                                            />
-                                          )}
+                                          )} */}
                                         </li>
                                       ))}
                                     </ol>

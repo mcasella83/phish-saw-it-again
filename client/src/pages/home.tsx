@@ -185,16 +185,8 @@ export default function HomePage({
           />
           <div className="min-h-[80vh] flex items-center justify-center mt-16">
             <div className="w-full max-w-md p-6 bg-card rounded-lg shadow-sm">
-              <h1 className="text-2xl font-bold text-center mb-6">
-                Welcome to Phish.net Explorer
-              </h1>
               <UserForm onSubmit={handleSubmit} />
-              <div className="mt-8">
-                <h2 className="text-xl font-semibold mb-4 text-center">
-                  Sample Song Tags
-                </h2>
-                <SongTagsDemo />
-              </div>
+              <div className="mt-8"></div>
             </div>
           </div>
         </>

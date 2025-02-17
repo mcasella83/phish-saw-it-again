@@ -159,6 +159,10 @@ export interface PhishSong {
   isFirstTimeHeardOpener: boolean;
   isFirstTimeHeardCloser: boolean;
   isFirstTimeHeardEncore: boolean;
+  venue: string;
+  city: string;
+  state: string;
+  country: string;
 }
 
 export const createDefaultPhishSong = (): PhishSong => ({
@@ -173,4 +177,8 @@ export const createDefaultPhishSong = (): PhishSong => ({
   isFirstTimeHeardOpener: false,
   isFirstTimeHeardCloser: false,
   isFirstTimeHeardEncore: false,
+  venue: "",
+  city: "",
+  state: "",
+  country: "",
 });

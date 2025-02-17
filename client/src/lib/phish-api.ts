@@ -76,6 +76,10 @@ export async function getShowSetList(id: string): Promise<PhishShowSetlist> {
     song.gap = songData.gap;
     song.nickname = songData.nickname;
     song.uniqueid = songData.uniqueid;
+    song.venue = songData.venue;
+    song.city = songData.city;
+    song.state = songData.state;
+    song.country = songData.country;
 
     // These are set to their default values from createDefaultPhishSong
     // but could be updated based on API data if available
