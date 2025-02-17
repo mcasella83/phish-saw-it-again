@@ -35,27 +35,25 @@ export default function Header({
     <header className="fixed top-0 left-0 right-0 z-50 border-b bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Link href="/">
-            <a className="text-2xl font-bold flex flex-col items-center hover:opacity-80 transition-opacity">
-              <div className="flex items-center gap-2">
-                <IoMusicalNotes className="h-8 w-8 text-primary" />
-                <span className="text-primary">I Saw It Again</span>
+          <a className="text-2xl font-bold flex flex-col items-left hover:opacity-80 transition-opacity">
+            <div className="flex items-left gap-2">
+              <IoMusicalNotes className="h-8 w-8 text-primary" />
+              <span className="text-primary">I Saw It Again</span>
+            </div>
+            {isLoggedIn && username && (
+              <div className="flex items-left justify-start w-full gap-4 text-sm mt-1">
+                <span className="text-muted-foreground">
+                  Viewing stats for: {username}
+                </span>
+                <button
+                  onClick={handleSignOut}
+                  className="text-blue-500 hover:text-blue-700 transition-colors"
+                >
+                  Sign Out
+                </button>
               </div>
-              {isLoggedIn && username && (
-                <div className="flex items-center justify-start w-full gap-4 text-sm mt-1">
-                  <span className="text-muted-foreground">
-                    Viewing stats for: {username}
-                  </span>
-                  <button
-                    onClick={handleSignOut}
-                    className="text-blue-500 hover:text-blue-700 transition-colors"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              )}
-            </a>
-          </Link>
+            )}
+          </a>
         </div>
         {showNavigation && (
           <NavigationMenu>
