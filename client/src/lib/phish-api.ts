@@ -48,6 +48,26 @@ export async function getShowSetList(id: string): Promise<PhishShowSetlist> {
   });
 
   if (!response.ok) {
+    throw new Error("Failed to fetch setlist");
+  }
+
+  const apiResponse: PhishSetlistApiResponse = await response.json();
+  
+  const songs: PhishSong[] = apiResponse.data.map(songData => {
+    const song = createDefaultPhishSong();
+    song.name = songData.song;
+    song.date = songData.showdate;
+    song.position = songData.position;
+    song.set = songData.set;
+    song.transition = songData.transition;
+    song.isjam = !!songData.isjam;
+    song.gap = songData.gap;
+    song.nickname = songData.nickname;
+    song.uniqueid = songData.uniqueid;
+    return song;
+  });
+
+  if (!response.ok) {
     throw new Error("Failed to fetch show setlists");
   }
   const apiResponse: PhishSetlistApiResponse = await response.json();
