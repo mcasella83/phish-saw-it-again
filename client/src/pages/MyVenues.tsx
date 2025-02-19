@@ -10,13 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-} from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { VenueStats } from "@/lib/phish-processing";
 
 interface MyVenuesProps {
@@ -24,7 +18,9 @@ interface MyVenuesProps {
 }
 
 export default function MyVenues({ venues }: MyVenuesProps) {
-  const [expandedVenues, setExpandedVenues] = useState<Record<string, boolean>>({});
+  const [expandedVenues, setExpandedVenues] = useState<Record<string, boolean>>(
+    {},
+  );
   const [isChartCollapsed, setIsChartCollapsed] = useState(false);
   const [selectedVenue, setSelectedVenue] = useState<string | null>(null);
 
@@ -51,54 +47,57 @@ export default function MyVenues({ venues }: MyVenuesProps) {
   }, [venues, totalShows]);
 
   const renderCustomizedLabel = ({
-      cx,
-      cy,
-      midAngle,
-      innerRadius,
-      outerRadius,
-      value,
-      index,
-    }: any) => {
-      const RADIAN = Math.PI / 180;
-      const radius = outerRadius * 1.2;
-      const x = cx + radius * Math.cos(-midAngle * RADIAN);
-      const y = cy + radius * Math.sin(-midAngle * RADIAN);
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    value,
+    index,
+  }: any) => {
+    const RADIAN = Math.PI / 180;
+    const radius = outerRadius * 1.2;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
-      // Calculate percentage and only show label if > 5%
-      const percent = (value / venues.reduce((acc, v) => acc + v.showCount, 0)) * 100;
-      if (percent <= 5) return null;
+    // Calculate percentage and only show label if > 5%
+    const percent =
+      (value / venues.reduce((acc, v) => acc + v.showCount, 0)) * 100;
+    if (percent <= 5) return null;
 
-      const name = venueData[index]?.name || '';
-      return (
-        <text 
-          x={x} 
-          y={y} 
-          fill="black" 
-          textAnchor={x > cx ? 'start' : 'end'}
-          dominantBaseline="middle"
-          className="font-bold"
-        >
-          {`${name}: ${value} (${percent.toFixed(1)}%)`}
-        </text>
-      );
+    const name = venueData[index]?.name || "";
+    return (
+      <text
+        x={x}
+        y={y}
+        fill="black"
+        textAnchor={x > cx ? "start" : "end"}
+        dominantBaseline="middle"
+        className="font-bold"
+      >
+        {`${name}${value} (${percent.toFixed(1)}%)`}
+      </text>
+    );
 
-      return (
-        <text 
-          x={x} 
-          y={y} 
-          fill="#000000"
-          textAnchor={x > cx ? 'start' : 'end'}
-          dominantBaseline="central"
-        >
-          {value}
-        </text>
-      );
+    return (
+      <text
+        x={x}
+        y={y}
+        fill="#000000"
+        textAnchor={x > cx ? "start" : "end"}
+        dominantBaseline="central"
+      >
+        {value}
+      </text>
+    );
   };
 
   return (
     <div className="space-y-4">
       <div className="fixed top-16 left-0 right-0 z-50 bg-background px-8">
-        <h2 className="text-xl font-semibold mb-4">My Venues ({venues.length})</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          My Venues ({venues.length})
+        </h2>
         <div className="rounded-md border shadow-sm w-full">
           <div className="flex justify-between items-center p-4">
             <h3 className="text-lg font-medium">Venue Distribution</h3>
@@ -130,7 +129,7 @@ export default function MyVenues({ venues }: MyVenuesProps) {
                 <PieChart>
                   <Tooltip
                     formatter={(value, name) => [
-                      `${value} shows (${((value as number) / totalShows * 100).toFixed(1)}%)`,
+                      `${value} shows (${(((value as number) / totalShows) * 100).toFixed(1)}%)`,
                       name,
                     ]}
                   />
@@ -199,11 +198,15 @@ export default function MyVenues({ venues }: MyVenuesProps) {
                         }))
                       }
                     >
-                      <TableCell className="font-medium">{venue.name}</TableCell>
+                      <TableCell className="font-medium">
+                        {venue.name}
+                      </TableCell>
                       <TableCell className="hidden md:table-cell">
                         {venue.city}, {venue.state}, {venue.country}
                       </TableCell>
-                      <TableCell className="text-right">{venue.showCount}</TableCell>
+                      <TableCell className="text-right">
+                        {venue.showCount}
+                      </TableCell>
                       <TableCell>
                         <ChevronDown
                           className={cn(
@@ -216,7 +219,9 @@ export default function MyVenues({ venues }: MyVenuesProps) {
                     {isExpanded && (
                       <TableRow className="bg-muted/50">
                         <TableCell colSpan={4} className="p-4">
-                          <h4 className="text-sm font-medium mb-2">Show Dates:</h4>
+                          <h4 className="text-sm font-medium mb-2">
+                            Show Dates:
+                          </h4>
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                             {venue.dates.map((date) => (
                               <span key={date} className="text-sm">
