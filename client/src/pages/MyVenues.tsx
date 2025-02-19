@@ -62,11 +62,11 @@ export default function MyVenues({ venues }: MyVenuesProps) {
       const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
       const x = cx + radius * Math.cos(-midAngle * RADIAN);
       const y = cy + radius * Math.sin(-midAngle * RADIAN);
-      
+
       // Calculate percentage and only show label if > 5%
       const percent = (value / venues.reduce((acc, v) => acc + v.showCount, 0)) * 100;
       if (percent <= 5) return null;
-      
+
       return (
         <text 
           x={x} 
@@ -140,13 +140,14 @@ export default function MyVenues({ venues }: MyVenuesProps) {
                     cy="50%"
                     outerRadius={120}
                     label={renderCustomizedLabel}
-                    labelLine={true}
+                    labelLine={false}
                     onMouseEnter={(data) => {
                       setSelectedVenue(data.name);
                     }}
                     onMouseLeave={() => {
                       setSelectedVenue(null);
                     }}
+                    isAnimationActive={false}
                   >
                     {venueData.map((entry, index) => (
                       <Cell
