@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -64,12 +64,15 @@ export default function MyVenues({ venues }: MyVenuesProps) {
   }
 
   const totalShows = venues.reduce((acc, venue) => acc + venue.showCount, 0);
-  const venueData = venues.map((venue) => ({
-    name: venue.name,
-    value: venue.showCount,
-    percentage: (venue.showCount / totalShows) * 100,
-    color: `hsl(${Math.random() * 360}, 70%, 50%)`,
-  }));
+
+  const venueData = useMemo(() => {
+    return venues.map((venue, index) => ({
+      name: venue.name,
+      value: venue.showCount,
+      percentage: (venue.showCount / totalShows) * 100,
+      color: `hsl(${(index * 137.5) % 360}, 70%, 50%)`,
+    }));
+  }, [venues, totalShows]);
 
   return (
     <div className="space-y-4">
