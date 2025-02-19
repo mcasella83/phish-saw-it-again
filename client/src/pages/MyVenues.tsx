@@ -57,7 +57,7 @@ export default function MyVenues({ venues }: MyVenuesProps) {
     payload,
   }: any) => {
     const RADIAN = Math.PI / 180;
-    const radius = outerRadius * 1.2;
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
@@ -66,28 +66,32 @@ export default function MyVenues({ venues }: MyVenuesProps) {
       (value / venues.reduce((acc, v) => acc + v.showCount, 0)) * 100;
     if (percent <= 5) return null;
 
-    const name = venueData[index]?.name || "";
+    const textAnchor = "middle";
+    const shortenedName = payload.name.length > 12 
+      ? payload.name.substring(0, 10) + '...'
+      : payload.name;
+
     return (
       <g>
         <text
           x={x}
-          y={y - 8}
-          fill="black"
-          textAnchor={x > cx ? "start" : "end"}
+          y={y - 6}
+          fill="white"
+          textAnchor={textAnchor}
           dominantBaseline="central"
-          className="text-xs font-medium"
+          className="text-[10px] font-medium"
         >
-          {payload.name}
+          {shortenedName}
         </text>
         <text
           x={x}
-          y={y + 8}
-          fill="black"
-          textAnchor={x > cx ? "start" : "end"}
+          y={y + 6}
+          fill="white"
+          textAnchor={textAnchor}
           dominantBaseline="central"
-          className="text-xs"
+          className="text-[9px]"
         >
-          {`${value} (${payload.percentage.toFixed(1)}%)`}
+          {`${value} (${percent.toFixed(0)}%)`}
         </text>
       </g>
     );
@@ -140,6 +144,7 @@ export default function MyVenues({ venues }: MyVenuesProps) {
                     nameKey="name"
                     cx="50%"
                     cy="50%"
+                    innerRadius={60}
                     outerRadius={120}
                     label={renderCustomizedLabel}
                     labelLine={false}
