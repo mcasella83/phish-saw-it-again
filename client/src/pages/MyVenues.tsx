@@ -63,6 +63,10 @@ export default function MyVenues({ venues }: MyVenuesProps) {
       const x = cx + radius * Math.cos(-midAngle * RADIAN);
       const y = cy + radius * Math.sin(-midAngle * RADIAN);
       
+      // Calculate percentage and only show label if > 5%
+      const percent = (value / venues.reduce((acc, v) => acc + v.showCount, 0)) * 100;
+      if (percent <= 5) return null;
+      
       return (
         <text 
           x={x} 
