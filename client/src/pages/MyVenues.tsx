@@ -144,6 +144,7 @@ export default function MyVenues({ venues }: MyVenuesProps) {
                     label={renderCustomizedLabel}
                     labelLine={false}
                     stroke="none"
+                    style={{ outline: "none" }}
                     onMouseEnter={(data) => {
                       setSelectedVenue(data.name);
                     }}
