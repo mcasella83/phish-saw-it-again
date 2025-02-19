@@ -116,36 +116,28 @@ export default function MyVenues({ venues }: MyVenuesProps) {
                               const { cx, cy } = viewBox;
                               return (
                                 <g>
-                                  <text
-                                    x={cx}
-                                    y={cy - 12}
-                                    fill="#FFFFFF"
-                                    textAnchor="middle"
-                                    dominantBaseline="central"
-                                    className="font-bold text-xl"
+                                  <foreignObject
+                                    x={cx - 60}
+                                    y={cy - 40}
+                                    width={120}
+                                    height={80}
+                                    style={{
+                                      overflow: 'visible',
+                                      textAlign: 'center'
+                                    }}
                                   >
-                                    {entry.name}
-                                  </text>
-                                  <text
-                                    x={cx}
-                                    y={cy + 8}
-                                    fill="#FFFFFF"
-                                    textAnchor="middle"
-                                    dominantBaseline="central"
-                                    className="font-bold text-sm"
-                                  >
-                                    {entry.value} shows
-                                  </text>
-                                  <text
-                                    x={cx}
-                                    y={cy + 24}
-                                    fill="#FFFFFF"
-                                    textAnchor="middle"
-                                    dominantBaseline="central"
-                                    className="font-bold text-sm"
-                                  >
-                                    {entry.percentage.toFixed(1)}%
-                                  </text>
+                                    <div className="flex flex-col items-center justify-center gap-1">
+                                      <div className="text-white font-bold text-lg">
+                                        {entry.name}
+                                      </div>
+                                      <div className="text-white font-semibold text-sm">
+                                        {entry.value} shows
+                                      </div>
+                                      <div className="text-white font-semibold text-sm">
+                                        {entry.percentage.toFixed(1)}%
+                                      </div>
+                                    </div>
+                                  </foreignObject>
                                 </g>
                               );
                             }}
