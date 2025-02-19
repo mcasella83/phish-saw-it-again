@@ -67,6 +67,7 @@ export default function MyVenues({ venues }: MyVenuesProps) {
       const percent = (value / venues.reduce((acc, v) => acc + v.showCount, 0)) * 100;
       if (percent <= 5) return null;
 
+      const name = venueData[index]?.name || '';
       return (
         <text 
           x={x} 
@@ -76,7 +77,7 @@ export default function MyVenues({ venues }: MyVenuesProps) {
           dominantBaseline="middle"
           className="font-bold"
         >
-          {`${value} (${percent.toFixed(1)}%)`}
+          {`${name}: ${value} (${percent.toFixed(1)}%)`}
         </text>
       );
 
