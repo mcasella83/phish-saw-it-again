@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -46,6 +47,7 @@ export default function MyVenues({ venues }: MyVenuesProps) {
     }));
   }, [venues, totalShows]);
 
+  const isMobile = useIsMobile();
   const renderCustomizedLabel = ({
     cx,
     cy,
@@ -57,37 +59,38 @@ export default function MyVenues({ venues }: MyVenuesProps) {
     payload,
   }: any) => {
     const RADIAN = Math.PI / 180;
-    const radius = outerRadius * 1.2;
+    const percent = (value / venues.reduce((acc, v) => acc + v.showCount, 0)) * 100;
+    if (percent <= 5) return null;
+
+    const radius = isMobile ? outerRadius * 0.6 : outerRadius * 1.2;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
-    // Calculate percentage and only show label if > 5%
-    const percent =
-      (value / venues.reduce((acc, v) => acc + v.showCount, 0)) * 100;
-    if (percent <= 5) return null;
+    const shortenedName = isMobile && payload.name.length > 8 
+      ? payload.name.substring(0, 6) + '...'
+      : payload.name;
 
-    const name = venueData[index]?.name || "";
     return (
       <g>
         <text
           x={x}
-          y={y - 8}
+          y={y - 6}
           fill="black"
-          textAnchor={x > cx ? "start" : "end"}
+          textAnchor={isMobile ? "middle" : (x > cx ? "start" : "end")}
           dominantBaseline="central"
-          className="text-xs font-medium"
+          className={isMobile ? "text-[9px] font-medium" : "text-xs font-medium"}
         >
-          {payload.name}
+          {shortenedName}
         </text>
         <text
           x={x}
-          y={y + 8}
+          y={y + 6}
           fill="black"
-          textAnchor={x > cx ? "start" : "end"}
+          textAnchor={isMobile ? "middle" : (x > cx ? "start" : "end")}
           dominantBaseline="central"
-          className="text-xs"
+          className={isMobile ? "text-[8px]" : "text-xs"}
         >
-          {`${value} (${payload.percentage.toFixed(1)}%)`}
+          {`${value} (${percent.toFixed(0)}%)`}
         </text>
       </g>
     );
