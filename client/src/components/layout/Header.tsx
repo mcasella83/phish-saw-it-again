@@ -29,7 +29,7 @@ export default function Header({
     window.location.reload();
   };
 
-  const NavItems = ({ onNavClick }: { onNavClick?: () => void }) => (
+  const NavItems = () => (
     <>
       {showNavigation && (
         <>
@@ -39,10 +39,7 @@ export default function Header({
               "hover:bg-accent hover:text-accent-foreground",
               activeTab === "shows" && "bg-accent/50",
             )}
-            onClick={() => {
-              onTabChange?.("shows");
-              onNavClick?.();
-            }}
+            onClick={() => onTabChange?.("shows")}
           >
             My Shows
           </button>
@@ -52,10 +49,7 @@ export default function Header({
               "hover:bg-accent hover:text-accent-foreground",
               activeTab === "songs" && "bg-accent/50",
             )}
-            onClick={() => {
-              onTabChange?.("songs");
-              onNavClick?.();
-            }}
+            onClick={() => onTabChange?.("songs")}
           >
             My Songs
           </button>
@@ -65,10 +59,7 @@ export default function Header({
               "hover:bg-accent hover:text-accent-foreground",
               activeTab === "venues" && "bg-accent/50",
             )}
-            onClick={() => {
-              onTabChange?.("venues");
-              onNavClick?.();
-            }}
+            onClick={() => onTabChange?.("venues")}
           >
             My Venues
           </button>
@@ -80,10 +71,7 @@ export default function Header({
           "hover:bg-accent hover:text-accent-foreground",
           activeTab === "about" && "bg-accent/50",
         )}
-        onClick={() => {
-          onTabChange?.("about");
-          onNavClick?.();
-        }}
+        onClick={() => onTabChange?.("about")}
       >
         About
       </button>
@@ -124,20 +112,16 @@ export default function Header({
 
         {isMobile ? (
           <Sheet>
-            {({ open, setOpen }) => (
-              <>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <Menu className="h-5 w-5" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent>
-                  <div className="flex flex-col space-y-2 mt-8">
-                    <NavItems onNavClick={() => setOpen(false)} />
-                  </div>
-                </SheetContent>
-              </>
-            )}
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <div className="flex flex-col space-y-2 mt-8">
+                <NavItems />
+              </div>
+            </SheetContent>
           </Sheet>
         ) : (
           <nav className="flex items-center space-x-4">
