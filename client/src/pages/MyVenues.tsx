@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { VenueStats } from "@/lib/phish-processing";
 import {
   Table,
   TableBody,
@@ -10,13 +9,48 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Label,
+  Tooltip,
+} from "recharts";
+import { VenueStats } from "@/lib/phish-processing";
 
 interface MyVenuesProps {
   venues: VenueStats[] | null;
 }
 
+const getLuminance = (color: string): number => {
+  const hsl = color.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+  if (!hsl) return 0.5;
+
+  const h = parseInt(hsl[1]) / 360;
+  const s = parseInt(hsl[2]) / 100;
+  const l = parseInt(hsl[3]) / 100;
+
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  const p = 2 * l - q;
+
+  const rgb = [h + 1 / 3, h, h - 1 / 3].map((t) => {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+  });
+
+  return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+};
+
 export default function MyVenues({ venues }: MyVenuesProps) {
   const [expandedVenues, setExpandedVenues] = useState<Record<string, boolean>>({});
+  const [isChartCollapsed, setIsChartCollapsed] = useState(false);
+  const [selectedVenue, setSelectedVenue] = useState<string | null>(null);
 
   if (!venues || venues.length === 0) {
     return (
@@ -29,69 +63,167 @@ export default function MyVenues({ venues }: MyVenuesProps) {
     );
   }
 
+  const totalShows = venues.reduce((acc, venue) => acc + venue.showCount, 0);
+  const venueData = venues.map((venue) => ({
+    name: venue.name,
+    value: venue.showCount,
+    percentage: (venue.showCount / totalShows) * 100,
+    color: `hsl(${Math.random() * 360}, 70%, 50%)`,
+  }));
+
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">My Venues ({venues.length})</h2>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="min-w-[200px]">Venue</TableHead>
-              <TableHead className="hidden md:table-cell">Location</TableHead>
-              <TableHead className="text-right">Shows</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {venues.map((venue) => {
-              const venueKey = `${venue.name}-${venue.city}-${venue.state}`;
-              const isExpanded = expandedVenues[venueKey] || false;
-
-              return (
-                <React.Fragment key={venueKey}>
-                  <TableRow
-                    key={`row-${venueKey}`}
-                    className="cursor-pointer hover:bg-muted/50"
-                    onClick={() =>
-                      setExpandedVenues((prev) => ({
-                        ...prev,
-                        [venueKey]: !isExpanded,
-                      }))
-                    }
+      <div className="fixed top-16 left-0 right-0 z-50 bg-background px-8">
+        <h2 className="text-xl font-semibold mb-4">My Venues ({venues.length})</h2>
+        <div className="rounded-md border shadow-sm w-full">
+          <div className="flex justify-between items-center p-4">
+            <h3 className="text-lg font-medium">Venue Distribution</h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsChartCollapsed(!isChartCollapsed)}
+              className="flex items-center gap-2"
+            >
+              {isChartCollapsed ? (
+                <>
+                  Show <ChevronDown className="h-4 w-4" />
+                </>
+              ) : (
+                <>
+                  Hide <ChevronUp className="h-4 w-4" />
+                </>
+              )}
+            </Button>
+          </div>
+          <div
+            className={cn(
+              "transition-all duration-300 border-t",
+              isChartCollapsed ? "h-0 overflow-hidden" : "h-[340px] p-4",
+            )}
+          >
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Tooltip
+                    formatter={(value, name) => [
+                      `${value} shows (${((value as number) / totalShows * 100).toFixed(1)}%)`,
+                      name,
+                    ]}
+                  />
+                  <Pie
+                    data={venueData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={120}
+                    onMouseEnter={(data) => {
+                      setSelectedVenue(data.name);
+                    }}
+                    onMouseLeave={() => {
+                      setSelectedVenue(null);
+                    }}
                   >
-                    <TableCell className="font-medium">{venue.name}</TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      {venue.city}, {venue.state}, {venue.country}
-                    </TableCell>
-                    <TableCell className="text-right">{venue.showCount}</TableCell>
-                    <TableCell>
-                      <ChevronDown
-                        className={cn(
-                          "h-4 w-4 transition-transform duration-200",
-                          isExpanded && "transform rotate-180"
-                        )}
-                      />
-                    </TableCell>
-                  </TableRow>
-                  {isExpanded && (
-                    <TableRow key={`expanded-${venueKey}`} className="bg-muted/50">
-                      <TableCell colSpan={4} className="p-4">
-                        <h4 className="text-sm font-medium mb-2">Show Dates:</h4>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                          {venue.dates.map((date) => (
-                            <span key={date} className="text-sm">
-                              {new Date(date).toLocaleDateString()}
-                            </span>
-                          ))}
-                        </div>
+                    {venueData.map((entry, index) => {
+                      const isSelected = selectedVenue === entry.name;
+                      return (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={entry.color}
+                          stroke={isSelected ? "#000000" : entry.color}
+                          strokeWidth={isSelected ? 2 : 0}
+                        >
+                          {entry.percentage >= 5 && (
+                            <Label
+                              value={entry.name}
+                              position="center"
+                              fill={
+                                getLuminance(entry.color) > 0.5
+                                  ? "#000000"
+                                  : "#FFFFFF"
+                              }
+                              style={{
+                                fontSize: "12px",
+                                fontWeight: "bold",
+                              }}
+                            />
+                          )}
+                        </Cell>
+                      );
+                    })}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className={cn(
+          "transition-all duration-300",
+          isChartCollapsed ? "pt-[120px]" : "pt-[480px]",
+        )}
+      >
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="min-w-[200px]">Venue</TableHead>
+                <TableHead className="hidden md:table-cell">Location</TableHead>
+                <TableHead className="text-right">Shows</TableHead>
+                <TableHead className="w-[50px]"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {venues.map((venue) => {
+                const venueKey = `${venue.name}-${venue.city}-${venue.state}`;
+                const isExpanded = expandedVenues[venueKey] || false;
+
+                return (
+                  <React.Fragment key={venueKey}>
+                    <TableRow
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() =>
+                        setExpandedVenues((prev) => ({
+                          ...prev,
+                          [venueKey]: !isExpanded,
+                        }))
+                      }
+                    >
+                      <TableCell className="font-medium">{venue.name}</TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {venue.city}, {venue.state}, {venue.country}
+                      </TableCell>
+                      <TableCell className="text-right">{venue.showCount}</TableCell>
+                      <TableCell>
+                        <ChevronDown
+                          className={cn(
+                            "h-4 w-4 transition-transform duration-200",
+                            isExpanded && "transform rotate-180",
+                          )}
+                        />
                       </TableCell>
                     </TableRow>
-                  )}
-                </React.Fragment>
-              );
-            })}
-          </TableBody>
-        </Table>
+                    {isExpanded && (
+                      <TableRow className="bg-muted/50">
+                        <TableCell colSpan={4} className="p-4">
+                          <h4 className="text-sm font-medium mb-2">Show Dates:</h4>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                            {venue.dates.map((date) => (
+                              <span key={date} className="text-sm">
+                                {new Date(date).toLocaleDateString()}
+                              </span>
+                            ))}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );
