@@ -15,9 +15,7 @@ import {
   Pie,
   Cell,
   ResponsiveContainer,
-  Label,
   Tooltip,
-  LabelList,
 } from "recharts";
 import { VenueStats } from "@/lib/phish-processing";
 
@@ -51,6 +49,36 @@ export default function MyVenues({ venues }: MyVenuesProps) {
       color: `hsl(${(index * 137.5) % 360}, 70%, 50%)`,
     }));
   }, [venues, totalShows]);
+
+  const renderCustomizedLabel = ({
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    percent,
+    index,
+    value,
+    name,
+  }: any) => {
+    const radius = outerRadius + 30;
+    const x = cx + radius * Math.cos(-midAngle * Math.PI / 180);
+    const y = cy + radius * Math.sin(-midAngle * Math.PI / 180);
+
+    if (percent < 0.05) return null; // Don't show labels for small sections
+
+    return (
+      <text
+        x={x}
+        y={y}
+        fill="black"
+        textAnchor={x > cx ? 'start' : 'end'}
+        dominantBaseline="central"
+      >
+        {`${name} (${value})`}
+      </text>
+    );
+  };
 
   return (
     <div className="space-y-4">
@@ -98,6 +126,8 @@ export default function MyVenues({ venues }: MyVenuesProps) {
                     cx="50%"
                     cy="50%"
                     outerRadius={120}
+                    label={renderCustomizedLabel}
+                    labelLine={true}
                     onMouseEnter={(data) => {
                       setSelectedVenue(data.name);
                     }}
@@ -109,84 +139,10 @@ export default function MyVenues({ venues }: MyVenuesProps) {
                       <Cell
                         key={`cell-${index}`}
                         fill={entry.color}
-                      >
-                        {entry.percentage >= 5 && (
-                          <Label
-                            content={({ viewBox }) => {
-                              const { cx, cy } = viewBox;
-                              return (
-                                <g>
-                                  <text
-                                    x={cx}
-                                    y={cy - 15}
-                                    fill="white"
-                                    stroke="black"
-                                    strokeWidth="0.5"
-                                    textAnchor="middle"
-                                    dominantBaseline="middle"
-                                    style={{
-                                      fontSize: '16px',
-                                      fontWeight: 'bold',
-                                    }}
-                                  >
-                                    {entry.name}
-                                  </text>
-                                  <text
-                                    x={cx}
-                                    y={cy + 5}
-                                    fill="white"
-                                    stroke="black"
-                                    strokeWidth="0.5"
-                                    textAnchor="middle"
-                                    dominantBaseline="middle"
-                                    style={{
-                                      fontSize: '14px',
-                                      fontWeight: 'bold',
-                                    }}
-                                  >
-                                    {entry.value} shows
-                                  </text>
-                                  <text
-                                    x={cx}
-                                    y={cy + 25}
-                                    fill="white"
-                                    stroke="black"
-                                    strokeWidth="0.5"
-                                    textAnchor="middle"
-                                    dominantBaseline="middle"
-                                    style={{
-                                      fontSize: '14px',
-                                      fontWeight: 'bold',
-                                    }}
-                                  >
-                                    {entry.percentage.toFixed(1)}%
-                                  </text>
-                                </g>
-                              );
-                            }}
-                          />
-                        )}
-                      </Cell>
+                        stroke={selectedVenue === entry.name ? "#000000" : entry.color}
+                        strokeWidth={selectedVenue === entry.name ? 2 : 0}
+                      />
                     ))}
-                    <LabelList
-                      dataKey="name"
-                      position="outside"
-                      content={({ x, y, value, index }) => {
-                        const entry = venueData[index];
-                        if (!entry || entry.percentage >= 5) return null;
-                        return (
-                          <text
-                            x={x}
-                            y={y}
-                            fill="#000000"
-                            textAnchor={Number(x) > 250 ? "start" : "end"}
-                            className="text-xs font-bold"
-                          >
-                            {`${value} (${entry.value}, ${entry.percentage.toFixed(1)}%)`}
-                          </text>
-                        );
-                      }}
-                    />
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
