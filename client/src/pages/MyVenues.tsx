@@ -63,12 +63,15 @@ export default function MyVenues({ venues }: MyVenuesProps) {
       const radius = outerRadius * 1.2;
       const x = cx + radius * Math.cos(-midAngle * RADIAN);
       const y = cy + radius * Math.sin(-midAngle * RADIAN);
+      const isMobile = window.innerWidth < 768;
 
       // Calculate percentage and only show label if > 5%
       const percent = (value / venues.reduce((acc, v) => acc + v.showCount, 0)) * 100;
       if (percent <= 5) return null;
 
       const name = venueData[index]?.name || '';
+      const displayName = isMobile ? name.split(' ')[0] : name; // Only first word on mobile
+      
       return (
         <text 
           x={x} 
@@ -76,9 +79,9 @@ export default function MyVenues({ venues }: MyVenuesProps) {
           fill="black" 
           textAnchor={x > cx ? 'start' : 'end'}
           dominantBaseline="middle"
-          className="font-bold"
+          className={isMobile ? "text-[10px]" : "text-sm"}
         >
-          {`${name}: ${value} (${percent.toFixed(1)}%)`}
+          {isMobile ? `${value}` : `${displayName}: ${value} (${percent.toFixed(1)}%)`}
         </text>
       );
 
