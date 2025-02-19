@@ -137,33 +137,35 @@ export default function MyVenues({ venues }: MyVenuesProps) {
                           <Label
                             content={({ viewBox }) => {
                               const { cx, cy } = viewBox;
-                              const textColor = getLuminance(entry.color) > 0.5 ? "#000000" : "#FFFFFF";
                               return (
                                 <g>
                                   <text
                                     x={cx}
                                     y={cy - 12}
-                                    fill={textColor}
+                                    fill="#FFFFFF"
                                     textAnchor="middle"
-                                    className="text-sm font-bold"
+                                    dominantBaseline="central"
+                                    className="font-bold text-sm"
                                   >
                                     {entry.name}
                                   </text>
                                   <text
                                     x={cx}
                                     y={cy + 8}
-                                    fill={textColor}
+                                    fill="#FFFFFF"
                                     textAnchor="middle"
-                                    className="text-xs"
+                                    dominantBaseline="central"
+                                    className="font-bold text-xs"
                                   >
                                     {entry.value} shows
                                   </text>
                                   <text
                                     x={cx}
                                     y={cy + 24}
-                                    fill={textColor}
+                                    fill="#FFFFFF"
                                     textAnchor="middle"
-                                    className="text-xs"
+                                    dominantBaseline="central"
+                                    className="font-bold text-xs"
                                   >
                                     {entry.percentage.toFixed(1)}%
                                   </text>
@@ -186,7 +188,7 @@ export default function MyVenues({ venues }: MyVenuesProps) {
                             y={y}
                             fill="#000000"
                             textAnchor={Number(x) > 250 ? "start" : "end"}
-                            className="text-xs"
+                            className="text-xs font-bold"
                           >
                             {`${value} (${entry.value}, ${entry.percentage.toFixed(1)}%)`}
                           </text>
