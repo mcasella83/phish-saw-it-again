@@ -116,28 +116,51 @@ export default function MyVenues({ venues }: MyVenuesProps) {
                               const { cx, cy } = viewBox;
                               return (
                                 <g>
-                                  <foreignObject
-                                    x={cx - 60}
-                                    y={cy - 40}
-                                    width={120}
-                                    height={80}
+                                  <text
+                                    x={cx}
+                                    y={cy - 15}
+                                    fill="white"
+                                    stroke="black"
+                                    strokeWidth="0.5"
+                                    textAnchor="middle"
+                                    dominantBaseline="middle"
                                     style={{
-                                      overflow: 'visible',
-                                      textAlign: 'center'
+                                      fontSize: '16px',
+                                      fontWeight: 'bold',
                                     }}
                                   >
-                                    <div className="flex flex-col items-center justify-center gap-1">
-                                      <div className="text-white font-bold text-lg">
-                                        {entry.name}
-                                      </div>
-                                      <div className="text-white font-semibold text-sm">
-                                        {entry.value} shows
-                                      </div>
-                                      <div className="text-white font-semibold text-sm">
-                                        {entry.percentage.toFixed(1)}%
-                                      </div>
-                                    </div>
-                                  </foreignObject>
+                                    {entry.name}
+                                  </text>
+                                  <text
+                                    x={cx}
+                                    y={cy + 5}
+                                    fill="white"
+                                    stroke="black"
+                                    strokeWidth="0.5"
+                                    textAnchor="middle"
+                                    dominantBaseline="middle"
+                                    style={{
+                                      fontSize: '14px',
+                                      fontWeight: 'bold',
+                                    }}
+                                  >
+                                    {entry.value} shows
+                                  </text>
+                                  <text
+                                    x={cx}
+                                    y={cy + 25}
+                                    fill="white"
+                                    stroke="black"
+                                    strokeWidth="0.5"
+                                    textAnchor="middle"
+                                    dominantBaseline="middle"
+                                    style={{
+                                      fontSize: '14px',
+                                      fontWeight: 'bold',
+                                    }}
+                                  >
+                                    {entry.percentage.toFixed(1)}%
+                                  </text>
                                 </g>
                               );
                             }}
