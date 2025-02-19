@@ -51,35 +51,32 @@ export default function MyVenues({ venues }: MyVenuesProps) {
   }, [venues, totalShows]);
 
   const renderCustomizedLabel = ({
-    cx,
-    cy,
-    midAngle,
-    innerRadius,
-    outerRadius,
-    percent,
-    index,
-    value,
-    name,
-  }: any) => {
-    const RADIAN = Math.PI / 180;
-    const radius = outerRadius + 40;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+      cx,
+      cy,
+      midAngle,
+      innerRadius,
+      outerRadius,
+      percent,
+      value,
+    }: any) => {
+      const RADIAN = Math.PI / 180;
+      const radius = outerRadius + 25;
+      const x = cx + radius * Math.cos(-midAngle * RADIAN);
+      const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
-    if (percent < 0.03) return null; // Don't show labels for very small sections
+      if (percent < 0.03) return null; // Don't show labels for very small sections
 
-    return (
-      <text
-        x={x}
-        y={y}
-        fill="currentColor"
-        textAnchor={x > cx ? 'start' : 'end'}
-        dominantBaseline="central"
-        style={{ fontSize: '12px' }}
-      >
-        {`${name} (${value})`}
-      </text>
-    );
+      return (
+        <text 
+          x={x} 
+          y={y} 
+          fill="#000000"
+          textAnchor={x > cx ? 'start' : 'end'}
+          dominantBaseline="central"
+        >
+          {value}
+        </text>
+      );
   };
 
   return (
