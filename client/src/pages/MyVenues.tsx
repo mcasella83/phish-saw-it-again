@@ -74,8 +74,9 @@ export default function MyVenues({ venues }: MyVenuesProps) {
           fill="white" 
           textAnchor="middle" 
           dominantBaseline="middle"
+          className="font-bold"
         >
-          {value}
+          {`${value} (${percent.toFixed(1)}%)`}
         </text>
       );
 
