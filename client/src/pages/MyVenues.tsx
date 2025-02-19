@@ -143,6 +143,7 @@ export default function MyVenues({ venues }: MyVenuesProps) {
                     outerRadius={120}
                     label={renderCustomizedLabel}
                     labelLine={false}
+                    stroke="none"
                     onMouseEnter={(data) => {
                       setSelectedVenue(data.name);
                     }}
