@@ -63,33 +63,21 @@ export default function MyVenues({ venues }: MyVenuesProps) {
       const x = cx + radius * Math.cos(-midAngle * RADIAN);
       const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
-      // Calculate percentage and only show label if > 3%
+      // Calculate percentage and only show label if > 5%
       const percent = (value / venues.reduce((acc, v) => acc + v.showCount, 0)) * 100;
-      if (percent <= 3) return null;
+      if (percent <= 5) return null;
 
       return (
-        <>
-          <text 
-            x={x} 
-            y={y - 10} 
-            fill="black" 
-            textAnchor={x > cx ? 'start' : 'end'}
-            dominantBaseline="middle"
-            className="font-bold text-sm"
-          >
-            {name}
-          </text>
-          <text 
-            x={x} 
-            y={y + 10} 
-            fill="black" 
-            textAnchor={x > cx ? 'start' : 'end'}
-            dominantBaseline="middle"
-            className="font-bold"
-          >
-            {`${value} (${percent.toFixed(1)}%)`}
-          </text>
-        </>
+        <text 
+          x={x} 
+          y={y} 
+          fill="black" 
+          textAnchor={x > cx ? 'start' : 'end'}
+          dominantBaseline="middle"
+          className="font-bold"
+        >
+          {`${value} (${percent.toFixed(1)}%)`}
+        </text>
       );
 
       return (
