@@ -124,33 +124,28 @@ export default function MyVenues({ venues }: MyVenuesProps) {
                       setSelectedVenue(null);
                     }}
                   >
-                    {venueData.map((entry, index) => {
-                      const isSelected = selectedVenue === entry.name;
-                      return (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={entry.color}
-                          stroke={isSelected ? "#000000" : entry.color}
-                          strokeWidth={isSelected ? 2 : 0}
-                        >
-                          {entry.percentage >= 5 && (
-                            <Label
-                              value={entry.name}
-                              position="center"
-                              fill={
-                                getLuminance(entry.color) > 0.5
-                                  ? "#000000"
-                                  : "#FFFFFF"
-                              }
-                              style={{
-                                fontSize: "12px",
-                                fontWeight: "bold",
-                              }}
-                            />
-                          )}
-                        </Cell>
-                      );
-                    })}
+                    {venueData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={entry.color}
+                      >
+                        {entry.percentage >= 5 && (
+                          <Label
+                            value={entry.name}
+                            position="center"
+                            fill={
+                              getLuminance(entry.color) > 0.5
+                                ? "#000000"
+                                : "#FFFFFF"
+                            }
+                            style={{
+                              fontSize: "12px",
+                              fontWeight: "bold",
+                            }}
+                          />
+                        )}
+                      </Cell>
+                    ))}
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
