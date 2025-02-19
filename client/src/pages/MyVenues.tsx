@@ -61,19 +61,21 @@ export default function MyVenues({ venues }: MyVenuesProps) {
     value,
     name,
   }: any) => {
-    const radius = outerRadius + 30;
-    const x = cx + radius * Math.cos(-midAngle * Math.PI / 180);
-    const y = cy + radius * Math.sin(-midAngle * Math.PI / 180);
+    const RADIAN = Math.PI / 180;
+    const radius = outerRadius + 40;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
-    if (percent < 0.05) return null; // Don't show labels for small sections
+    if (percent < 0.03) return null; // Don't show labels for very small sections
 
     return (
       <text
         x={x}
         y={y}
-        fill="black"
+        fill="currentColor"
         textAnchor={x > cx ? 'start' : 'end'}
         dominantBaseline="central"
+        style={{ fontSize: '12px' }}
       >
         {`${name} (${value})`}
       </text>
