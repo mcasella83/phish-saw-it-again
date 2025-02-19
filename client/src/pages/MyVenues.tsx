@@ -155,8 +155,7 @@ export default function MyVenues({ venues }: MyVenuesProps) {
                       <Cell
                         key={`cell-${index}`}
                         fill={entry.color}
-                        stroke={selectedVenue === entry.name ? "#000000" : entry.color}
-                        strokeWidth={selectedVenue === entry.name ? 2 : 0}
+                        stroke="none"
                       />
                     ))}
                   </Pie>
