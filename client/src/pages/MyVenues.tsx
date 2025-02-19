@@ -54,6 +54,7 @@ export default function MyVenues({ venues }: MyVenuesProps) {
     outerRadius,
     value,
     index,
+    payload,
   }: any) => {
     const RADIAN = Math.PI / 180;
     const radius = outerRadius * 1.2;
@@ -67,28 +68,28 @@ export default function MyVenues({ venues }: MyVenuesProps) {
 
     const name = venueData[index]?.name || "";
     return (
-      <text
-        x={x}
-        y={y}
-        fill="black"
-        textAnchor={x > cx ? "start" : "end"}
-        dominantBaseline="middle"
-        className="font-bold"
-      >
-        {`${name}${value} (${percent.toFixed(1)}%)`}
-      </text>
-    );
-
-    return (
-      <text
-        x={x}
-        y={y}
-        fill="#000000"
-        textAnchor={x > cx ? "start" : "end"}
-        dominantBaseline="central"
-      >
-        {value}
-      </text>
+      <g>
+        <text
+          x={x}
+          y={y - 8}
+          fill="black"
+          textAnchor={x > cx ? "start" : "end"}
+          dominantBaseline="central"
+          className="text-xs font-medium"
+        >
+          {payload.name}
+        </text>
+        <text
+          x={x}
+          y={y + 8}
+          fill="black"
+          textAnchor={x > cx ? "start" : "end"}
+          dominantBaseline="central"
+          className="text-xs"
+        >
+          {`${value} (${payload.percentage.toFixed(1)}%)`}
+        </text>
+      </g>
     );
   };
 
