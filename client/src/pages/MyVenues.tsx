@@ -56,15 +56,24 @@ export default function MyVenues({ venues }: MyVenuesProps) {
       midAngle,
       innerRadius,
       outerRadius,
-      percent,
       value,
     }: any) => {
       const RADIAN = Math.PI / 180;
-      const radius = outerRadius + 25;
+      const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
       const x = cx + radius * Math.cos(-midAngle * RADIAN);
       const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-      if (percent < 0.03) return null; // Don't show labels for very small sections
+      
+      return (
+        <text 
+          x={x} 
+          y={y} 
+          fill="white" 
+          textAnchor="middle" 
+          dominantBaseline="middle"
+        >
+          {value}
+        </text>
+      );
 
       return (
         <text 
