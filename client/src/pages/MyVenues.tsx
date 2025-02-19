@@ -57,6 +57,7 @@ export default function MyVenues({ venues }: MyVenuesProps) {
       innerRadius,
       outerRadius,
       value,
+      index,
     }: any) => {
       const RADIAN = Math.PI / 180;
       const radius = outerRadius * 1.2;
