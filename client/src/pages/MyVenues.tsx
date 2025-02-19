@@ -17,6 +17,7 @@ import {
   ResponsiveContainer,
   Label,
   Tooltip,
+  LabelList,
 } from "recharts";
 import { VenueStats } from "@/lib/phish-processing";
 
@@ -134,21 +135,64 @@ export default function MyVenues({ venues }: MyVenuesProps) {
                       >
                         {entry.percentage >= 5 && (
                           <Label
-                            value={entry.name}
-                            position="center"
-                            fill={
-                              getLuminance(entry.color) > 0.5
-                                ? "#000000"
-                                : "#FFFFFF"
-                            }
-                            style={{
-                              fontSize: "12px",
-                              fontWeight: "bold",
+                            content={({ viewBox }) => {
+                              const { cx, cy } = viewBox;
+                              const textColor = getLuminance(entry.color) > 0.5 ? "#000000" : "#FFFFFF";
+                              return (
+                                <g>
+                                  <text
+                                    x={cx}
+                                    y={cy - 12}
+                                    fill={textColor}
+                                    textAnchor="middle"
+                                    className="text-sm font-bold"
+                                  >
+                                    {entry.name}
+                                  </text>
+                                  <text
+                                    x={cx}
+                                    y={cy + 8}
+                                    fill={textColor}
+                                    textAnchor="middle"
+                                    className="text-xs"
+                                  >
+                                    {entry.value} shows
+                                  </text>
+                                  <text
+                                    x={cx}
+                                    y={cy + 24}
+                                    fill={textColor}
+                                    textAnchor="middle"
+                                    className="text-xs"
+                                  >
+                                    {entry.percentage.toFixed(1)}%
+                                  </text>
+                                </g>
+                              );
                             }}
                           />
                         )}
                       </Cell>
                     ))}
+                    <LabelList
+                      dataKey="name"
+                      position="outside"
+                      content={({ x, y, value, index }) => {
+                        const entry = venueData[index];
+                        if (!entry || entry.percentage >= 5) return null;
+                        return (
+                          <text
+                            x={x}
+                            y={y}
+                            fill="#000000"
+                            textAnchor={Number(x) > 250 ? "start" : "end"}
+                            className="text-xs"
+                          >
+                            {`${value} (${entry.value}, ${entry.percentage.toFixed(1)}%)`}
+                          </text>
+                        );
+                      }}
+                    />
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
