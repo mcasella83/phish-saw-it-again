@@ -124,16 +124,20 @@ export default function Header({
 
         {isMobile ? (
           <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent onOpenChange={(open) => !open}>
-              <div className="flex flex-col space-y-2 mt-8">
-                <NavItems onNavClick={() => {}} />
-              </div>
-            </SheetContent>
+            {({ open, setOpen }) => (
+              <>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent>
+                  <div className="flex flex-col space-y-2 mt-8">
+                    <NavItems onNavClick={() => setOpen(false)} />
+                  </div>
+                </SheetContent>
+              </>
+            )}
           </Sheet>
         ) : (
           <nav className="flex items-center space-x-4">
