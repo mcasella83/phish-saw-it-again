@@ -75,7 +75,7 @@ export default function MyVenues({ venues }: MyVenuesProps) {
         dominantBaseline="middle"
         className="font-bold"
       >
-        {`${name}\n${value} (${percent.toFixed(1)}%)`}
+        {`${name}${value} (${percent.toFixed(1)}%)`}
       </text>
     );
 
