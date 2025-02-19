@@ -3,6 +3,7 @@ import { SongStats, VenueStats } from "./phish-processing";
 
 // Cache keys
 const CACHE_KEYS = {
+  USERNAME: "phish-explorer-username",
   SHOWS: "phish-explorer-shows",
   SONGS: "phish-explorer-songs",
   VENUES: "phish-explorer-venues",
@@ -29,6 +30,7 @@ function isCacheValid(): boolean {
 }
 
 export function clearShowsCache(): void {
+  localStorage.removeItem(CACHE_KEYS.USERNAME);
   localStorage.removeItem(CACHE_KEYS.SHOWS);
   localStorage.removeItem(CACHE_KEYS.SONGS);
   localStorage.removeItem(CACHE_KEYS.VENUES);

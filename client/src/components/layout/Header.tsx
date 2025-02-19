@@ -1,14 +1,10 @@
-
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { clearShowsCache } from "@/lib/storage-utils";
 
 interface HeaderProps {
   showNavigation?: boolean;
@@ -26,9 +22,10 @@ export default function Header({
   username = "",
 }: HeaderProps) {
   const isMobile = useIsMobile();
-  
+
   const handleSignOut = () => {
     localStorage.removeItem("phish-explorer-username");
+    clearShowsCache();
     window.location.reload();
   };
 
@@ -40,7 +37,7 @@ export default function Header({
             className={cn(
               "w-full text-left px-4 py-2 text-sm font-medium transition-colors",
               "hover:bg-accent hover:text-accent-foreground",
-              activeTab === "shows" && "bg-accent/50"
+              activeTab === "shows" && "bg-accent/50",
             )}
             onClick={() => onTabChange?.("shows")}
           >
@@ -50,7 +47,7 @@ export default function Header({
             className={cn(
               "w-full text-left px-4 py-2 text-sm font-medium transition-colors",
               "hover:bg-accent hover:text-accent-foreground",
-              activeTab === "songs" && "bg-accent/50"
+              activeTab === "songs" && "bg-accent/50",
             )}
             onClick={() => onTabChange?.("songs")}
           >
@@ -60,7 +57,7 @@ export default function Header({
             className={cn(
               "w-full text-left px-4 py-2 text-sm font-medium transition-colors",
               "hover:bg-accent hover:text-accent-foreground",
-              activeTab === "venues" && "bg-accent/50"
+              activeTab === "venues" && "bg-accent/50",
             )}
             onClick={() => onTabChange?.("venues")}
           >
@@ -72,7 +69,7 @@ export default function Header({
         className={cn(
           "w-full text-left px-4 py-2 text-sm font-medium transition-colors",
           "hover:bg-accent hover:text-accent-foreground",
-          activeTab === "about" && "bg-accent/50"
+          activeTab === "about" && "bg-accent/50",
         )}
         onClick={() => onTabChange?.("about")}
       >

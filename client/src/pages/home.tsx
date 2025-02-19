@@ -23,8 +23,7 @@ import {
 } from "@/lib/storage-utils";
 import Header from "@/components/layout/Header";
 
-import About from './About';
-
+import About from "./About";
 
 const STORAGE_KEY = "phish-explorer-username";
 
@@ -108,7 +107,6 @@ export default function HomePage({
       setSongStats(null);
       setVenueStats(null);
       clearShowsCache();
-      localStorage.removeItem(STORAGE_KEY);
 
       toast({
         title: "Failed to fetch shows",

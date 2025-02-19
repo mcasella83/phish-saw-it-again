@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -17,7 +16,9 @@ interface MySongsProps {
 }
 
 export default function MySongs({ songs }: MySongsProps) {
-  const [expandedSongs, setExpandedSongs] = useState<Record<string, boolean>>({});
+  const [expandedSongs, setExpandedSongs] = useState<Record<string, boolean>>(
+    {},
+  );
 
   if (!songs || songs.length === 0) {
     return (
@@ -77,7 +78,7 @@ export default function MySongs({ songs }: MySongsProps) {
                       <ChevronDown
                         className={cn(
                           "h-4 w-4 transition-transform duration-200",
-                          isExpanded && "transform rotate-180"
+                          isExpanded && "transform rotate-180",
                         )}
                       />
                     </TableCell>
@@ -89,7 +90,7 @@ export default function MySongs({ songs }: MySongsProps) {
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                           {song.occurrences.map((date) => (
                             <span key={date} className="text-sm">
-                              {new Date(date).toLocaleDateString()}
+                              {date}
                             </span>
                           ))}
                         </div>
