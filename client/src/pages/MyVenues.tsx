@@ -45,7 +45,6 @@ export default function MyVenues({ venues }: MyVenuesProps) {
 
   const venueData = useMemo(() => {
     return venues.map((venue, index) => ({
-      year: parseInt(venue.dates[0]), //Added this line
       name: venue.name,
       value: venue.showCount,
       percentage: (venue.showCount / totalShows) * 100,
