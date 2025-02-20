@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer } from "http";
 import { storage } from "./storage";
 import { userSchema } from "@shared/schema";
+import { logUserLogin } from "./db";
 
 export function registerRoutes(app: Express) {
   app.get("/api/phish/shows", async (req, res) => {
