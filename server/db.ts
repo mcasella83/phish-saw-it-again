@@ -1,6 +1,7 @@
+
 import Database from "@replit/database";
 
-const db = new Database();
+const db = new Database(process.env.REPLIT_DB_URL);
 
 export async function logUserLogin(username: string, showCount: number) {
   const timestamp = new Date().toISOString();
