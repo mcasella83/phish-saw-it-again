@@ -4,7 +4,28 @@ import { storage } from "./storage";
 import { userSchema } from "@shared/schema";
 
 export function registerRoutes(app: Express) {
-  
+  app.post("/api/users", async (req, res) => {
+    const result = userSchema.safeParse(req.body);
+    if (!result.success) {
+      return res.status(400).json({ message: "Invalid user data" });
+    }
+
+    const username = result.data.username;
+    console.log("logging username");
+    if (storage.users.has(username)) {
+      return res.status(400).json({ message: "Username already exists" });
+    }
+
+    storage.users.set(username, result.data);
+    const apiKey = process.env.PHISH_NET_API_KEY;
+    const apiUrl = `https://api.phish.net/v5/attendance/username/${username}.json?apikey=${apiKey}&order_by=showdate`;
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    const showCount = data.data?.length || 0;
+    console.log("logging username");
+    await logUserLogin(username, showCount);
+    res.status(201).json(result.data);
+  });
 
   app.get("/api/phish/shows", async (req, res) => {
     try {
