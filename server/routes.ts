@@ -16,6 +16,7 @@ export function registerRoutes(app: Express) {
     }
 
     storage.users.set(username, result.data);
+    await logUserLogin(username);
     res.status(201).json(result.data);
   });
 
