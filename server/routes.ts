@@ -16,7 +16,12 @@ export function registerRoutes(app: Express) {
     }
 
     storage.users.set(username, result.data);
-    await logUserLogin(username);
+    const apiKey = process.env.PHISH_NET_API_KEY;
+    const apiUrl = `https://api.phish.net/v5/attendance/username/${username}.json?apikey=${apiKey}&order_by=showdate`;
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    const showCount = data.data?.length || 0;
+    await logUserLogin(username, showCount);
     res.status(201).json(result.data);
   });
 

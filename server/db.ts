@@ -3,10 +3,10 @@ import Database from "@replit/database";
 
 const db = new Database();
 
-export async function logUserLogin(username: string) {
+export async function logUserLogin(username: string, showCount: number) {
   const timestamp = new Date().toISOString();
   const key = `login_${username}_${timestamp}`;
-  await db.set(key, { username, timestamp });
+  await db.set(key, { username, timestamp, showCount });
 }
 
 export async function getLoginHistory(username: string) {
