@@ -3,7 +3,19 @@ import Database from "@replit/database";
 
 const db = new Database(process.env.REPLIT_DB_URL);
 
-console.log('Replit DB URL:', process.env.REPLIT_DB_URL ? 'configured' : 'missing');
+if (!process.env.REPLIT_DB_URL) {
+  console.error('ERROR: Replit DB URL is missing!');
+  throw new Error('Replit DB URL environment variable is not configured');
+}
+console.log('Replit DB URL is configured');
+
+// Test DB connection
+db.list().then(keys => {
+  console.log('Successfully connected to Replit DB');
+  console.log('Current DB keys:', keys);
+}).catch(err => {
+  console.error('Failed to connect to Replit DB:', err);
+});
 
 export async function logUserLogin(username: string, showCount: number) {
   const timestamp = new Date().toISOString();
