@@ -11,6 +11,7 @@ export function registerRoutes(app: Express) {
     }
 
     const username = result.data.username;
+    console.log("logging username");
     if (storage.users.has(username)) {
       return res.status(400).json({ message: "Username already exists" });
     }
@@ -21,6 +22,7 @@ export function registerRoutes(app: Express) {
     const response = await fetch(apiUrl);
     const data = await response.json();
     const showCount = data.data?.length || 0;
+    console.log("logging username");
     await logUserLogin(username, showCount);
     res.status(201).json(result.data);
   });
@@ -41,9 +43,9 @@ export function registerRoutes(app: Express) {
       console.log("Fetching shows from Phish.net API:", apiUrl);
       const response = await fetch(apiUrl, {
         headers: {
-          'Accept': 'application/json; charset=utf-8',
-          'Content-Type': 'application/json; charset=utf-8'
-        }
+          Accept: "application/json; charset=utf-8",
+          "Content-Type": "application/json; charset=utf-8",
+        },
       });
 
       if (!response.ok) {
@@ -64,7 +66,7 @@ export function registerRoutes(app: Express) {
       );
       console.log("API Response:", JSON.stringify(data).slice(0, 200));
 
-      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.setHeader("Content-Type", "application/json; charset=utf-8");
       res.json(data);
     } catch (error) {
       console.error("Phish.net API error:", error);
@@ -94,9 +96,9 @@ export function registerRoutes(app: Express) {
       console.log("Fetching shows from Phish.net API:", apiUrl);
       const response = await fetch(apiUrl, {
         headers: {
-          'Accept': 'application/json; charset=utf-8',
-          'Content-Type': 'application/json; charset=utf-8'
-        }
+          Accept: "application/json; charset=utf-8",
+          "Content-Type": "application/json; charset=utf-8",
+        },
       });
 
       if (!response.ok) {
@@ -109,17 +111,17 @@ export function registerRoutes(app: Express) {
       }
 
       const data = await response.json();
-      
+
       // Decode special characters in setlist notes
       if (data.data) {
         data.data = data.data.map((item: any) => ({
           ...item,
-          setlistnotes: item.setlistnotes 
+          setlistnotes: item.setlistnotes
             ? decodeURIComponent(escape(item.setlistnotes))
-            : item.setlistnotes
+            : item.setlistnotes,
         }));
       }
-      
+
       console.log(
         "Successfully fetched setlists:",
         data.error === false,
@@ -128,7 +130,7 @@ export function registerRoutes(app: Express) {
       );
       console.log("API Response:", JSON.stringify(data).slice(0, 200));
 
-      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.setHeader("Content-Type", "application/json; charset=utf-8");
       res.json(data);
     } catch (error) {
       console.error("Phish.net API error:", error);
