@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer } from "http";
 import { storage } from "./storage";
+import { logUserLogin } from "./db";
 import { userSchema } from "@shared/schema";
 
 export function registerRoutes(app: Express) {
@@ -57,6 +58,10 @@ export function registerRoutes(app: Express) {
         data.data?.length,
       );
       console.log("API Response:", JSON.stringify(data).slice(0, 200));
+
+      if (!data.error && data.data) {
+        await logUserLogin(username as string, data.data.length);
+      }
 
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
       res.json(data);
