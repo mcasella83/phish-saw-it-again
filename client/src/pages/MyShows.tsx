@@ -344,11 +344,7 @@ export default function MyShows({
                       }
                     >
                       <TableCell>
-                        {new Date(show.date).toLocaleDateString('en-US', {
-                          month: '2-digit',
-                          day: '2-digit',
-                          year: 'numeric'
-                        })}
+                        {show.date.split('T')[0].split('-').join('/')}
                       </TableCell>
                       <TableCell className="font-medium">
                         {show.venue}
