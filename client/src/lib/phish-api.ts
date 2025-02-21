@@ -104,6 +104,7 @@ export async function getShowSetList(id: string): Promise<PhishShowSetlist> {
     city: firstSong.city,
     state: firstSong.state,
     country: firstSong.country,
+    venueid: firstSong.venueid,
   };
 
   return setlist;

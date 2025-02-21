@@ -130,6 +130,7 @@ export interface PhishShowSetlist {
   city: string;
   state: string;
   country: string;
+  venueid: number;
 }
 
 export const createDefaultPhishShowSetlist = (): PhishShowSetlist => ({
@@ -141,6 +142,7 @@ export const createDefaultPhishShowSetlist = (): PhishShowSetlist => ({
   city: "",
   state: "",
   country: "",
+  venueid: 0,
 });
 
 export interface PhishSong {

@@ -10,12 +10,13 @@ export interface SongStats {
 }
 
 export interface VenueStats {
-  name: string;
+  names: string[];
+  id: number;
   city: string;
   state: string;
   country: string;
   showCount: number;
-  dates: string[];
+  occurrences: any[];
 }
 
 export function getUniqueSongsFromSetlists(
@@ -31,6 +32,11 @@ export function getUniqueSongsFromSetlists(
       const existingEntry = songMap.get(song.name);
       const songDisplay = song.date + ", " + song.venue;
       if (existingEntry) {
+        if (existingEntry.lastTime.date === song.date) {
+          console.log("found repeat song %s in setlist", song.name);
+          return;
+        }
+
         existingEntry.count++;
         existingEntry.occurrences.push(songDisplay);
         existingEntry.lastTime.isLastTimeHeard = false;
@@ -72,36 +78,48 @@ export function getVenueStatsFromSetlists(
   const venueMap = new Map<
     string,
     {
+      id: number;
+      names: string[];
       city: string;
       state: string;
       country: string;
       count: number;
-      dates: Set<string>;
+      occurrences: any[];
     }
   >();
 
   setlists.forEach((setlist) => {
-    const venueKey = `${setlist.venue}-${setlist.city}-${setlist.state}`;
+    const venueKey = `${setlist.city}-${setlist.state}--${setlist.country}`;
     const existingEntry = venueMap.get(venueKey);
     if (existingEntry) {
       existingEntry.count++;
-      existingEntry.dates.add(setlist.date);
+      existingEntry.occurrences.push({
+        date: setlist.date,
+        name: setlist.venue,
+      });
+
+      //save the most recent venue name
+      if (existingEntry.names.includes(setlist.venue) === false) {
+        existingEntry.names.unshift(setlist.venue);
+      }
     } else {
       venueMap.set(venueKey, {
+        id: setlist.venueid,
+        names: [setlist.venue],
         city: setlist.city,
         state: setlist.state,
         country: setlist.country,
         count: 1,
-        dates: new Set([setlist.date]),
+        occurrences: [{ date: setlist.date, name: setlist.venue }],
       });
     }
   });
 
   return Array.from(venueMap.entries())
     .map(([venueKey, stats]) => {
-      const [name] = venueKey.split("-");
       return {
-        name,
+        id: stats.id,
+        names: stats.names,
         city: stats.city,
         state: stats.state,
         country: stats.country,

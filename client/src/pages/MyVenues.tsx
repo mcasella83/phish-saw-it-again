@@ -59,16 +59,18 @@ export default function MyVenues({ venues }: MyVenuesProps) {
     payload,
   }: any) => {
     const RADIAN = Math.PI / 180;
-    const percent = (value / venues.reduce((acc, v) => acc + v.showCount, 0)) * 100;
+    const percent =
+      (value / venues.reduce((acc, v) => acc + v.showCount, 0)) * 100;
     if (percent <= 5) return null;
 
     const radius = isMobile ? outerRadius * 0.6 : outerRadius * 1.2;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
-    const shortenedName = isMobile && payload.name.length > 8 
-      ? payload.name.substring(0, 6) + '...'
-      : payload.name;
+    const shortenedName =
+      isMobile && payload.name.length > 8
+        ? payload.name.substring(0, 6) + "..."
+        : payload.name;
 
     return (
       <g>
@@ -76,9 +78,11 @@ export default function MyVenues({ venues }: MyVenuesProps) {
           x={x}
           y={y - 6}
           fill="black"
-          textAnchor={isMobile ? "middle" : (x > cx ? "start" : "end")}
+          textAnchor={isMobile ? "middle" : x > cx ? "start" : "end"}
           dominantBaseline="central"
-          className={isMobile ? "text-[9px] font-medium" : "text-xs font-medium"}
+          className={
+            isMobile ? "text-[9px] font-medium" : "text-xs font-medium"
+          }
         >
           {shortenedName}
         </text>
@@ -86,7 +90,7 @@ export default function MyVenues({ venues }: MyVenuesProps) {
           x={x}
           y={y + 6}
           fill="black"
-          textAnchor={isMobile ? "middle" : (x > cx ? "start" : "end")}
+          textAnchor={isMobile ? "middle" : x > cx ? "start" : "end"}
           dominantBaseline="central"
           className={isMobile ? "text-[8px]" : "text-xs"}
         >
@@ -188,7 +192,8 @@ export default function MyVenues({ venues }: MyVenuesProps) {
             </TableHeader>
             <TableBody>
               {venues.map((venue) => {
-                const venueKey = `${venue.name}-${venue.city}-${venue.state}`;
+                console.log("table venue=" + JSON.stringify(venue));
+                const venueKey = venue.id; //`${venue.name}-${venue.city}-${venue.state}`;
                 const isExpanded = expandedVenues[venueKey] || false;
 
                 return (
@@ -203,7 +208,7 @@ export default function MyVenues({ venues }: MyVenuesProps) {
                       }
                     >
                       <TableCell className="font-medium">
-                        {venue.name}
+                        {venue.names[0]}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         {venue.city}, {venue.state}, {venue.country}
@@ -227,9 +232,9 @@ export default function MyVenues({ venues }: MyVenuesProps) {
                             Show Dates:
                           </h4>
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                            {venue.dates.map((date) => (
-                              <span key={date} className="text-sm">
-                                {new Date(date).toLocaleDateString()}
+                            {venue.occurrences.map((occ) => (
+                              <span key={occ.date} className="text-sm">
+                                {occ.date}(${occ.name})
                               </span>
                             ))}
                           </div>
