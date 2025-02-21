@@ -234,7 +234,7 @@ export default function MyVenues({ venues }: MyVenuesProps) {
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                             {venue.occurrences.map((occ) => (
                               <span key={occ.date} className="text-sm">
-                                {occ.date}(${occ.name})
+                                {occ.date} ({occ.name})
                               </span>
                             ))}
                           </div>

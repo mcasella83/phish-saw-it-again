@@ -124,7 +124,9 @@ export function getVenueStatsFromSetlists(
         state: stats.state,
         country: stats.country,
         showCount: stats.count,
-        dates: Array.from(stats.dates).sort((a, b) => b.localeCompare(a)),
+        occurrences: Array.from(stats.occurrences).sort((a, b) =>
+          b.date.localeCompare(a.date),
+        ),
       };
     })
     .sort((a, b) => b.showCount - a.showCount);
