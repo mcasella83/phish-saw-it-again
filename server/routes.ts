@@ -20,8 +20,20 @@ export function registerRoutes(app: Express) {
         throw new Error("Start date and end date are required");
       }
 
-      // Construct API URL for show search
-      let apiUrl = `https://api.phish.net/v5/shows/artistid/2.json?apikey=${apiKey}`;
+      // Construct API URL for show search with date range
+      // Use the date range endpoint if available, otherwise we'll filter the results
+      let artistId = "2"; // Default is all
+      if (artist === "phish") {
+        artistId = "1";
+      } else if (artist === "trey") {
+        artistId = "2";
+      }
+      
+      // The API endpoint for shows in a date range
+      let apiUrl = `https://api.phish.net/v5/shows-on-date-range.json?apikey=${apiKey}&showdatestart=${startDate}&showdateend=${endDate}`;
+      if (artist && artist !== "all") {
+        apiUrl += `&artistid=${artistId}`;
+      }
       
       console.log("Fetching shows from Phish.net API:", apiUrl);
       const response = await fetch(apiUrl, {
@@ -42,18 +54,30 @@ export function registerRoutes(app: Express) {
 
       const data = await response.json();
       
-      // Filter by artist if specified
-      if (artist && artist !== "all" && data.data) {
+      // Additional filtering if needed
+      if (data.data) {
+        const startDateObj = new Date(startDate);
+        const endDateObj = new Date(endDate);
+        
+        // Ensure all shows are within the date range
         data.data = data.data.filter((show: any) => {
-          if (artist === "phish") {
-            return show.artist_name === "Phish";
-          } else if (artist === "trey") {
-            return show.artist_name === "Trey Anastasio" || 
-                   show.artist_name === "Trey Anastasio Band" || 
-                   show.artist_name === "TAB";
-          }
-          return true;
+          const showDate = new Date(show.showdate);
+          return showDate >= startDateObj && showDate <= endDateObj;
         });
+        
+        // Additional artist filtering if the API doesn't handle it well
+        if (artist && artist !== "all") {
+          data.data = data.data.filter((show: any) => {
+            if (artist === "phish") {
+              return show.artist_name === "Phish";
+            } else if (artist === "trey") {
+              return show.artist_name === "Trey Anastasio" || 
+                    show.artist_name === "Trey Anastasio Band" || 
+                    show.artist_name === "TAB";
+            }
+            return true;
+          });
+        }
       }
 
       console.log(

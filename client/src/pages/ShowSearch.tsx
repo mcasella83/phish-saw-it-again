@@ -61,6 +61,18 @@ export default function ShowSearch() {
       // Fetch the shows data
       const showsData = await searchShows(formattedStartDate, formattedEndDate, artist);
       
+      // Filter shows to ensure they're within the selected date range
+      const startDateObj = new Date(formattedStartDate);
+      const endDateObj = new Date(formattedEndDate);
+      
+      const filteredShows = showsData.data.filter(show => {
+        const showDate = new Date(show.showdate);
+        return showDate >= startDateObj && showDate <= endDateObj;
+      });
+      
+      // Update the response with filtered shows
+      showsData.data = filteredShows;
+      
       if (showsData.data.length === 0) {
         setSearchResults({
           shows: [],
