@@ -7,9 +7,17 @@ import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home";
 import { useState } from "react";
 import About from "@/pages/About";
+import ShowSearch from "@/pages/ShowSearch";
 
 function Router() {
-  const [activeTab, setActiveTab] = useState("shows");
+  const [activeTab, setActiveTab] = useState(() => {
+    // Set initial active tab based on the current path
+    const path = window.location.pathname;
+    if (path === "/search") return "search";
+    if (path === "/about") return "about";
+    return "shows";
+  });
+  
   const username = localStorage.getItem("phish-explorer-username");
   const isLoggedIn = username !== null;
 
@@ -26,6 +34,12 @@ function Router() {
         <Switch>
           <Route path="/">
             <HomePage initialTab={activeTab} onTabChange={setActiveTab} />
+          </Route>
+          <Route path="/search">
+            <ShowSearch />
+          </Route>
+          <Route path="/about">
+            <About />
           </Route>
           <Route component={NotFound} />
         </Switch>

@@ -65,16 +65,22 @@ export default function Header({
           </button>
         </>
       )}
-      <button
+      <Link href="/search" 
         className={cn(
-          "w-full text-left px-4 py-2 text-sm font-medium transition-colors",
+          "w-full text-left px-4 py-2 text-sm font-medium transition-colors block",
+          "hover:bg-accent hover:text-accent-foreground",
+          activeTab === "search" && "bg-accent/50",
+        )}>
+        Show Search
+      </Link>
+      <Link href="/about" 
+        className={cn(
+          "w-full text-left px-4 py-2 text-sm font-medium transition-colors block",
           "hover:bg-accent hover:text-accent-foreground",
           activeTab === "about" && "bg-accent/50",
-        )}
-        onClick={() => onTabChange?.("about")}
-      >
+        )}>
         About
-      </button>
+      </Link>
     </>
   );
 

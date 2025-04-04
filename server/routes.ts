@@ -5,6 +5,75 @@ import { userSchema } from "@shared/schema";
 import { logUserLogin } from "./db";
 
 export function registerRoutes(app: Express) {
+  app.get("/api/phish/search", async (req, res) => {
+    try {
+      const apiKey = process.env.PHISH_NET_API_KEY;
+      if (!apiKey) {
+        throw new Error("API key not configured");
+      }
+
+      const startDate = req.query.startDate as string;
+      const endDate = req.query.endDate as string;
+      const artist = req.query.artist as string;
+
+      if (!startDate || !endDate) {
+        throw new Error("Start date and end date are required");
+      }
+
+      // Construct API URL for show search
+      let apiUrl = `https://api.phish.net/v5/shows/query.json?apikey=${apiKey}`;
+      apiUrl += `&showdatestart=${startDate}&showdateend=${endDate}`;
+      
+      console.log("Fetching shows from Phish.net API:", apiUrl);
+      const response = await fetch(apiUrl, {
+        headers: {
+          Accept: "application/json; charset=utf-8",
+          "Content-Type": "application/json; charset=utf-8",
+        },
+      });
+
+      if (!response.ok) {
+        console.error(
+          "Phish.net API error:",
+          response.status,
+          response.statusText,
+        );
+        throw new Error("Failed to fetch from Phish.net API");
+      }
+
+      const data = await response.json();
+      
+      // Filter by artist if specified
+      if (artist && artist !== "all" && data.data) {
+        data.data = data.data.filter((show: any) => {
+          if (artist === "phish") {
+            return show.artist_name === "Phish";
+          } else if (artist === "trey") {
+            return show.artist_name === "Trey Anastasio" || 
+                   show.artist_name === "Trey Anastasio Band" || 
+                   show.artist_name === "TAB";
+          }
+          return true;
+        });
+      }
+
+      console.log(
+        "Successfully fetched shows:",
+        data.error === false,
+        "Show count:",
+        data.data?.length,
+      );
+
+      res.setHeader("Content-Type", "application/json; charset=utf-8");
+      res.json(data);
+    } catch (error) {
+      console.error("Phish.net API error:", error);
+      res.status(500).json({
+        message: "Failed to fetch shows from Phish.net",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  });
   app.get("/api/phish/shows", async (req, res) => {
     try {
       const apiKey = process.env.PHISH_NET_API_KEY;
@@ -12,7 +81,7 @@ export function registerRoutes(app: Express) {
         throw new Error("API key not configured");
       }
 
-      const username = req.query.username;
+      const username = req.query.username as string;
       if (!username) {
         throw new Error("Username is required");
       }
