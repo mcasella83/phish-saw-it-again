@@ -3,9 +3,23 @@ import {
   PhishShowSetlist,
   PhishSetlistApiResponse,
   PhishSong,
+  PhishShow,
   createDefaultPhishSong,
 } from "./types";
 import { decodeHtmlEntities, encodeUTF8 } from "./utils";
+
+export interface SongStat {
+  name: string;
+  playCount: number;
+  shows: string[]; // Date strings of shows where this song was played
+}
+
+export interface SearchResults {
+  shows: PhishShow[];
+  songs: SongStat[];
+  totalSongs: number;
+  uniqueSongs: number;
+}
 
 export async function getShowsByUsername(
   username: string,
@@ -40,6 +54,120 @@ export async function getShowsByUsername(
   return data;
 }
 
+export async function searchShows(
+  startDate: string,
+  endDate: string,
+  artist: string
+): Promise<PhishShowApiResponse> {
+  // Format the query string
+  const queryParams = new URLSearchParams({
+    startDate,
+    endDate,
+    artist,
+  });
+
+  console.log("Making API request for shows search:", queryParams.toString());
+  const response = await fetch(`/api/phish/search?${queryParams.toString()}`, {
+    headers: {
+      Accept: "application/json; charset=utf-8",
+      "Content-Type": "application/json; charset=utf-8",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch shows");
+  }
+
+  const data = await response.json();
+  
+  // Convert to our expected PhishShowApiResponse format
+  const apiResponse: PhishShowApiResponse = {
+    error: data.error || false,
+    error_message: data.message,
+    data: data.data || []
+  };
+  
+  return apiResponse;
+}
+
+export async function processShowsForSongStats(
+  shows: PhishShow[],
+  progressCallback?: (current: number, total: number) => void
+): Promise<SearchResults> {
+  // Initialize our result structure
+  const results: SearchResults = {
+    shows: shows,
+    songs: [],
+    totalSongs: 0,
+    uniqueSongs: 0
+  };
+
+  if (shows.length === 0) {
+    return results;
+  }
+
+  // Track song plays
+  const songMap = new Map<string, SongStat>();
+  let totalSongCount = 0;
+
+  // Process each show to get its setlist
+  for (let i = 0; i < shows.length; i++) {
+    const show = shows[i];
+    
+    // Call progress callback if provided
+    if (progressCallback) {
+      progressCallback(i, shows.length);
+    }
+    
+    try {
+      const setlist = await getShowSetList(show.showid);
+      
+      for (const song of setlist.songs) {
+        totalSongCount++;
+        
+        if (songMap.has(song.name)) {
+          // Increment play count and add show date if not already present
+          const stat = songMap.get(song.name)!;
+          stat.playCount++;
+          if (!stat.shows.includes(song.date)) {
+            stat.shows.push(song.date);
+          }
+        } else {
+          // Add a new song stat
+          songMap.set(song.name, {
+            name: song.name,
+            playCount: 1,
+            shows: [song.date]
+          });
+        }
+      }
+    } catch (error) {
+      console.error(`Error fetching setlist for show ${show.showid}:`, error);
+      // Continue with next show
+    }
+    
+    // For every 5 shows processed or on the last show, return partial results
+    // This allows the UI to update with partial data
+    if ((i + 1) % 5 === 0 || i === shows.length - 1) {
+      // Create a partial result to return
+      const songStats = Array.from(songMap.values()).sort((a, b) => b.playCount - a.playCount);
+      
+      results.songs = songStats;
+      results.totalSongs = totalSongCount;
+      results.uniqueSongs = songStats.length;
+    }
+  }
+
+  // Convert map to array and sort by play count (descending)
+  const songStats = Array.from(songMap.values()).sort((a, b) => b.playCount - a.playCount);
+
+  results.songs = songStats;
+  results.totalSongs = totalSongCount;
+  results.uniqueSongs = songStats.length;
+
+  return results;
+}
+
 export async function getShowSetList(id: string): Promise<PhishShowSetlist> {
   console.log("Making API request for id:", id);
   const response = await fetch(`/api/phish/showsetlist/${id}`, {
@@ -53,19 +181,19 @@ export async function getShowSetList(id: string): Promise<PhishShowSetlist> {
     throw new Error("Failed to fetch setlist");
   }
 
-  const apiResponse: PhishSetlistApiResponse = await response.json();
-  console.log("API response data:", apiResponse);
+  const data = await response.json();
+  console.log("API response data:", data);
 
-  if (apiResponse.error && apiResponse.error_message) {
-    throw new Error(apiResponse.error_message);
+  if (data.error) {
+    throw new Error(data.message || "Error fetching setlist");
   }
 
-  if (!apiResponse.data || apiResponse.data.length === 0) {
+  if (!data.data || data.data.length === 0) {
     throw new Error("No setlist data found for this show");
   }
 
-  // Map the API response to our PhishShowSetlist type using the createDefaultPhishSong
-  const songs: PhishSong[] = apiResponse.data.map((songData) => {
+  // Map the API response to our PhishShowSetlist type
+  const songs: PhishSong[] = data.data.map((songData: any) => {
     const song = createDefaultPhishSong(); // This includes all required boolean fields
     song.name = songData.song;
     song.date = songData.showdate;
@@ -94,12 +222,12 @@ export async function getShowSetList(id: string): Promise<PhishShowSetlist> {
     return a.set.localeCompare(b.set);
   });
 
-  const firstSong = apiResponse.data[0];
+  const firstSong = data.data[0];
   const setlist: PhishShowSetlist = {
     id: firstSong.showid,
     date: firstSong.showdate,
     songs: songs,
-    setListNotes: decodeHtmlEntities(firstSong.setlistnotes),
+    setListNotes: firstSong.setlistnotes ? decodeHtmlEntities(firstSong.setlistnotes) : "",
     venue: firstSong.venue,
     city: firstSong.city,
     state: firstSong.state,

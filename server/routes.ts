@@ -21,8 +21,7 @@ export function registerRoutes(app: Express) {
       }
 
       // Construct API URL for show search
-      let apiUrl = `https://api.phish.net/v5/shows/query.json?apikey=${apiKey}`;
-      apiUrl += `&showdatestart=${startDate}&showdateend=${endDate}`;
+      let apiUrl = `https://api.phish.net/v5/shows/artistid/2.json?apikey=${apiKey}`;
       
       console.log("Fetching shows from Phish.net API:", apiUrl);
       const response = await fetch(apiUrl, {

@@ -184,3 +184,16 @@ export const createDefaultPhishSong = (): PhishSong => ({
   state: "",
   country: "",
 });
+
+export interface SongStat {
+  name: string;
+  playCount: number;
+  shows: string[]; // Date strings of shows where this song was played
+}
+
+export interface SearchResults {
+  shows: PhishShow[];
+  songs: SongStat[];
+  totalSongs: number;
+  uniqueSongs: number;
+}
