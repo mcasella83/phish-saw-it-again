@@ -12,6 +12,9 @@ export interface SongStat {
   name: string;
   playCount: number;
   shows: string[]; // Date strings of shows where this song was played
+  showIds: string[]; // IDs of shows where this song was played
+  venues: string[]; // Venues where this song was played
+  dates: string[]; // Formatted dates of shows where this song was played
 }
 
 export interface SearchResults {
@@ -90,6 +93,22 @@ export async function searchShows(
   return apiResponse;
 }
 
+// Function to create a new SongStat object with all required fields
+function createSongStat(name: string, date: string, showId: string, venue: string): SongStat {
+  const formattedDate = new Date(date).toLocaleDateString('en-US', { 
+    year: 'numeric', month: 'short', day: 'numeric'
+  });
+  
+  return {
+    name,
+    playCount: 1,
+    shows: [date],
+    showIds: [showId],
+    venues: [venue],
+    dates: [formattedDate]
+  };
+}
+
 export async function processShowsForSongStats(
   shows: PhishShow[],
   progressCallback?: (current: number, total: number) => void
@@ -125,20 +144,36 @@ export async function processShowsForSongStats(
       for (const song of setlist.songs) {
         totalSongCount++;
         
+        // Format the date once
+        const formattedDate = new Date(song.date).toLocaleDateString('en-US', { 
+          year: 'numeric', month: 'short', day: 'numeric'
+        });
+        
         if (songMap.has(song.name)) {
           // Increment play count and add show date if not already present
           const stat = songMap.get(song.name)!;
           stat.playCount++;
+          
           if (!stat.shows.includes(song.date)) {
+            // Add show date
             stat.shows.push(song.date);
+            
+            // Add show ID 
+            stat.showIds.push(show.showid);
+            
+            // Add venue if not already included
+            if (!stat.venues.includes(song.venue)) {
+              stat.venues.push(song.venue);
+            }
+            
+            // Add formatted date
+            if (!stat.dates.includes(formattedDate)) {
+              stat.dates.push(formattedDate);
+            }
           }
         } else {
-          // Add a new song stat
-          songMap.set(song.name, {
-            name: song.name,
-            playCount: 1,
-            shows: [song.date]
-          });
+          // Add a new song stat using our helper function
+          songMap.set(song.name, createSongStat(song.name, song.date, show.showid, song.venue));
         }
       }
     } catch (error) {

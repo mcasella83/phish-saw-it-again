@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { CalendarIcon, Music } from "lucide-react";
+import { CalendarIcon, Music, Info, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { PhishShow } from "@/lib/types";
@@ -13,6 +13,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { SearchResults, SongStat, searchShows, processShowsForSongStats } from "@/lib/phish-api";
 
 export interface ShowSearchProps {
@@ -20,6 +22,82 @@ export interface ShowSearchProps {
 }
 
 type Artist = "all" | "phish" | "trey";
+
+// Component to display song details in a dialog
+interface SongDetailsDialogProps {
+  song: SongStat;
+  showsCount: number;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+function SongDetailsDialog({ song, showsCount, isOpen, onOpenChange }: SongDetailsDialogProps) {
+  return (
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="text-xl flex items-center gap-2">
+            <Music className="h-5 w-5" />
+            {song.name}
+          </DialogTitle>
+          <DialogDescription>
+            Played {song.playCount} times in {song.shows.length} different shows 
+            ({((song.shows.length / showsCount) * 100).toFixed(1)}% of shows in range)
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="space-y-4 mt-2">
+          {/* Venues section */}
+          <div>
+            <h3 className="text-sm font-semibold mb-2">Venues</h3>
+            <div className="flex flex-wrap gap-2">
+              {song.venues && song.venues.map((venue, index) => (
+                <Badge key={index} variant="outline">
+                  {venue}
+                </Badge>
+              ))}
+            </div>
+          </div>
+          
+          {/* Show dates section */}
+          <div>
+            <h3 className="text-sm font-semibold mb-2">Show Dates</h3>
+            <ScrollArea className="h-60 rounded-md border p-4">
+              <div className="space-y-2">
+                {song.dates && song.dates.map((date, index) => (
+                  <div key={index} className="flex justify-between items-center">
+                    <span>{date}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 px-2"
+                      onClick={() => {
+                        // Open phish.net URL in a new tab
+                        if (song.showIds && song.showIds[index]) {
+                          const showId = song.showIds[index];
+                          window.open(`https://phish.net/setlists/?showid=${showId}`, '_blank');
+                        }
+                      }}
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      <span className="sr-only">View on phish.net</span>
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+          
+          <div className="py-2">
+            <p className="text-xs text-muted-foreground text-center">
+              Click the link icon next to a date to view the full show on phish.net
+            </p>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 export default function ShowSearch() {
   const [artist, setArtist] = useState<Artist>("all");
@@ -32,6 +110,8 @@ export default function ShowSearch() {
   const [hasSearched, setHasSearched] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>("shows");
+  const [selectedSong, setSelectedSong] = useState<SongStat | null>(null);
+  const [isSongDetailsOpen, setIsSongDetailsOpen] = useState(false);
 
   const handleSearch = async () => {
     if (!startDate) {
@@ -260,6 +340,16 @@ export default function ShowSearch() {
         </div>
       )}
 
+      {/* Song details dialog */}
+      {selectedSong && searchResults && (
+        <SongDetailsDialog
+          song={selectedSong}
+          showsCount={searchResults.shows.length}
+          isOpen={isSongDetailsOpen}
+          onOpenChange={setIsSongDetailsOpen}
+        />
+      )}
+
       {!isLoading && !isProcessingSetlists && searchResults && searchResults.shows.length > 0 && (
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2">
@@ -307,27 +397,100 @@ export default function ShowSearch() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                <div className="mb-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Songs by Play Count</h3>
+                    <div className="flex items-center space-x-2">
+                      <Badge variant="outline" className="px-3">
+                        {searchResults.totalSongs} Total Plays
+                      </Badge>
+                      <Badge variant="outline" className="px-3">
+                        {searchResults.uniqueSongs} Unique Songs
+                      </Badge>
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Songs played during shows in the selected date range
+                  </p>
+                </div>
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Song</TableHead>
-                      <TableHead className="w-[100px] text-right">Play Count</TableHead>
-                      <TableHead className="w-[180px] text-right">% of Shows</TableHead>
+                      <TableHead className="w-[80px] text-right">Plays</TableHead>
+                      <TableHead className="w-[140px] text-right">% of Shows</TableHead>
+                      <TableHead>Appearance Details</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {searchResults.songs.map((song) => (
-                      <TableRow key={song.name}>
-                        <TableCell className="font-medium">{song.name}</TableCell>
+                      <TableRow 
+                        key={song.name}
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => {
+                          setSelectedSong(song);
+                          setIsSongDetailsOpen(true);
+                        }}
+                      >
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-1">
+                            {song.name}
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-6 w-6 ml-1 opacity-50 hover:opacity-100"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedSong(song);
+                                setIsSongDetailsOpen(true);
+                              }}
+                            >
+                              <Info className="h-3.5 w-3.5" />
+                              <span className="sr-only">Details</span>
+                            </Button>
+                          </div>
+                        </TableCell>
                         <TableCell className="text-right">{song.playCount}</TableCell>
                         <TableCell className="text-right">
                           {((song.shows.length / searchResults.shows.length) * 100).toFixed(1)}%
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap gap-1 max-w-md">
+                            {song.venues && song.venues.length > 0 && (
+                              <Badge variant="outline" className="text-xs">
+                                {song.venues.length === 1 
+                                  ? song.venues[0] 
+                                  : `${song.venues.length} venues`}
+                              </Badge>
+                            )}
+                            
+                            {song.dates && song.dates.slice(0, 3).map((date, index) => (
+                              <Badge 
+                                key={index} 
+                                variant="secondary" 
+                                className="text-xs"
+                              >
+                                {date}
+                              </Badge>
+                            ))}
+                            
+                            {song.dates && song.dates.length > 3 && (
+                              <Badge variant="secondary" className="text-xs">
+                                +{song.dates.length - 3} more
+                              </Badge>
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
               </CardContent>
+              <CardFooter>
+                <p className="text-sm text-muted-foreground">
+                  Songs with multiple appearances are grouped by name and counted across all shows
+                </p>
+              </CardFooter>
             </Card>
           </TabsContent>
         </Tabs>
