@@ -4,6 +4,7 @@ export interface PhishShow {
   venue: string;
   location: string;
   rating: number;
+  setlist?: ApiSong[]; // Optional setlist data added by the random show endpoint
 }
 
 export interface PhishShowApiResponse {

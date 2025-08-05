@@ -1,22 +1,26 @@
 import React, { useState, useEffect } from "react";
-import { getRandomShow } from "@/lib/phish-api";
+import { getRandomShow } from "@/lib/phish-a      return guessDate < actualDate ? "📈 Within a year! Several months later." : "📉 Within a year! Several months earlier.";i";
 import { PhishShow } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { Slider } from "@/components/ui/slider";
 import { Loader2, Trophy, Calendar, MapPin, RefreshCw } from "lucide-react";
 
 interface GameState {
   currentShow: PhishShow | null;
-  guesses: string[];
+  guesses: number[]; // Store years instead of date strings
   hints: string[];
   gameOver: boolean;
   score: number | null;
   isLoading: boolean;
   error: string | null;
 }
+
+// Phish timeline constants
+const PHISH_START_YEAR = 1983;
+const PHISH_CURRENT_YEAR = new Date().getFullYear();
 
 export default function DateGuessGame() {
   const [gameState, setGameState] = useState<GameState>({
@@ -28,7 +32,7 @@ export default function DateGuessGame() {
     isLoading: false,
     error: null,
   });
-  const [currentGuess, setCurrentGuess] = useState("");
+  const [currentGuess, setCurrentGuess] = useState([1997]); // Default to middle of timeline
 
   const loadRandomShow = async () => {
     setGameState(prev => ({ 
@@ -62,10 +66,10 @@ export default function DateGuessGame() {
     loadRandomShow();
   }, []);
 
-  const calculateDaysDifference = (guess: string, actual: string): number => {
-    const guessDate = new Date(guess);
-    const actualDate = new Date(actual);
-    return Math.abs(Math.floor((guessDate.getTime() - actualDate.getTime()) / (1000 * 60 * 60 * 24)));
+  const calculateDaysDifference = (guessYear: number, actualDate: string): number => {
+    const actualDay = new Date(actualDate);
+    const guessDay = new Date(guessYear, 5, 15); // Use mid-year as approximation
+    return Math.abs(Math.floor((guessDay.getTime() - actualDay.getTime()) / (1000 * 60 * 60 * 24)));
   };
 
   const formatDate = (dateStr: string): string => {
@@ -80,13 +84,20 @@ export default function DateGuessGame() {
   const getHint = (guess: string, actual: string): string => {
     const guessDate = new Date(guess);
     const actualDate = new Date(actual);
+    const daysDiff = Math.abs(Math.floor((guessDate.getTime() - actualDate.getTime()) / (1000 * 60 * 60 * 24)));
     
     if (guessDate.getTime() === actualDate.getTime()) {
-      return "🎯 Exact match! Perfect!";
-    } else if (guessDate < actualDate) {
-      return "📈 Higher! The show was later than your guess.";
+      return "🎯 Exact date! Perfect!";
+    } else if (daysDiff <= 7) {
+      return guessDate < actualDate ? "📈 Very close! Just a few days later!" : "📉 Very close! Just a few days earlier!";
+    } else if (daysDiff <= 30) {
+      return guessDate < actualDate ? "📈 Close! About a month later." : "📉 Close! About a month earlier.";
+    } else if (daysDiff <= 90) {
+      return guessDate < actualDate ? "📈 Getting warmer! A few months later." : "📉 Getting warmer! A few months earlier.";
+    } else if (daysDiff <= 365) {
+      return guessDate < actualDate ? "� Within a year! Several months later." : "📉 Within a year! Several months earlier.";
     } else {
-      return "📉 Lower! The show was earlier than your guess.";
+      return guessDate < actualDate ? "📈 Much later! Keep going forward." : "📉 Much earlier! Keep going back.";
     }
   };
 
@@ -112,9 +123,9 @@ export default function DateGuessGame() {
     const newGuesses = [...gameState.guesses, guess];
     const newHints = [...gameState.hints, hint];
     
-    // Check if it's exact or if they've used both guesses
+    // Check if it's exact or if they've used all 5 guesses
     const isExact = daysDifference === 0;
-    const isGameOver = isExact || newGuesses.length >= 2;
+    const isGameOver = isExact || newGuesses.length >= 5;
     
     setGameState(prev => ({
       ...prev,
@@ -144,7 +155,7 @@ export default function DateGuessGame() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-6xl mx-auto space-y-6 px-4">
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="flex items-center justify-center gap-2 text-2xl">
@@ -191,10 +202,66 @@ export default function DateGuessGame() {
               )}
             </div>
 
+            {/* Setlist Display */}
+            {gameState.currentShow.setlist && gameState.currentShow.setlist.length > 0 && (
+              <div className="border rounded-lg p-4 bg-muted/30">
+                <h3 className="font-semibold mb-3 text-center">🎵 Setlist (Your Clue!)</h3>
+                <div className="overflow-x-auto overflow-y-hidden pb-2" style={{scrollbarWidth: 'thin'}}>
+                  {(() => {
+                    // Group songs by set
+                    const songsBySet = gameState.currentShow.setlist.reduce((acc: any, song: any) => {
+                      const setName = song.set || '1';
+                      if (!acc[setName]) acc[setName] = [];
+                      acc[setName].push(song);
+                      return acc;
+                    }, {});
+
+                    // Sort sets (Set 1, Set 2, Set 3, Encore, etc.)
+                    const setOrder = ['1', '2', '3', '4', 'E', 'E2', 'E3'];
+                    const sortedSets = Object.keys(songsBySet).sort((a, b) => {
+                      const aIndex = setOrder.indexOf(a);
+                      const bIndex = setOrder.indexOf(b);
+                      if (aIndex === -1 && bIndex === -1) return a.localeCompare(b);
+                      if (aIndex === -1) return 1;
+                      if (bIndex === -1) return -1;
+                      return aIndex - bIndex;
+                    });
+
+                    return (
+                      <div className="flex gap-6 min-w-fit pb-2">
+                        {sortedSets.map((setName) => (
+                          <div key={setName} className="flex-shrink-0 min-w-[240px] max-w-[300px]">
+                            <h4 className="font-medium text-sm mb-2 text-primary text-center border-b pb-1">
+                              {setName === 'E' ? 'Encore' : 
+                               setName === 'E2' ? 'Encore 2' :
+                               setName === 'E3' ? 'Encore 3' :
+                               `Set ${setName}`}
+                            </h4>
+                            <div className="space-y-1">
+                              {songsBySet[setName].map((song: any, index: number) => (
+                                <div key={index} className="text-sm">
+                                  <div className="font-medium">{song.song}</div>
+                                  {song.songnotes && (
+                                    <div className="text-xs text-muted-foreground italic">
+                                      {song.songnotes}
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            )}
+
             {!gameState.gameOver && (
               <div className="space-y-4">
                 <div className="text-center text-sm text-muted-foreground">
-                  Guess {gameState.guesses.length + 1} of 2
+                  Guess {gameState.guesses.length + 1} of 5
                 </div>
                 <div className="flex gap-2">
                   <Input
@@ -251,6 +318,62 @@ export default function DateGuessGame() {
                     {getScoreMessage(gameState.score!)}
                   </div>
                 </div>
+
+                {/* Show complete setlist when game is over */}
+                {gameState.currentShow.setlist && gameState.currentShow.setlist.length > 0 && (
+                  <div className="border rounded-lg p-4 bg-muted/30">
+                    <h3 className="font-semibold mb-3 text-center">🎵 Complete Setlist</h3>
+                    <div className="overflow-x-auto overflow-y-hidden pb-2" style={{scrollbarWidth: 'thin'}}>
+                      {(() => {
+                        // Group songs by set
+                        const songsBySet = gameState.currentShow.setlist.reduce((acc: any, song: any) => {
+                          const setName = song.set || '1';
+                          if (!acc[setName]) acc[setName] = [];
+                          acc[setName].push(song);
+                          return acc;
+                        }, {});
+
+                        // Sort sets (Set 1, Set 2, Set 3, Encore, etc.)
+                        const setOrder = ['1', '2', '3', '4', 'E', 'E2', 'E3'];
+                        const sortedSets = Object.keys(songsBySet).sort((a, b) => {
+                          const aIndex = setOrder.indexOf(a);
+                          const bIndex = setOrder.indexOf(b);
+                          if (aIndex === -1 && bIndex === -1) return a.localeCompare(b);
+                          if (aIndex === -1) return 1;
+                          if (bIndex === -1) return -1;
+                          return aIndex - bIndex;
+                        });
+
+                        return (
+                          <div className="flex gap-6 min-w-fit pb-2">
+                            {sortedSets.map((setName) => (
+                              <div key={setName} className="flex-shrink-0 min-w-[240px] max-w-[300px]">
+                                <h4 className="font-medium text-sm mb-2 text-primary text-center border-b pb-1">
+                                  {setName === 'E' ? 'Encore' : 
+                                   setName === 'E2' ? 'Encore 2' :
+                                   setName === 'E3' ? 'Encore 3' :
+                                   `Set ${setName}`}
+                                </h4>
+                                <div className="space-y-1">
+                                  {songsBySet[setName].map((song: any, index: number) => (
+                                    <div key={index} className="text-sm">
+                                      <div className="font-medium">{song.song}</div>
+                                      {song.songnotes && (
+                                        <div className="text-xs text-muted-foreground italic">
+                                          {song.songnotes}
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                )}
                 <div className="flex justify-center">
                   <Button onClick={loadRandomShow} className="gap-2">
                     <RefreshCw className="h-4 w-4" />
