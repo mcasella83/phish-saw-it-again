@@ -240,11 +240,13 @@ const DateGuessGame: React.FC = () => {
       </div>
 
       {/* Game Progress */}
-      <div className="text-center">
-        <Badge variant="outline" className="text-sm">
-          Guess {gameState.guesses.length + 1} of {maxGuesses}
-        </Badge>
-      </div>
+      {!gameState.gameOver && (
+        <div className="text-center">
+          <Badge variant="outline" className="text-sm">
+            Guess {gameState.guesses.length + 1} of {maxGuesses}
+          </Badge>
+        </div>
+      )}
 
       {/* Setlist Display */}
       <Card>
