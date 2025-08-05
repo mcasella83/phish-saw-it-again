@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { VenueStats } from "@/lib/phish-processing";
+import VenuesMap from "@/components/VenuesMap";
 import {
   Table,
   TableBody,
@@ -30,8 +31,12 @@ export default function MyVenues({ venues }: MyVenuesProps) {
   }
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-semibold">My Venues ({venues.length})</h2>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-xl font-semibold mb-4">My Venues ({venues.length})</h2>
+        <VenuesMap venues={venues} />
+      </div>
+      
       <div className="rounded-md border">
         <Table>
           <TableHeader>

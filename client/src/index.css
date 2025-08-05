@@ -11,3 +11,15 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 }
+
+/* Leaflet map styles */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+}
+
+/* Custom venue marker styles */
+.custom-venue-marker {
+  background: transparent !important;
+  border: none !important;
+}

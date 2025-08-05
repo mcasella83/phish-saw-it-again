@@ -22,6 +22,11 @@ export function registerRoutes(app: Express) {
   app.get("/api/phish/shows", async (req, res) => {
     try {
       const apiKey = process.env.PHISH_NET_API_KEY;
+
+      // log env variable for debugging
+      console.log("PHISH_NET_API_KEY:", apiKey);
+      
+
       if (!apiKey) {
         throw new Error("API key not configured");
       }
