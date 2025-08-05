@@ -3,6 +3,11 @@ export interface PhishShow {
   showdate: string;
   venue: string;
   location: string;
+  city: string;
+  state: string;
+  country: string;
+  tour_name: string;
+  setlist_notes: string;
   rating: number;
   setlist?: ApiSong[]; // Optional setlist data added by the random show endpoint
 }
