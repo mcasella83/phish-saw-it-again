@@ -254,6 +254,42 @@ export function registerRoutes(app: Express) {
     }
   });
 
+  app.get("/api/phish/all-show-dates", async (req, res) => {
+    try {
+      const apiKey = process.env.PHISH_NET_API_KEY;
+      if (!apiKey) {
+        throw new Error("API key not configured");
+      }
+
+      // Get all Phish shows (uses cache if available)
+      const allShows = await getAllPhishShows(apiKey);
+      
+      if (!allShows || allShows.length === 0) {
+        throw new Error("No shows available");
+      }
+      
+      // Extract just the showdates and sort them chronologically
+      const showDates = allShows
+        .map((show: any) => show.showdate)
+        .filter((date: string) => date) // Remove any null/undefined dates
+        .sort((a: string, b: string) => a.localeCompare(b)); // Sort chronologically
+      
+      console.log(`Returning ${showDates.length} show dates`);
+      
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.json({
+        showDates: showDates
+      });
+      
+    } catch (error) {
+      console.error("All show dates API error:", error);
+      res.status(500).json({
+        message: "Failed to fetch all show dates",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  });
+
   app.get("/api/phish/refresh-shows-cache", async (req, res) => {
     try {
       const apiKey = process.env.PHISH_NET_API_KEY;

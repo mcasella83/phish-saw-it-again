@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { getRandomShow } from "@/lib/phish-a      return guessDate < actualDate ? "📈 Within a year! Several months later." : "📉 Within a year! Several months earlier.";i";
+import { getRandomShow, getAllShowDates } from "@/lib/phish-api";
 import { PhishShow } from "@/lib/types";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -10,12 +11,13 @@ import { Loader2, Trophy, Calendar, MapPin, RefreshCw } from "lucide-react";
 
 interface GameState {
   currentShow: PhishShow | null;
-  guesses: number[]; // Store years instead of date strings
+  guesses: string[]; // Store date strings
   hints: string[];
   gameOver: boolean;
   score: number | null;
   isLoading: boolean;
   error: string | null;
+  allShowDates?: string[]; // Available show dates for slider
 }
 
 // Phish timeline constants
@@ -31,8 +33,10 @@ export default function DateGuessGame() {
     score: null,
     isLoading: false,
     error: null,
+    allShowDates: [],
   });
-  const [currentGuess, setCurrentGuess] = useState([1997]); // Default to middle of timeline
+  const [currentGuess, setCurrentGuess] = useState([0]); // Index in allShowDates array
+  const [allShowDates, setAllShowDates] = useState<string[]>([]);
 
   const loadRandomShow = async () => {
     setGameState(prev => ({ 
@@ -62,14 +66,32 @@ export default function DateGuessGame() {
     }
   };
 
+  const loadAllShowDates = async () => {
+    try {
+      console.log("Loading all show dates...");
+      const dates = await getAllShowDates();
+      console.log(`Loaded ${dates.length} show dates`);
+      setAllShowDates(dates);
+      // Set initial guess to middle of timeline
+      setCurrentGuess([Math.floor(dates.length / 2)]);
+    } catch (error) {
+      console.error("Failed to load show dates:", error);
+      setGameState(prev => ({ 
+        ...prev, 
+        error: "Failed to load show dates. Please try refreshing the page." 
+      }));
+    }
+  };
+
   useEffect(() => {
+    loadAllShowDates();
     loadRandomShow();
   }, []);
 
-  const calculateDaysDifference = (guessYear: number, actualDate: string): number => {
-    const actualDay = new Date(actualDate);
-    const guessDay = new Date(guessYear, 5, 15); // Use mid-year as approximation
-    return Math.abs(Math.floor((guessDay.getTime() - actualDay.getTime()) / (1000 * 60 * 60 * 24)));
+  const calculateDaysDifference = (guessDate: string, actualDate: string): number => {
+    const guess = new Date(guessDate);
+    const actual = new Date(actualDate);
+    return Math.abs(Math.floor((guess.getTime() - actual.getTime()) / (1000 * 60 * 60 * 24)));
   };
 
   const formatDate = (dateStr: string): string => {
@@ -102,25 +124,24 @@ export default function DateGuessGame() {
   };
 
   const submitGuess = () => {
-    if (!currentGuess || !gameState.currentShow) return;
+    if (currentGuess.length === 0 || !gameState.currentShow || allShowDates.length === 0) return;
 
-    const guess = currentGuess.trim();
-    const guessDate = new Date(guess);
+    const guessIndex = currentGuess[0];
+    const guessDate = allShowDates[guessIndex];
     
-    // Validate date format
-    if (isNaN(guessDate.getTime())) {
+    if (!guessDate) {
       setGameState(prev => ({ 
         ...prev, 
-        error: "Please enter a valid date (YYYY-MM-DD format)" 
+        error: "Invalid date selection" 
       }));
       return;
     }
 
     const actualDate = gameState.currentShow.showdate;
-    const daysDifference = calculateDaysDifference(guess, actualDate);
-    const hint = getHint(guess, actualDate);
+    const daysDifference = calculateDaysDifference(guessDate, actualDate);
+    const hint = getHint(guessDate, actualDate);
     
-    const newGuesses = [...gameState.guesses, guess];
+    const newGuesses = [...gameState.guesses, guessDate];
     const newHints = [...gameState.hints, hint];
     
     // Check if it's exact or if they've used all 5 guesses
@@ -136,7 +157,7 @@ export default function DateGuessGame() {
       error: null
     }));
     
-    setCurrentGuess("");
+    // Don't reset currentGuess to preserve slider position
   };
 
   const getScoreMessage = (score: number): string => {
@@ -148,12 +169,6 @@ export default function DateGuessGame() {
     return "🗓️ Keep practicing!";
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      submitGuess();
-    }
-  };
-
   return (
     <div className="max-w-6xl mx-auto space-y-6 px-4">
       <Card>
@@ -163,7 +178,7 @@ export default function DateGuessGame() {
             Phish Date Guessing Game
           </CardTitle>
           <CardDescription>
-            Can you guess when this show happened? You get 2 guesses and hints along the way!
+            Can you guess when this show happened? Use the slider to select from actual Phish show dates. You get 5 guesses and hints along the way!
           </CardDescription>
         </CardHeader>
       </Card>
@@ -263,22 +278,40 @@ export default function DateGuessGame() {
                 <div className="text-center text-sm text-muted-foreground">
                   Guess {gameState.guesses.length + 1} of 5
                 </div>
-                <div className="flex gap-2">
-                  <Input
-                    type="date"
-                    value={currentGuess}
-                    onChange={(e) => setCurrentGuess(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="YYYY-MM-DD"
-                    className="flex-1"
-                  />
-                  <Button 
-                    onClick={submitGuess}
-                    disabled={!currentGuess.trim()}
-                  >
-                    Guess
-                  </Button>
-                </div>
+                {allShowDates.length === 0 ? (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    <span className="text-sm text-muted-foreground">Loading show dates...</span>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="text-center text-sm font-medium">
+                        Selected Date: {allShowDates[currentGuess[0]] ? formatDate(allShowDates[currentGuess[0]]) : "Loading..."}
+                      </div>
+                      <Slider
+                        value={currentGuess}
+                        onValueChange={setCurrentGuess}
+                        max={allShowDates.length - 1}
+                        min={0}
+                        step={1}
+                        className="w-full"
+                      />
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>{allShowDates[0] ? formatDate(allShowDates[0]) : ""}</span>
+                        <span>{allShowDates[allShowDates.length - 1] ? formatDate(allShowDates[allShowDates.length - 1]) : ""}</span>
+                      </div>
+                    </div>
+                    <div className="flex justify-center">
+                      <Button 
+                        onClick={submitGuess}
+                        disabled={allShowDates.length === 0}
+                      >
+                        Guess
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

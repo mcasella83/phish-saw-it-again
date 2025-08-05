@@ -115,3 +115,25 @@ export async function getRandomShow(): Promise<PhishShow> {
 
   return data.data[0];
 }
+
+export async function getAllShowDates(): Promise<string[]> {
+  console.log("Making API request for all show dates");
+  const response = await fetch(`/api/phish/all-show-dates`, {
+    headers: {
+      Accept: "application/json; charset=utf-8",
+      "Content-Type": "application/json; charset=utf-8",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch all show dates");
+  }
+  const data = await response.json();
+  console.log("All show dates API response:", data);
+
+  if (!data.showDates || !Array.isArray(data.showDates)) {
+    throw new Error("Invalid show dates response");
+  }
+
+  return data.showDates;
+}
