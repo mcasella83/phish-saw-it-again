@@ -131,20 +131,20 @@ const DateGuessGame: React.FC = () => {
 
     if (diffDays > 0) {
       if (diffDays > 365) {
-        return `Too late! Try ${Math.floor(diffDays / 365)} year(s) earlier.`;
+        return `Too late! Try going back several years.`;
       } else if (diffDays > 30) {
-        return `Too late! Try ${Math.floor(diffDays / 30)} month(s) earlier.`;
+        return `Too late! Try going back further.`;
       } else {
-        return `Too late! Try ${diffDays} day(s) earlier.`;
+        return `Too late! Try a bit earlier.`;
       }
     } else {
       const absDiffDays = Math.abs(diffDays);
       if (absDiffDays > 365) {
-        return `Too early! Try ${Math.floor(absDiffDays / 365)} year(s) later.`;
+        return `Too early! Try going forward several years.`;
       } else if (absDiffDays > 30) {
-        return `Too early! Try ${Math.floor(absDiffDays / 30)} month(s) later.`;
+        return `Too early! Try going forward more.`;
       } else {
-        return `Too early! Try ${absDiffDays} day(s) later.`;
+        return `Too early! Try a bit later.`;
       }
     }
   };
