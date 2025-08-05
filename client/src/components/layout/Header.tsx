@@ -83,7 +83,7 @@ export default function Header({
                   }`}
                   onClick={() => onTabChange?.("game")}
                 >
-                  Date Game
+                 Guess the Show
                 </button>
               </NavigationMenuItem>
             </NavigationMenuList>
