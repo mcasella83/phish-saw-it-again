@@ -11,7 +11,7 @@ import { Loader2, Trophy, Calendar, MapPin, RefreshCw } from "lucide-react";
 
 interface GameState {
   currentShow: PhishShow | null;
-  guesses: string[]; // Store date strings
+  guesses: string[];
   hints: string[];
   gameOver: boolean;
   score: number | null;
@@ -233,7 +233,7 @@ const DateGuessGame: React.FC = () => {
   return (
     <div className="container mx-auto p-6 max-w-4xl space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold">🎭 Phish Date Guessing Game</h1>
+        <h1 className="text-3xl font-bold">🎯 Guess the Show</h1>
         <p className="text-muted-foreground">
           Can you guess the date of this show from the setlist? You have {maxGuesses} tries!
         </p>
@@ -380,16 +380,37 @@ const DateGuessGame: React.FC = () => {
       {gameState.guesses.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Your Guesses</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5" />
+              Your Guesses
+              <Badge variant="outline" className="ml-auto">
+                {gameState.guesses.length}/{maxGuesses}
+              </Badge>
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {gameState.guesses.map((guess, index) => (
-                <div key={index} className="flex items-center justify-between p-2 bg-muted/30 rounded">
-                  <span className="font-mono">{formatDate(guess)}</span>
-                  {index < gameState.hints.length && (
-                    <span className="text-sm text-muted-foreground">{gameState.hints[index]}</span>
-                  )}
+                <div 
+                  key={index} 
+                  className="flex items-center justify-between p-4 bg-gradient-to-r from-muted/40 to-muted/20 rounded-lg border border-muted/50 hover:border-muted transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold text-sm">
+                      {index + 1}
+                    </div>
+                    <div className="space-y-1">
+                      <div className="font-mono font-medium">{formatDate(guess)}</div>
+                      {index < gameState.hints.length && (
+                        <div className="text-sm text-muted-foreground italic">
+                          💡 {gameState.hints[index]}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-red-500 font-semibold">
+                    ❌
+                  </div>
                 </div>
               ))}
             </div>
