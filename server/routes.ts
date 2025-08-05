@@ -133,5 +133,68 @@ export function registerRoutes(app: Express) {
     }
   });
 
+  app.get("/api/phish/random-show", async (req, res) => {
+    try {
+      const apiKey = process.env.PHISH_NET_API_KEY;
+      if (!apiKey) {
+        throw new Error("API key not configured");
+      }
+
+      // Get random shows by fetching a year range and picking randomly
+      // Phish played from 1983 to present, let's pick a random year and then a random show from that year
+      const currentYear = new Date().getFullYear();
+      const startYear = 1983;
+      const randomYear = Math.floor(Math.random() * (currentYear - startYear + 1)) + startYear;
+      
+      const apiUrl = `https://api.phish.net/v5/shows/query.json?apikey=${apiKey}&year=${randomYear}`;
+      console.log("Fetching shows for random year from Phish.net API:", apiUrl);
+      
+      const response = await fetch(apiUrl, {
+        headers: {
+          'Accept': 'application/json; charset=utf-8',
+          'Content-Type': 'application/json; charset=utf-8'
+        }
+      });
+
+      if (!response.ok) {
+        console.error(
+          "Phish.net API error:",
+          response.status,
+          response.statusText,
+        );
+        throw new Error("Failed to fetch from Phish.net API");
+      }
+
+      const data = await response.json();
+      
+      if (data.error || !data.data || data.data.length === 0) {
+        // If no shows found for that year, try another approach
+        throw new Error("No shows found for selected year");
+      }
+      
+      // Pick a random show from the year
+      const randomShow = data.data[Math.floor(Math.random() * data.data.length)];
+      
+      console.log(
+        "Successfully fetched random show:",
+        randomShow.showdate,
+        randomShow.venue
+      );
+
+      // Return in the same format as the other endpoints
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.json({
+        error: false,
+        data: [randomShow]
+      });
+    } catch (error) {
+      console.error("Phish.net API error:", error);
+      res.status(500).json({
+        message: "Failed to fetch random show from Phish.net",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  });
+
   return createServer(app);
 }

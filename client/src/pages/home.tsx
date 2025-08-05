@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import MyShows from "./MyShows";
 import MySongs from "./MySongs";
 import MyVenues from "./MyVenues";
+import DateGuessGame from "./DateGuessGame";
 import { PhishShowSetlist } from "@/lib/types";
 import { LoadingModal } from "@/components/ui/LoadingModal";
 import {
@@ -158,6 +159,8 @@ export default function HomePage({ initialTab = "shows", onTabChange }: HomePage
         return <MySongs songs={songStats} />;
       case "venues":
         return <MyVenues venues={venueStats} />;
+      case "game":
+        return <DateGuessGame />;
       default:
         return null;
     }
