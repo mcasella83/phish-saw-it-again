@@ -59,10 +59,10 @@ export function registerRoutes(app: Express) {
         const startDateObj = new Date(startDate);
         const endDateObj = new Date(endDate);
         
-        // Ensure all shows are within the date range
+        // Ensure all shows are within the date range and not excluded from stats
         data.data = data.data.filter((show: any) => {
           const showDate = new Date(show.showdate);
-          return showDate >= startDateObj && showDate <= endDateObj;
+          return showDate >= startDateObj && showDate <= endDateObj && !show.exclude_from_stats;
         });
         
         // Additional artist filtering if the API doesn't handle it well
