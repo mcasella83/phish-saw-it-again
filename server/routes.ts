@@ -128,6 +128,11 @@ export function registerRoutes(app: Express) {
       }
 
       const data = await response.json();
+
+      if (data.data) {
+        data.data = data.data.filter((show: any) => !show.exclude_from_stats);
+      }
+
       console.log(
         "Successfully fetched shows:",
         data.error === false,
