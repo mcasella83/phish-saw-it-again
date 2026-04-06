@@ -1,6 +1,10 @@
 import { PhishShowSetlist } from "./types";
 import { SongStats, VenueStats } from "./phish-processing";
 
+// Bump this version any time the data shape or filtering logic changes.
+// It forces all existing local caches to be discarded.
+const CACHE_VERSION = "2";
+
 // Cache keys
 const CACHE_KEYS = {
   USERNAME: "phish-explorer-username",
@@ -8,6 +12,7 @@ const CACHE_KEYS = {
   SONGS: "phish-explorer-songs",
   VENUES: "phish-explorer-venues",
   CACHE_TIMESTAMP: "phish-explorer-cache-timestamp",
+  CACHE_VERSION: "phish-explorer-cache-version",
 } as const;
 
 // Cache will expire after 90 days
@@ -20,6 +25,9 @@ interface CacheData {
 }
 
 function isCacheValid(): boolean {
+  const version = localStorage.getItem(CACHE_KEYS.CACHE_VERSION);
+  if (version !== CACHE_VERSION) return false;
+
   const timestamp = localStorage.getItem(CACHE_KEYS.CACHE_TIMESTAMP);
   if (!timestamp) return false;
 
@@ -35,6 +43,7 @@ export function clearShowsCache(): void {
   localStorage.removeItem(CACHE_KEYS.SONGS);
   localStorage.removeItem(CACHE_KEYS.VENUES);
   localStorage.removeItem(CACHE_KEYS.CACHE_TIMESTAMP);
+  localStorage.removeItem(CACHE_KEYS.CACHE_VERSION);
 }
 
 export function saveShowsToCache(data: CacheData): void {
@@ -43,6 +52,7 @@ export function saveShowsToCache(data: CacheData): void {
     localStorage.setItem(CACHE_KEYS.SONGS, JSON.stringify(data.songs));
     localStorage.setItem(CACHE_KEYS.VENUES, JSON.stringify(data.venues));
     localStorage.setItem(CACHE_KEYS.CACHE_TIMESTAMP, Date.now().toString());
+    localStorage.setItem(CACHE_KEYS.CACHE_VERSION, CACHE_VERSION);
   } catch (error) {
     console.error("Failed to save data to cache:", error);
     // If saving fails (e.g., due to quota), clear the cache to prevent inconsistent state
