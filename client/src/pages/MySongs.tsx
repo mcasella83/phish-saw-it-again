@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react";
+import { ChevronDown, ChevronUp, ChevronsUpDown, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Table,
@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
 import { SongStats } from "@/lib/phish-processing";
 
 type SortColumn = "name" | "playCount" | "firstSeen" | "lastSeen";
@@ -29,6 +30,7 @@ export default function MySongs({ songs }: MySongsProps) {
   const [expandedSongs, setExpandedSongs] = useState<Record<string, boolean>>({});
   const [sortColumn, setSortColumn] = useState<SortColumn>("playCount");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [search, setSearch] = useState("");
 
   const handleSort = (column: SortColumn) => {
     if (sortColumn === column) {
@@ -41,7 +43,10 @@ export default function MySongs({ songs }: MySongsProps) {
 
   const sortedSongs = useMemo(() => {
     if (!songs) return [];
-    return [...songs].sort((a, b) => {
+    const filtered = search.trim()
+      ? songs.filter((s) => s.name.toLowerCase().includes(search.toLowerCase()))
+      : songs;
+    return [...filtered].sort((a, b) => {
       let cmp = 0;
       if (sortColumn === "name") {
         cmp = a.name.localeCompare(b.name);
@@ -73,7 +78,18 @@ export default function MySongs({ songs }: MySongsProps) {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">My Songs ({songs.length})</h2>
+      <div className="flex items-center justify-between gap-4">
+        <h2 className="text-xl font-semibold">My Songs ({sortedSongs.length}{search.trim() ? ` of ${songs.length}` : ""})</h2>
+        <div className="relative w-64">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search songs..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-8"
+          />
+        </div>
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
