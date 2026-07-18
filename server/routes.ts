@@ -192,14 +192,20 @@ export function registerRoutes(app: Express) {
 
       const data = await response.json();
 
-      // Decode special characters in setlist notes
+      // Decode special characters in setlist notes (safely — some older notes contain
+      // characters that cause decodeURIComponent/escape to throw a URIError)
       if (data.data) {
-        data.data = data.data.map((item: any) => ({
-          ...item,
-          setlistnotes: item.setlistnotes
-            ? decodeURIComponent(escape(item.setlistnotes))
-            : item.setlistnotes,
-        }));
+        data.data = data.data.map((item: any) => {
+          let notes = item.setlistnotes;
+          if (notes) {
+            try {
+              notes = decodeURIComponent(escape(notes));
+            } catch {
+              // Leave notes as-is if decoding fails
+            }
+          }
+          return { ...item, setlistnotes: notes };
+        });
       }
 
       console.log(
