@@ -3,7 +3,7 @@ import { SongStats, VenueStats } from "./phish-processing";
 
 // Bump this version any time the data shape or filtering logic changes.
 // It forces all existing local caches to be discarded.
-const CACHE_VERSION = "3";
+const CACHE_VERSION = "4";
 
 // Cache keys
 const CACHE_KEYS = {

@@ -88,8 +88,23 @@ export function getVenueStatsFromSetlists(
     }
   >();
 
+  // Venues that are iconic enough to get their own entry instead of being
+  // collapsed into the city bucket.
+  const STANDALONE_VENUES = [
+    "Madison Square Garden",
+  ];
+
+  const getVenueKey = (setlist: PhishShowSetlist): string => {
+    const isStandalone = STANDALONE_VENUES.some((v) =>
+      setlist.venue.toLowerCase().includes(v.toLowerCase())
+    );
+    return isStandalone
+      ? `venue::${setlist.venue}`
+      : `${setlist.city}-${setlist.state}--${setlist.country}`;
+  };
+
   setlists.forEach((setlist) => {
-    const venueKey = `${setlist.city}-${setlist.state}--${setlist.country}`;
+    const venueKey = getVenueKey(setlist);
     const existingEntry = venueMap.get(venueKey);
     if (existingEntry) {
       existingEntry.count++;
