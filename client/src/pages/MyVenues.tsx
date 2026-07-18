@@ -39,13 +39,30 @@ export default function MyVenues({ venues }: MyVenuesProps) {
   const totalShows = venues.reduce((acc, venue) => acc + venue.showCount, 0);
 
   const venueData = useMemo(() => {
-    return venues.map((venue, index) => ({
-      name: venue.name,
-      value: venue.showCount,
-      percentage: (venue.showCount / totalShows) * 100,
-      color: `hsl(${(index * 137.5) % 360}, 70%, 50%)`,
-    }));
+    return venues.map((venue, index) => {
+      const locationParts = [venue.city, venue.state, venue.country].filter(Boolean);
+      return {
+        name: venue.names[0] ?? venue.city,
+        venueName: venue.names[0] ?? venue.city,
+        location: locationParts.join(", "),
+        value: venue.showCount,
+        percentage: (venue.showCount / totalShows) * 100,
+        color: `hsl(${(index * 137.5) % 360}, 70%, 50%)`,
+      };
+    });
   }, [venues, totalShows]);
+
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (!active || !payload?.length) return null;
+    const d = payload[0].payload;
+    return (
+      <div className="rounded-md border bg-popover px-3 py-2 shadow-md text-sm">
+        <p className="font-semibold">{d.venueName}</p>
+        <p className="text-muted-foreground text-xs mb-1">{d.location}</p>
+        <p>{d.value} shows ({d.percentage.toFixed(1)}%)</p>
+      </div>
+    );
+  };
 
   const isMobile = useIsMobile();
   const renderCustomizedLabel = ({
@@ -135,12 +152,7 @@ export default function MyVenues({ venues }: MyVenuesProps) {
             <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Tooltip
-                    formatter={(value, name) => [
-                      `${value} shows (${(((value as number) / totalShows) * 100).toFixed(1)}%)`,
-                      name,
-                    ]}
-                  />
+                  <Tooltip content={<CustomTooltip />} />
                   <Pie
                     data={venueData}
                     dataKey="value"
