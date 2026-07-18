@@ -61,7 +61,7 @@ export default function MySongs({ songs }: MySongsProps) {
       }
       return sortDirection === "asc" ? cmp : -cmp;
     });
-  }, [songs, sortColumn, sortDirection]);
+  }, [songs, sortColumn, sortDirection, search]);
 
   if (!songs || songs.length === 0) {
     return (
