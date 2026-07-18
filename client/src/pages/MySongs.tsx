@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import React, { useState, useMemo } from "react";
+import { ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Table,
@@ -11,14 +11,52 @@ import {
 } from "@/components/ui/table";
 import { SongStats } from "@/lib/phish-processing";
 
+type SortColumn = "name" | "playCount" | "firstSeen" | "lastSeen";
+type SortDirection = "asc" | "desc";
+
 interface MySongsProps {
   songs: SongStats[] | null;
 }
 
+function SortIcon({ column, sortColumn, sortDirection }: { column: SortColumn; sortColumn: SortColumn; sortDirection: SortDirection }) {
+  if (sortColumn !== column) return <ChevronsUpDown className="inline-block ml-1 h-3.5 w-3.5 opacity-40" />;
+  return sortDirection === "asc"
+    ? <ChevronUp className="inline-block ml-1 h-3.5 w-3.5" />
+    : <ChevronDown className="inline-block ml-1 h-3.5 w-3.5" />;
+}
+
 export default function MySongs({ songs }: MySongsProps) {
-  const [expandedSongs, setExpandedSongs] = useState<Record<string, boolean>>(
-    {},
-  );
+  const [expandedSongs, setExpandedSongs] = useState<Record<string, boolean>>({});
+  const [sortColumn, setSortColumn] = useState<SortColumn>("playCount");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+
+  const handleSort = (column: SortColumn) => {
+    if (sortColumn === column) {
+      setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortColumn(column);
+      setSortDirection(column === "name" ? "asc" : "desc");
+    }
+  };
+
+  const sortedSongs = useMemo(() => {
+    if (!songs) return [];
+    return [...songs].sort((a, b) => {
+      let cmp = 0;
+      if (sortColumn === "name") {
+        cmp = a.name.localeCompare(b.name);
+      } else if (sortColumn === "playCount") {
+        cmp = a.playCount - b.playCount;
+      } else if (sortColumn === "firstSeen") {
+        cmp = (a.occurrences[0] ?? "").localeCompare(b.occurrences[0] ?? "");
+      } else if (sortColumn === "lastSeen") {
+        const aLast = a.occurrences[a.occurrences.length - 1] ?? "";
+        const bLast = b.occurrences[b.occurrences.length - 1] ?? "";
+        cmp = aLast.localeCompare(bLast);
+      }
+      return sortDirection === "asc" ? cmp : -cmp;
+    });
+  }, [songs, sortColumn, sortDirection]);
 
   if (!songs || songs.length === 0) {
     return (
@@ -31,6 +69,8 @@ export default function MySongs({ songs }: MySongsProps) {
     );
   }
 
+  const headerClass = "cursor-pointer select-none hover:text-foreground whitespace-nowrap";
+
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">My Songs ({songs.length})</h2>
@@ -38,15 +78,23 @@ export default function MySongs({ songs }: MySongsProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="min-w-[200px]">Song Name</TableHead>
-              <TableHead className="w-24 text-right">Times</TableHead>
-              <TableHead className="hidden md:table-cell">First Seen</TableHead>
-              <TableHead className="hidden md:table-cell">Last Seen</TableHead>
+              <TableHead className={cn("min-w-[200px]", headerClass)} onClick={() => handleSort("name")}>
+                Song Name <SortIcon column="name" sortColumn={sortColumn} sortDirection={sortDirection} />
+              </TableHead>
+              <TableHead className={cn("w-24 text-right", headerClass)} onClick={() => handleSort("playCount")}>
+                Times <SortIcon column="playCount" sortColumn={sortColumn} sortDirection={sortDirection} />
+              </TableHead>
+              <TableHead className={cn("hidden md:table-cell", headerClass)} onClick={() => handleSort("firstSeen")}>
+                First Seen <SortIcon column="firstSeen" sortColumn={sortColumn} sortDirection={sortDirection} />
+              </TableHead>
+              <TableHead className={cn("hidden md:table-cell", headerClass)} onClick={() => handleSort("lastSeen")}>
+                Last Seen <SortIcon column="lastSeen" sortColumn={sortColumn} sortDirection={sortDirection} />
+              </TableHead>
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {songs.map((song) => {
+            {sortedSongs.map((song) => {
               const isExpanded = expandedSongs[song.name] || false;
 
               return (
