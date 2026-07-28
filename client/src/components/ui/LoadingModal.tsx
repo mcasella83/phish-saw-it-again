@@ -22,7 +22,9 @@ export function LoadingModal({
         <DialogTitle>Loading Shows</DialogTitle>
         <div className="grid gap-4 py-4 place-items-center">
           <div className="text-xl font-semibold">
-            Processing show {current} out of {total}
+            {total === 0
+              ? "Fetching your show list…"
+              : `Processing show ${current} out of ${total}`}
           </div>
           {currentShowDate && currentShowVenue && (
             <div className="text-sm text-muted-foreground text-center">
@@ -33,7 +35,7 @@ export function LoadingModal({
           <div className="w-full bg-secondary rounded-full h-2.5">
             <div 
               className="bg-primary h-2.5 rounded-full transition-all duration-200" 
-              style={{ width: `${(current / total) * 100}%` }}
+              style={{ width: total === 0 ? 0 : `${(current / total) * 100}%` }}
             />
           </div>
         </div>

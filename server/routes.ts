@@ -155,6 +155,9 @@ export function registerRoutes(app: Express) {
           response.status,
           response.statusText,
         );
+        if (response.status === 429) {
+          throw new Error("Phish.net is rate-limiting requests. Please wait a minute and try again.");
+        }
         throw new Error("Failed to fetch from Phish.net API");
       }
 
