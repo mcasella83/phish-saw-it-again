@@ -40,6 +40,9 @@ export default function UserForm({ onSubmit }: UserFormProps) {
                   autoComplete="off"
                 />
               </FormControl>
+              <p className="text-xs text-muted-foreground">
+                ⚠️ Username is case-sensitive — use the exact capitalisation from your phish.net profile.
+              </p>
               <FormMessage />
             </FormItem>
           )}
