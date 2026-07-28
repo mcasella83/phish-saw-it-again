@@ -4,6 +4,34 @@ import { storage } from "./storage";
 import { userSchema } from "@shared/schema";
 import { logUserLogin } from "./db";
 
+/**
+ * Fetch with automatic retry on 429 Too Many Requests.
+ * Waits for the delay indicated by the Retry-After header, or falls back to
+ * exponential backoff (1 s, 2 s, 4 s …) for up to `maxRetries` attempts.
+ */
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit = {},
+  maxRetries = 3,
+): Promise<Response> {
+  let attempt = 0;
+  while (true) {
+    const response = await fetch(url, options);
+    if (response.status !== 429 || attempt >= maxRetries) {
+      return response;
+    }
+    const retryAfter = response.headers.get("Retry-After");
+    const waitMs = retryAfter
+      ? parseFloat(retryAfter) * 1000
+      : Math.pow(2, attempt) * 1000;
+    console.warn(
+      `Phish.net rate-limited (429). Retrying in ${waitMs}ms (attempt ${attempt + 1}/${maxRetries})`,
+    );
+    await new Promise((resolve) => setTimeout(resolve, waitMs));
+    attempt++;
+  }
+}
+
 export function registerRoutes(app: Express) {
   app.get("/api/phish/search", async (req, res) => {
     try {
@@ -36,7 +64,7 @@ export function registerRoutes(app: Express) {
       }
       
       console.log("Fetching shows from Phish.net API:", apiUrl);
-      const response = await fetch(apiUrl, {
+      const response = await fetchWithRetry(apiUrl, {
         headers: {
           Accept: "application/json; charset=utf-8",
           "Content-Type": "application/json; charset=utf-8",
@@ -111,7 +139,7 @@ export function registerRoutes(app: Express) {
 
       const apiUrl = `https://api.phish.net/v5/attendance/username/${username}.json?apikey=${apiKey}&order_by=showdate`;
       console.log("Fetching shows from Phish.net API:", apiUrl);
-      const response = await fetch(apiUrl, {
+      const response = await fetchWithRetry(apiUrl, {
         headers: {
           Accept: "application/json; charset=utf-8",
           "Content-Type": "application/json; charset=utf-8",
@@ -174,7 +202,7 @@ export function registerRoutes(app: Express) {
         `setlists/setlistid/${showId}.json` +
         `?apikey=${apiKey}&order_by=showdate`;
       console.log("Fetching shows from Phish.net API:", apiUrl);
-      const response = await fetch(apiUrl, {
+      const response = await fetchWithRetry(apiUrl, {
         headers: {
           Accept: "application/json; charset=utf-8",
           "Content-Type": "application/json; charset=utf-8",
