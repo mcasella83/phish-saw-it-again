@@ -163,21 +163,28 @@ export async function processShowsData(
   const totalShows = shows.length;
   let completedShows = 0;
 
-  const showPromises = shows.map(async (show) => {
-    try {
-      const setlist = await getShowSetList(show.showid);
-      completedShows++;
-      onProgress?.(completedShows, totalShows, show);
-      return setlist;
-    } catch (error) {
-      console.error(`Failed to fetch setlist for show ${show.showid}:`, error);
-      completedShows++;
-      onProgress?.(completedShows, totalShows, show);
-      return null;
-    }
-  });
-
-  const results = await Promise.all(showPromises);
+  // Limit concurrent requests to avoid triggering phish.net rate limits.
+  const CONCURRENCY = 5;
+  const results: (PhishShowSetlist | null)[] = [];
+  for (let i = 0; i < shows.length; i += CONCURRENCY) {
+    const batch = shows.slice(i, i + CONCURRENCY);
+    const batchResults = await Promise.all(
+      batch.map(async (show) => {
+        try {
+          const setlist = await getShowSetList(show.showid);
+          completedShows++;
+          onProgress?.(completedShows, totalShows, show);
+          return setlist;
+        } catch (error) {
+          console.error(`Failed to fetch setlist for show ${show.showid}:`, error);
+          completedShows++;
+          onProgress?.(completedShows, totalShows, show);
+          return null;
+        }
+      }),
+    );
+    results.push(...batchResults);
+  }
   return results.filter(
     (setlist): setlist is PhishShowSetlist => setlist !== null,
   );

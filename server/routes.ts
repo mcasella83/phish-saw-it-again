@@ -21,9 +21,12 @@ async function fetchWithRetry(
       return response;
     }
     const retryAfter = response.headers.get("Retry-After");
-    const waitMs = retryAfter
-      ? parseFloat(retryAfter) * 1000
-      : Math.pow(2, attempt) * 1000;
+    // Cap wait at 8 s — phish.net sometimes sends Retry-After: 300 which would
+    // freeze the request for 5 minutes.
+    const waitMs = Math.min(
+      retryAfter ? parseFloat(retryAfter) * 1000 : Math.pow(2, attempt) * 1000,
+      8000,
+    );
     console.warn(
       `Phish.net rate-limited (429). Retrying in ${waitMs}ms (attempt ${attempt + 1}/${maxRetries})`,
     );
