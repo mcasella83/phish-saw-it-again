@@ -37,10 +37,13 @@ export async function logUserLogin(username: string, showCount: number) {
 }
 
 export async function getLoginHistory(username: string) {
+  if (!db) return [];
   console.log('Getting login history for:', username);
-  const keys = await db.list(`login_${username}`);
+  const result = await db.list(`login_${username}`);
+  if (!result.ok) return [];
+  const keys = result.value;
   console.log('Found keys:', keys);
-  const logins = await Promise.all(keys.map((key) => db.get(key)));
+  const logins = await Promise.all(keys.map((key) => db!.get(key)));
   console.log('Retrieved login history:', logins);
   return logins;
 }

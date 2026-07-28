@@ -147,13 +147,29 @@ export function getVenueStatsFromSetlists(
     .sort((a, b) => b.showCount - a.showCount);
 }
 
+export interface ProcessShowsOptions {
+  /** Called after each show is resolved (from cache or API). */
+  onProgress?: (current: number, total: number, show?: any) => void;
+  /** Return a cached setlist for a showid, or null on a cache miss. */
+  getCached?: (showid: string | number) => PhishShowSetlist | null;
+  /** Persist a freshly-fetched setlist so future visits can skip the API. */
+  setCache?: (showid: string | number, setlist: PhishShowSetlist) => void;
+  /**
+   * The showid that should always be fetched fresh from the API — typically
+   * the most recent show, which may still be in progress or have notes updated.
+   */
+  latestShowId?: string | number;
+}
+
 export async function processShowsData(
   showsData: PhishShowApiResponse,
-  onProgress?: (current: number, total: number, show?: any) => void,
+  options: ProcessShowsOptions = {},
 ): Promise<PhishShowSetlist[]> {
   if (!showsData.data) {
     throw new Error("No show data available");
   }
+
+  const { onProgress, getCached, setCache, latestShowId } = options;
 
   let shows = showsData.data;
   if (LIMIT_SHOWS && LIMIT_SHOWS >= 0 && LIMIT_SHOWS <= shows.length) {
@@ -165,32 +181,64 @@ export async function processShowsData(
 
   // Limit concurrent requests to avoid triggering phish.net rate limits.
   // 3 requests per batch, 600 ms between batches → ~5 req/s, well under phish.net limits.
+  // Shows that are served from cache are resolved immediately and don't count
+  // against the batch; only API fetches go through the throttled queue.
   const CONCURRENCY = 3;
   const BATCH_DELAY_MS = 600;
+
   const results: (PhishShowSetlist | null)[] = [];
-  for (let i = 0; i < shows.length; i += CONCURRENCY) {
+
+  // Separate cached shows (instant) from shows that need an API call.
+  const cachedResults: { index: number; setlist: PhishShowSetlist }[] = [];
+  const toFetch: { index: number; show: (typeof shows)[number] }[] = [];
+
+  shows.forEach((show, index) => {
+    const isLatest = latestShowId !== undefined &&
+      String(show.showid) === String(latestShowId);
+
+    if (!isLatest && getCached) {
+      const cached = getCached(show.showid);
+      if (cached) {
+        cachedResults.push({ index, setlist: cached });
+        return;
+      }
+    }
+    toFetch.push({ index, show });
+  });
+
+  // Pre-fill results array so we can place by original index.
+  results.length = shows.length;
+
+  // Immediately resolve cached entries and report progress.
+  for (const { index, setlist } of cachedResults) {
+    results[index] = setlist;
+    completedShows++;
+    onProgress?.(completedShows, totalShows, shows[index]);
+  }
+
+  // Fetch the remaining shows in rate-limited batches.
+  for (let i = 0; i < toFetch.length; i += CONCURRENCY) {
     if (i > 0) {
       await new Promise((resolve) => setTimeout(resolve, BATCH_DELAY_MS));
     }
-    const batch = shows.slice(i, i + CONCURRENCY);
-    const batchResults = await Promise.all(
-      batch.map(async (show) => {
+    const batch = toFetch.slice(i, i + CONCURRENCY);
+    await Promise.all(
+      batch.map(async ({ index, show }) => {
         try {
           const setlist = await getShowSetList(show.showid);
-          completedShows++;
-          onProgress?.(completedShows, totalShows, show);
-          return setlist;
+          setCache?.(show.showid, setlist);
+          results[index] = setlist;
         } catch (error) {
           console.error(`Failed to fetch setlist for show ${show.showid}:`, error);
-          completedShows++;
-          onProgress?.(completedShows, totalShows, show);
-          return null;
+          results[index] = null;
         }
+        completedShows++;
+        onProgress?.(completedShows, totalShows, show);
       }),
     );
-    results.push(...batchResults);
   }
-  return results.filter(
+
+  return (results as (PhishShowSetlist | null)[]).filter(
     (setlist): setlist is PhishShowSetlist => setlist !== null,
   );
 }

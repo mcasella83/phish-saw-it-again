@@ -20,6 +20,8 @@ import {
   clearShowsCache,
   loadShowsFromCache,
   saveShowsToCache,
+  getCachedSetlist,
+  setCachedSetlist,
 } from "@/lib/storage-utils";
 import Header from "@/components/layout/Header";
 
@@ -55,10 +57,10 @@ export default function HomePage({
       const userData: User = { username };
       setUser(userData);
 
-      // Try to load from cache first
-      const cachedData = loadShowsFromCache();
+      // Try the computed output cache first (valid only for the same username).
+      const cachedData = loadShowsFromCache(username);
       if (cachedData) {
-        console.log("Loading data from cache");
+        console.log("Loading data from output cache");
         setShowsWithSetlists(cachedData.shows);
         setSongStats(cachedData.songs);
         setVenueStats(cachedData.venues);
@@ -71,28 +73,42 @@ export default function HomePage({
       if (!showsData.error && showsData.data) {
         setLoadingMaxShowCount(showsData.data.length);
 
-        let processedShows = await processShowsData(
-          showsData,
-          (current, total, show) => {
+        // The attendance list is sorted oldest-first; the last entry is the
+        // most recent show.  Always fetch that one fresh — it may still be in
+        // progress or have setlist notes being updated.
+        const latestShowId =
+          showsData.data.length > 0
+            ? showsData.data[showsData.data.length - 1].showid
+            : undefined;
+
+        if (latestShowId) {
+          console.log("Most recent show (always fetched fresh):", latestShowId);
+        }
+
+        let processedShows = await processShowsData(showsData, {
+          onProgress: (current, total, show) => {
             setLoadingShowCount(current);
             if (show) {
               setCurrentShowDate(show.showdate);
               setCurrentShowVenue(show.venue);
             }
           },
-        );
+          getCached: getCachedSetlist,
+          setCache: setCachedSetlist,
+          latestShowId,
+        });
 
         const processedSongs = getUniqueSongsFromSetlists(processedShows);
         const processedVenues = getVenueStatsFromSetlists(processedShows);
 
         processedShows = processedShows.reverse();
 
-        // Save processed data to local storage
-        saveShowsToCache({
-          shows: processedShows,
-          songs: processedSongs,
-          venues: processedVenues,
-        });
+        // Save the fully-processed output so future logins for this user are
+        // instant (as long as the show list hasn't changed).
+        saveShowsToCache(
+          { shows: processedShows, songs: processedSongs, venues: processedVenues },
+          username,
+        );
 
         setShowsWithSetlists(processedShows);
         setSongStats(processedSongs);
@@ -148,7 +164,7 @@ export default function HomePage({
       case "shows":
         return (
           <MyShows
-            showsWithSetLists={showsWithSetLists}
+            showsWithSetLists={showsWithSetLists ?? []}
             loading={loading}
             loadingShowCount={loadingShowCount}
             loadingMaxShowCount={loadingMaxShowCount}

@@ -232,7 +232,7 @@ export default function MyShows({
                       dataKey="count"
                       position="center"
                       content={({ x, y, width, height, value, index }) => {
-                        const entry = showsByYear[index];
+                        const entry = index !== undefined ? showsByYear[index] : undefined;
                         if (!entry) return null;
 
                         // Don't render labels if width is too small
