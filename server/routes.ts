@@ -5,34 +5,38 @@ import { userSchema } from "@shared/schema";
 import { logUserLogin } from "./db";
 
 /**
- * Fetch with automatic retry on 429 Too Many Requests.
- * Waits for the delay indicated by the Retry-After header, or falls back to
- * exponential backoff (1 s, 2 s, 4 s …) for up to `maxRetries` attempts.
+ * Server-side rate-limited fetch for the Phish.net API.
+ *
+ * All calls are serialised through a single queue so we never fire more than
+ * one request at a time to phish.net, with a minimum gap of MIN_GAP_MS between
+ * requests.  This is the only reliable way to stay under their rate limit
+ * regardless of how many concurrent browser requests come in.
  */
-async function fetchWithRetry(
-  url: string,
-  options: RequestInit = {},
-  maxRetries = 3,
-): Promise<Response> {
-  let attempt = 0;
-  while (true) {
-    const response = await fetch(url, options);
-    if (response.status !== 429 || attempt >= maxRetries) {
-      return response;
+const MIN_GAP_MS = 250; // max 4 req/s
+let lastRequestTime = 0;
+let phishQueue: Promise<void> = Promise.resolve();
+
+async function phishFetch(url: string, options: RequestInit = {}): Promise<Response> {
+  // Chain onto the shared queue so requests are serialised.
+  const result = phishQueue.then(async () => {
+    const now = Date.now();
+    const wait = Math.max(0, lastRequestTime + MIN_GAP_MS - now);
+    if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+    lastRequestTime = Date.now();
+
+    // Single retry on 429 — if we hit it despite the queue, back off 10 s.
+    let response = await fetch(url, options);
+    if (response.status === 429) {
+      console.warn("Phish.net rate-limited (429) despite queue — backing off 10 s");
+      await new Promise((r) => setTimeout(r, 10_000));
+      lastRequestTime = Date.now();
+      response = await fetch(url, options);
     }
-    const retryAfter = response.headers.get("Retry-After");
-    // Cap wait at 8 s — phish.net sometimes sends Retry-After: 300 which would
-    // freeze the request for 5 minutes.
-    const waitMs = Math.min(
-      retryAfter ? parseFloat(retryAfter) * 1000 : Math.pow(2, attempt) * 1000,
-      8000,
-    );
-    console.warn(
-      `Phish.net rate-limited (429). Retrying in ${waitMs}ms (attempt ${attempt + 1}/${maxRetries})`,
-    );
-    await new Promise((resolve) => setTimeout(resolve, waitMs));
-    attempt++;
-  }
+    return response;
+  });
+  // Keep the queue moving even if this request throws.
+  phishQueue = result.then(() => {}, () => {});
+  return result;
 }
 
 export function registerRoutes(app: Express) {
@@ -67,7 +71,7 @@ export function registerRoutes(app: Express) {
       }
       
       console.log("Fetching shows from Phish.net API:", apiUrl);
-      const response = await fetchWithRetry(apiUrl, {
+      const response = await phishFetch(apiUrl, {
         headers: {
           Accept: "application/json; charset=utf-8",
           "Content-Type": "application/json; charset=utf-8",
@@ -142,7 +146,7 @@ export function registerRoutes(app: Express) {
 
       const apiUrl = `https://api.phish.net/v5/attendance/username/${username}.json?apikey=${apiKey}&order_by=showdate`;
       console.log("Fetching shows from Phish.net API:", apiUrl);
-      const response = await fetchWithRetry(apiUrl, {
+      const response = await phishFetch(apiUrl, {
         headers: {
           Accept: "application/json; charset=utf-8",
           "Content-Type": "application/json; charset=utf-8",
@@ -208,7 +212,7 @@ export function registerRoutes(app: Express) {
         `setlists/setlistid/${showId}.json` +
         `?apikey=${apiKey}&order_by=showdate`;
       console.log("Fetching shows from Phish.net API:", apiUrl);
-      const response = await fetchWithRetry(apiUrl, {
+      const response = await phishFetch(apiUrl, {
         headers: {
           Accept: "application/json; charset=utf-8",
           "Content-Type": "application/json; charset=utf-8",

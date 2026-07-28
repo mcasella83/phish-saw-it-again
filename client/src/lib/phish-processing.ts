@@ -164,9 +164,14 @@ export async function processShowsData(
   let completedShows = 0;
 
   // Limit concurrent requests to avoid triggering phish.net rate limits.
-  const CONCURRENCY = 5;
+  // 3 requests per batch, 600 ms between batches → ~5 req/s, well under phish.net limits.
+  const CONCURRENCY = 3;
+  const BATCH_DELAY_MS = 600;
   const results: (PhishShowSetlist | null)[] = [];
   for (let i = 0; i < shows.length; i += CONCURRENCY) {
+    if (i > 0) {
+      await new Promise((resolve) => setTimeout(resolve, BATCH_DELAY_MS));
+    }
     const batch = shows.slice(i, i + CONCURRENCY);
     const batchResults = await Promise.all(
       batch.map(async (show) => {
