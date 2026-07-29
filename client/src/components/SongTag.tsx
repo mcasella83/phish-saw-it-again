@@ -39,7 +39,7 @@ export const SongTag = ({ type, className }: SongTagProps) => {
     return (
       <span
         className={cn(
-          "text-xs text-muted-foreground/70 font-normal tracking-wide",
+          "text-xs text-blue-900 font-normal tracking-wide",
           className,
         )}
       >

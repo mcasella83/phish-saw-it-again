@@ -393,18 +393,33 @@ export default function MyShows({
                                               className="ml-2"
                                             />
                                           )}
-                                          {song.isFirstTimeHeard && (
-                                            <SongTag
-                                              type="firstTime"
-                                              className="ml-2"
-                                            />
-                                          )}
-                                          {song.isLastTimeHeard && (
-                                            <SongTag
-                                              type="lastTime"
-                                              className="ml-1"
-                                            />
-                                          )}
+                                          {song.isFirstTimeHeard &&
+                                            !song.isLastTimeHeard && (
+                                              <SongTag
+                                                type="firstTime"
+                                                className="ml-2"
+                                              />
+                                            )}
+                                          {song.isLastTimeHeard &&
+                                            !song.isFirstTimeHeard && (
+                                              <SongTag
+                                                type="lastTime"
+                                                className="ml-1"
+                                              />
+                                            )}
+                                          {song.isFirstTimeHeard &&
+                                            song.isLastTimeHeard && (
+                                              <>
+                                                <SongTag
+                                                  type="firstTime"
+                                                  className="ml-2"
+                                                />
+                                                <SongTag
+                                                  type="only"
+                                                  className="ml-1"
+                                                />
+                                              </>
+                                            )}
                                           {/* {song.isFirstTimeHeardOpener && (
                                             <SongTag
                                               type="firstOpener"
