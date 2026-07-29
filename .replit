@@ -40,3 +40,8 @@ task = "packager.installForAll"
 task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
+
+[userenv]
+
+[userenv.production]
+PHISH_NET_API_KEY = "13D50F83A597EAF9C947"
