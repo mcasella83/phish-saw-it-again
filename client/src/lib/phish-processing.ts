@@ -180,10 +180,10 @@ export async function processShowsData(
   let completedShows = 0;
 
   // Limit concurrent requests to avoid triggering phish.net rate limits.
-  // 3 requests per batch, 600 ms between batches → ~5 req/s, well under phish.net limits.
+  // 10 requests per batch, 600 ms between batches → ~16 req/s, within phish.net limits.
   // Shows that are served from cache are resolved immediately and don't count
   // against the batch; only API fetches go through the throttled queue.
-  const CONCURRENCY = 3;
+  const CONCURRENCY = 10;
   const BATCH_DELAY_MS = 600;
 
   const results: (PhishShowSetlist | null)[] = [];
