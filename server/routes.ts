@@ -40,6 +40,10 @@ async function phishFetch(url: string, options: RequestInit = {}): Promise<Respo
 }
 
 export function registerRoutes(app: Express) {
+  // Startup diagnostic — logs key presence/length without revealing the value
+  const _diagKey = process.env.PHISH_NET_API_KEY;
+  console.log(`[startup] PHISH_NET_API_KEY present=${!!_diagKey} length=${_diagKey?.length ?? 0}`);
+
   app.get("/api/phish/search", async (req, res) => {
     try {
       const apiKey = process.env.PHISH_NET_API_KEY;
