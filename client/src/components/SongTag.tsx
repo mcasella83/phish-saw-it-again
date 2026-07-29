@@ -15,10 +15,9 @@ interface SongTagProps {
   className?: string;
 }
 
-const tagStyles: Record<TagType, string> = {
+const tagStyles: Record<Exclude<TagType, "lastTime">, string> = {
   bustout: "bg-purple-500 hover:bg-purple-600",
   firstTime: "bg-green-500 hover:bg-green-600",
-  lastTime: "bg-red-500 hover:bg-red-600",
   firstOpener: "bg-blue-500 hover:bg-blue-600",
   firstCloser: "bg-blue-500 hover:bg-blue-600",
   firstEncore: "bg-blue-500 hover:bg-blue-600",
@@ -28,7 +27,7 @@ const tagStyles: Record<TagType, string> = {
 const tagLabels: Record<TagType, string> = {
   bustout: "Bust",
   firstTime: "1st",
-  lastTime: "Last",
+  lastTime: "last",
   firstOpener: "Open",
   firstCloser: "Close",
   firstEncore: "Encore",
@@ -36,6 +35,19 @@ const tagLabels: Record<TagType, string> = {
 };
 
 export const SongTag = ({ type, className }: SongTagProps) => {
+  if (type === "lastTime") {
+    return (
+      <span
+        className={cn(
+          "text-xs text-muted-foreground/70 font-normal tracking-wide",
+          className,
+        )}
+      >
+        {tagLabels[type]}
+      </span>
+    );
+  }
+
   return (
     <Badge
       variant="default"
