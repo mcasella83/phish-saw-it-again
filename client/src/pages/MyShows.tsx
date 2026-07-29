@@ -400,13 +400,7 @@ export default function MyShows({
                                                 className="ml-2"
                                               />
                                             )}
-                                          {song.isLastTimeHeard &&
-                                            !song.isFirstTimeHeard && (
-                                              <SongTag
-                                                type="lastTime"
-                                                className="ml-1"
-                                              />
-                                            )}
+
                                           {song.isFirstTimeHeard &&
                                             song.isLastTimeHeard && (
                                               <>
