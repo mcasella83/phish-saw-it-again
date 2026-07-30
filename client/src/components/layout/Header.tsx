@@ -5,6 +5,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { clearShowsCache } from "@/lib/storage-utils";
+import { useState } from "react";
 
 interface HeaderProps {
   showNavigation?: boolean;
@@ -24,11 +25,17 @@ export default function Header({
   onRefresh,
 }: HeaderProps) {
   const isMobile = useIsMobile();
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const handleSignOut = () => {
     localStorage.removeItem("phish-explorer-username");
     clearShowsCache();
     window.location.reload();
+  };
+
+  const handleNavClick = (tab: string) => {
+    onTabChange?.(tab);
+    setSheetOpen(false);
   };
 
   const NavItems = () => (
@@ -41,7 +48,7 @@ export default function Header({
               "hover:bg-accent hover:text-accent-foreground",
               activeTab === "shows" && "bg-accent/50",
             )}
-            onClick={() => onTabChange?.("shows")}
+            onClick={() => handleNavClick("shows")}
           >
             My Shows
           </button>
@@ -51,7 +58,7 @@ export default function Header({
               "hover:bg-accent hover:text-accent-foreground",
               activeTab === "songs" && "bg-accent/50",
             )}
-            onClick={() => onTabChange?.("songs")}
+            onClick={() => handleNavClick("songs")}
           >
             My Songs
           </button>
@@ -61,26 +68,30 @@ export default function Header({
               "hover:bg-accent hover:text-accent-foreground",
               activeTab === "venues" && "bg-accent/50",
             )}
-            onClick={() => onTabChange?.("venues")}
+            onClick={() => handleNavClick("venues")}
           >
             My Venues
           </button>
         </>
       )}
-      <Link href="/search" 
+      <Link href="/search"
         className={cn(
           "w-full text-left px-4 py-2 text-sm font-medium transition-colors block",
           "hover:bg-accent hover:text-accent-foreground",
           activeTab === "search" && "bg-accent/50",
-        )}>
+        )}
+        onClick={() => setSheetOpen(false)}
+      >
         Show Search
       </Link>
-      <Link href="/about" 
+      <Link href="/about"
         className={cn(
           "w-full text-left px-4 py-2 text-sm font-medium transition-colors block",
           "hover:bg-accent hover:text-accent-foreground",
           activeTab === "about" && "bg-accent/50",
-        )}>
+        )}
+        onClick={() => setSheetOpen(false)}
+      >
         About
       </Link>
     </>
@@ -127,7 +138,7 @@ export default function Header({
         </div>
 
         {isMobile ? (
-          <Sheet>
+          <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
                 <Menu className="h-5 w-5" />
