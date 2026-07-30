@@ -18,8 +18,6 @@ import { LoadingModal } from "@/components/ui/LoadingModal";
 import { SongTagsDemo } from "@/components/SongTagsDemo";
 import {
   clearShowsCache,
-  loadShowsFromCache,
-  saveShowsToCache,
   getCachedSetlist,
   setCachedSetlist,
 } from "@/lib/storage-utils";
@@ -57,16 +55,9 @@ export default function HomePage({
       const userData: User = { username };
       setUser(userData);
 
-      // Try the computed output cache first (valid only for the same username).
-      const cachedData = loadShowsFromCache(username);
-      if (cachedData) {
-        console.log("Loading data from output cache");
-        setShowsWithSetlists(cachedData.shows);
-        setSongStats(cachedData.songs);
-        setVenueStats(cachedData.venues);
-        return;
-      }
-
+      // Always fetch fresh attendance from phish.net so new shows are detected.
+      // Individual setlists are still served from the per-setlist cache so old
+      // shows never need an API call; only genuinely new shows hit the network.
       const showsData = await getShowsByUsername(username);
       console.log("Shows data received:", showsData.data.length);
 
@@ -102,13 +93,6 @@ export default function HomePage({
         const processedVenues = getVenueStatsFromSetlists(processedShows);
 
         processedShows = processedShows.reverse();
-
-        // Save the fully-processed output so future logins for this user are
-        // instant (as long as the show list hasn't changed).
-        saveShowsToCache(
-          { shows: processedShows, songs: processedSongs, venues: processedVenues },
-          username,
-        );
 
         setShowsWithSetlists(processedShows);
         setSongStats(processedSongs);
@@ -147,6 +131,15 @@ export default function HomePage({
       loadUserData(savedUsername);
     }
   }, []);
+
+  const handleRefresh = async () => {
+    if (!user) return;
+    clearShowsCache();
+    setShowsWithSetlists(null);
+    setSongStats(null);
+    setVenueStats(null);
+    await loadUserData(user.username);
+  };
 
   const handleSubmit = async (data: User) => {
     try {
@@ -189,6 +182,7 @@ export default function HomePage({
         onTabChange={onTabChange}
         isLoggedIn={!!user}
         username={user?.username || ""}
+        onRefresh={user ? handleRefresh : undefined}
       />
       {user && showsWithSetLists ? (
         <div className="w-full px-8 pb-8">

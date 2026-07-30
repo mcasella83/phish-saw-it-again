@@ -12,6 +12,7 @@ interface HeaderProps {
   onTabChange?: (value: string) => void;
   isLoggedIn?: boolean;
   username?: string;
+  onRefresh?: () => void;
 }
 
 export default function Header({
@@ -20,6 +21,7 @@ export default function Header({
   onTabChange,
   isLoggedIn = false,
   username = "",
+  onRefresh,
 }: HeaderProps) {
   const isMobile = useIsMobile();
 
@@ -106,6 +108,14 @@ export default function Header({
               <span className="text-muted-foreground">
                 Viewing stats for: {username}
               </span>
+              {onRefresh && (
+                <button
+                  onClick={onRefresh}
+                  className="text-blue-500 hover:text-blue-700 transition-colors"
+                >
+                  Refresh Stats
+                </button>
+              )}
               <button
                 onClick={handleSignOut}
                 className="text-blue-500 hover:text-blue-700 transition-colors"
